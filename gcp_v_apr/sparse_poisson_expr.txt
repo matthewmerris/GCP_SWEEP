@@ -1,0 +1,282 @@
+Sparsity: 1.0% (0.01)
+
+CP_ALS:
+ Iter 10: f = 3.935306e-01 f-delta = 8.3e-06
+ Final f = 3.935306e-01 
+Elapsed time is 24.086150 seconds.
+
+factor_match_score_als =
+
+    0.8641
+
+Final fit: 3.935306e-01 
+
+
+CP_PQNR (alternating Poisson regression using quasi-Newton)
+  Precomputing sparse index sets...done
+  10. Ttl Inner Its: 23759, KKT viol = 9.57e+00, obj = 8.29504312e+06, nz: 1654
+  20. Ttl Inner Its: 19550, KKT viol = 2.96e-01, obj = 8.14201862e+06, nz: 1185
+  30. Ttl Inner Its: 18685, KKT viol = 1.52e-01, obj = 8.14154266e+06, nz: 1164
+  40. Ttl Inner Its: 19965, KKT viol = 3.01e-01, obj = 8.14101916e+06, nz: 1100
+  50. Ttl Inner Its: 20062, KKT viol = 1.17e+00, obj = 7.81124852e+06, nz: 370
+  60. Ttl Inner Its: 4803, KKT viol = 2.35e-02, obj = 7.81110408e+06, nz: 368
+  70. Ttl Inner Its: 2664, KKT viol = 1.72e-02, obj = 7.81110339e+06, nz: 368
+  80. Ttl Inner Its: 2440, KKT viol = 6.38e-04, obj = 7.81110336e+06, nz: 368
+  90. Ttl Inner Its: 2409, KKT viol = 2.67e-04, obj = 7.81110336e+06, nz: 368
+===========================================
+ Final log-likelihood = -7.811103e+06 
+ Final least squares fit = 3.969119e-01 
+ Final KKT violation = 9.9260134e-05
+ Total inner iterations = 1243713
+ Total execution time = 359.99 secs
+Elapsed time is 361.370015 seconds.
+
+factor_match_score_apr =
+
+    0.9988
+
+Final fit: 3.969119e-01 
+
+
+GCP-OPT-ADAM (Generalized CP Tensor Decomposition)
+
+Tensor size: 1000 x 800 x 600 (480000000 total entries)
+Sparse tensor: 2878800 (0.6%) Nonzeros and 477121200 (99.40%) Zeros
+Generalized function Type: count
+Objective function: @(x,m)m-x.*log(m+1e-10)
+Gradient function: @(x,m)1-x./(m+1e-10)
+Lower bound of factor matrices: 0
+Optimization method: adam
+Max iterations (epochs): 1000
+Iterations per epoch: 1000
+Learning rate / decay / maxfails: 0.001 0.1 1
+Function Sampler: stratified with 100000 nonzero and 100000 zero samples
+Gradient Sampler: stratified with 8637 nonzero and 8637 zero samples
+
+Begin Main loop
+Initial f-est: 8.380390e+07
+Epoch 10: f-est = 8.276681e+06, step = 0.001
+Epoch 18: f-est = 8.152718e+06, step = 0.001, nfails = 1 (resetting to solution from last epoch)
+Epoch 20: f-est = 7.995742e+06, step = 0.0001
+Epoch 30: f-est = 7.843505e+06, step = 0.0001
+Epoch 36: f-est = 7.833184e+06, step = 0.0001, nfails = 2 (resetting to solution from last epoch)
+End Main Loop
+
+Final f-est: 7.8329e+06
+Setup time: 0.55 seconds
+Main loop time: 276.38 seconds
+Total iterations: 36000
+Elapsed time is 277.413944 seconds.
+
+factor_match_score_gcp =
+
+    0.9925
+
+Final fit: 3.963107e-01
+
+Sparsity: 0.1% (0.001)
+CP_ALS:
+ Iter 10: f = 7.474245e-02 f-delta = 3.8e-05
+ Final f = 7.474245e-02
+Elapsed time is 2.648361 seconds.
+
+factor_match_score_als =
+
+    0.6120
+
+Final fit: 7.474245e-02
+
+
+CP_PQNR (alternating Poisson regression using quasi-Newton)
+  Precomputing sparse index sets...done
+  10. Ttl Inner Its: 19335, KKT viol = 2.08e-01, obj = 1.92109802e+06, nz: 4084
+  20. Ttl Inner Its: 14100, KKT viol = 1.10e-01, obj = 1.92099619e+06, nz: 4062
+  30. Ttl Inner Its: 11615, KKT viol = 8.81e-02, obj = 1.92097245e+06, nz: 4047
+  40. Ttl Inner Its: 11335, KKT viol = 1.09e-01, obj = 1.92095382e+06, nz: 4054
+  50. Ttl Inner Its: 10661, KKT viol = 4.68e-02, obj = 1.92094413e+06, nz: 4081
+  60. Ttl Inner Its: 9412, KKT viol = 2.24e-02, obj = 1.92093796e+06, nz: 4067
+  70. Ttl Inner Its: 9048, KKT viol = 9.94e-02, obj = 1.92093033e+06, nz: 4058
+  80. Ttl Inner Its: 7714, KKT viol = 1.65e-02, obj = 1.92092868e+06, nz: 4055
+  90. Ttl Inner Its: 8077, KKT viol = 3.20e-02, obj = 1.92092575e+06, nz: 4056
+ 100. Ttl Inner Its: 6407, KKT viol = 5.96e-03, obj = 1.92092453e+06, nz: 4056
+ 110. Ttl Inner Its: 6123, KKT viol = 2.06e-02, obj = 1.92092440e+06, nz: 4053
+ 120. Ttl Inner Its: 7065, KKT viol = 8.51e-03, obj = 1.92092320e+06, nz: 4049
+ 130. Ttl Inner Its: 8858, KKT viol = 5.37e-02, obj = 1.92092200e+06, nz: 4039
+ 140. Ttl Inner Its: 8389, KKT viol = 1.10e-02, obj = 1.92091860e+06, nz: 4040
+ 150. Ttl Inner Its: 7074, KKT viol = 7.26e-03, obj = 1.92091820e+06, nz: 4040
+ 160. Ttl Inner Its: 7803, KKT viol = 3.00e-02, obj = 1.92091772e+06, nz: 4043
+ 170. Ttl Inner Its: 9243, KKT viol = 1.13e-01, obj = 1.92091607e+06, nz: 4042
+ 180. Ttl Inner Its: 6420, KKT viol = 5.56e-03, obj = 1.92091571e+06, nz: 4031
+ 190. Ttl Inner Its: 6899, KKT viol = 2.12e-02, obj = 1.92091511e+06, nz: 4038
+ 200. Ttl Inner Its: 7136, KKT viol = 3.72e-02, obj = 1.92091427e+06, nz: 4041
+ 210. Ttl Inner Its: 5059, KKT viol = 8.23e-03, obj = 1.92091390e+06, nz: 4044
+ 220. Ttl Inner Its: 3979, KKT viol = 4.83e-03, obj = 1.92091385e+06, nz: 4047
+ 230. Ttl Inner Its: 3061, KKT viol = 6.64e-03, obj = 1.92091383e+06, nz: 4049
+ 240. Ttl Inner Its: 3214, KKT viol = 9.24e-03, obj = 1.92091382e+06, nz: 4048
+ 250. Ttl Inner Its: 3994, KKT viol = 3.97e-03, obj = 1.92091379e+06, nz: 4047
+ 260. Ttl Inner Its: 2716, KKT viol = 4.71e-04, obj = 1.92091379e+06, nz: 4047
+ 270. Ttl Inner Its: 2486, KKT viol = 2.31e-04, obj = 1.92091378e+06, nz: 4047
+ 280. Ttl Inner Its: 2475, KKT viol = 2.13e-04, obj = 1.92091378e+06, nz: 4047
+===========================================
+ Final log-likelihood = -1.920914e+06
+ Final least squares fit = 7.543274e-02
+ Final KKT violation = 9.7833701e-05
+ Total inner iterations = 2236165
+ Total execution time = 455.01 secs
+Elapsed time is 455.170418 seconds.
+
+factor_match_score_apr =
+
+    0.7900
+
+Final fit: 7.543274e-02
+
+
+GCP-OPT-ADAM (Generalized CP Tensor Decomposition)
+
+Tensor size: 1000 x 800 x 600 (480000000 total entries)
+Sparse tensor: 442096 (0.092%) Nonzeros and 479557904 (99.91%) Zeros
+Generalized function Type: count
+Objective function: @(x,m)m-x.*log(m+1e-10)
+Gradient function: @(x,m)1-x./(m+1e-10)
+Lower bound of factor matrices: 0
+Optimization method: adam
+Max iterations (epochs): 1000
+Iterations per epoch: 1000
+Learning rate / decay / maxfails: 0.001 0.1 1
+Function Sampler: stratified with 100000 nonzero and 100000 zero samples
+Gradient Sampler: stratified with 1327 nonzero and 1327 zero samples
+
+Begin Main loop
+Initial f-est: 1.710025e+07
+Epoch 10: f-est = 2.035550e+06, step = 0.001
+Epoch 12: f-est = 2.026469e+06, step = 0.001, nfails = 1 (resetting to solution from last epoch)
+Epoch 20: f-est = 1.900075e+06, step = 0.0001
+Epoch 30: f-est = 1.876280e+06, step = 0.0001
+Epoch 33: f-est = 1.874374e+06, step = 0.0001, nfails = 2 (resetting to solution from last epoch)
+End Main Loop
+
+Final f-est: 1.8734e+06
+Setup time: 0.22 seconds
+Main loop time: 57.14 seconds
+Total iterations: 33000
+Elapsed time is 57.513637 seconds.
+
+factor_match_score_gcp =
+
+    0.9048
+
+Final fit: 7.683354e-02
+
+Sparsity: 0.05% (0.0005)
+
+
+CP_ALS:
+ Iter  5: f = 3.965442e-02 f-delta = 3.2e-05
+ Final f = 3.965442e-02 
+Elapsed time is 0.704581 seconds.
+
+factor_match_score_als =
+
+    0.3742
+
+Final fit: 3.965442e-02 
+
+
+CP_PQNR (alternating Poisson regression using quasi-Newton)
+  Precomputing sparse index sets...done
+  10. Ttl Inner Its: 20412, KKT viol = 4.80e-01, obj = 1.17244911e+06, nz: 8206
+  20. Ttl Inner Its: 17979, KKT viol = 4.10e-01, obj = 1.17226819e+06, nz: 8243
+  30. Ttl Inner Its: 16676, KKT viol = 3.61e-01, obj = 1.17220956e+06, nz: 8243
+  40. Ttl Inner Its: 19017, KKT viol = 2.71e-01, obj = 1.17215187e+06, nz: 8227
+  50. Ttl Inner Its: 16561, KKT viol = 2.48e-01, obj = 1.13101515e+06, nz: 7443
+  60. Ttl Inner Its: 13139, KKT viol = 3.48e-01, obj = 1.13099220e+06, nz: 7442
+  70. Ttl Inner Its: 11549, KKT viol = 3.80e-02, obj = 1.13097174e+06, nz: 7459
+  80. Ttl Inner Its: 10730, KKT viol = 8.18e-02, obj = 1.13096226e+06, nz: 7453
+  90. Ttl Inner Its: 10346, KKT viol = 4.06e-02, obj = 1.13095905e+06, nz: 7452
+ 100. Ttl Inner Its: 9278, KKT viol = 3.18e-02, obj = 1.13095784e+06, nz: 7445
+ 110. Ttl Inner Its: 9494, KKT viol = 6.91e-02, obj = 1.13095096e+06, nz: 7458
+ 120. Ttl Inner Its: 8729, KKT viol = 1.19e-01, obj = 1.13094757e+06, nz: 7462
+ 130. Ttl Inner Its: 9778, KKT viol = 4.64e-02, obj = 1.13094380e+06, nz: 7460
+ 140. Ttl Inner Its: 8010, KKT viol = 6.32e-02, obj = 1.13094152e+06, nz: 7461
+ 150. Ttl Inner Its: 8059, KKT viol = 2.07e-02, obj = 1.13093885e+06, nz: 7460
+ 160. Ttl Inner Its: 9135, KKT viol = 3.56e-02, obj = 1.13093734e+06, nz: 7464
+ 170. Ttl Inner Its: 10726, KKT viol = 1.29e-01, obj = 1.13093194e+06, nz: 7462
+ 180. Ttl Inner Its: 9891, KKT viol = 3.81e-02, obj = 1.13092751e+06, nz: 7454
+ 190. Ttl Inner Its: 10158, KKT viol = 4.06e-02, obj = 1.13092510e+06, nz: 7445
+ 200. Ttl Inner Its: 14416, KKT viol = 6.79e-01, obj = 1.13090758e+06, nz: 7431
+ 210. Ttl Inner Its: 17107, KKT viol = 2.66e-01, obj = 1.08228198e+06, nz: 6639
+ 220. Ttl Inner Its: 2732, KKT viol = 1.17e-02, obj = 1.08227961e+06, nz: 6654
+ 230. Ttl Inner Its: 2471, KKT viol = 2.66e-03, obj = 1.08227958e+06, nz: 6655
+ 240. Ttl Inner Its: 2432, KKT viol = 7.40e-04, obj = 1.08227958e+06, nz: 6655
+ 250. Ttl Inner Its: 2407, KKT viol = 6.91e-04, obj = 1.08227958e+06, nz: 6655
+ 260. Ttl Inner Its: 2403, KKT viol = 7.80e-04, obj = 1.08227958e+06, nz: 6655
+ 270. Ttl Inner Its: 2403, KKT viol = 8.09e-04, obj = 1.08227958e+06, nz: 6655
+ 280. Ttl Inner Its: 2402, KKT viol = 9.18e-04, obj = 1.08227958e+06, nz: 6655
+ 290. Ttl Inner Its: 2403, KKT viol = 1.02e-03, obj = 1.08227958e+06, nz: 6655
+ 300. Ttl Inner Its: 2405, KKT viol = 1.13e-03, obj = 1.08227958e+06, nz: 6655
+ 310. Ttl Inner Its: 2412, KKT viol = 1.22e-03, obj = 1.08227958e+06, nz: 6655
+ 320. Ttl Inner Its: 2408, KKT viol = 1.36e-03, obj = 1.08227958e+06, nz: 6655
+ 330. Ttl Inner Its: 2407, KKT viol = 1.47e-03, obj = 1.08227958e+06, nz: 6655
+ 340. Ttl Inner Its: 2410, KKT viol = 1.66e-03, obj = 1.08227958e+06, nz: 6655
+ 350. Ttl Inner Its: 2404, KKT viol = 1.84e-03, obj = 1.08227958e+06, nz: 6655
+ 360. Ttl Inner Its: 2424, KKT viol = 1.98e-03, obj = 1.08227958e+06, nz: 6655
+ 370. Ttl Inner Its: 2408, KKT viol = 2.25e-03, obj = 1.08227958e+06, nz: 6655
+ 380. Ttl Inner Its: 2409, KKT viol = 2.49e-03, obj = 1.08227958e+06, nz: 6655
+ 390. Ttl Inner Its: 2416, KKT viol = 2.76e-03, obj = 1.08227958e+06, nz: 6655
+ 400. Ttl Inner Its: 2400, KKT viol = 9.75e-05, obj = 1.08227957e+06, nz: 6656
+===========================================
+ Final log-likelihood = -1.082280e+06 
+ Final least squares fit = 4.468454e-02 
+ Final KKT violation = 9.7472078e-05
+ Total inner iterations = 3174663
+ Total execution time = 547.17 secs
+Elapsed time is 547.241952 seconds.
+
+factor_match_score_apr =
+
+    0.9809
+
+Final fit: 4.468454e-02 
+
+
+GCP-OPT-ADAM (Generalized CP Tensor Decomposition)
+
+Tensor size: 1000 x 800 x 600 (480000000 total entries)
+Sparse tensor: 229157 (0.048%) Nonzeros and 479770843 (99.95%) Zeros
+Generalized function Type: count
+Objective function: @(x,m)m-x.*log(m+1e-10)
+Gradient function: @(x,m)1-x./(m+1e-10)
+Lower bound of factor matrices: 0
+Optimization method: adam
+Max iterations (epochs): 1000
+Iterations per epoch: 1000
+Learning rate / decay / maxfails: 0.001 0.1 1
+Function Sampler: stratified with 100000 nonzero and 100000 zero samples
+Gradient Sampler: stratified with 1000 nonzero and 1000 zero samples
+
+Begin Main loop
+Initial f-est: 1.149860e+07
+Epoch  7: f-est = 1.206988e+06, step = 0.001, nfails = 1 (resetting to solution from last epoch)
+Epoch 10: f-est = 1.163426e+06, step = 0.0001
+Epoch 20: f-est = 1.118758e+06, step = 0.0001
+Epoch 30: f-est = 1.103414e+06, step = 0.0001
+Epoch 32: f-est = 1.103412e+06, step = 0.0001, nfails = 2 (resetting to solution from last epoch)
+End Main Loop
+
+Final f-est: 1.1032e+06
+Setup time: 0.18 seconds
+Main loop time: 50.47 seconds
+Total iterations: 32000
+Elapsed time is 50.722968 seconds.
+
+factor_match_score_gcp =
+
+    0.7026
+
+Final fit: 4.298366e-02
+
+
+Sparsity: 0.01% (0.0001)
+
+
