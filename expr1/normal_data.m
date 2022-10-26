@@ -1,7 +1,7 @@
 % some basic params
 size = [50 50 50];
 R = 5;
-num_runs = 5;
+num_runs = 100;
 
 losses = {'normal' 'huber (0.25)'};
 num_losses = length(losses);
@@ -41,8 +41,16 @@ for run = 1:num_runs
         fits_gcp(i,run) = 1 - norm(X-full(M_gcp))/norm(X);
 %         loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
         cossim_gcp(i,run) = cosSim(X, M_gcp, ndims(X));
-        fprintf('Final fit: %e \n\n', fits_gcp(i,run));
+%         fprintf('Final fit: %e \n\n', fits_gcp(i,run));
     end
 end
 
 
+%% one plot to rule them all
+figure;
+subplot(1,3,1);
+scatter(categorical(losses), mean(fits_gcp,2));
+subplot(1,3,2);
+scatter(categorical(losses), mean(scores_gcp,2));
+subplot(1,3,3);
+scatter(categorical(losses), mean(cossim_gcp,2));
