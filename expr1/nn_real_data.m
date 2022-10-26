@@ -32,7 +32,7 @@ for run = 1:num_runs
     M_true = info.Soln;
     viz(M_true, 'Figure', 1);
     % create a guess
-    M_init = create_guess('Data', X, 'Num_factors', R,'Factor_Generator', 'randn');
+    M_init = create_guess('Data', X, 'Num_factors', R,'Factor_Generator', 'rand');
     M_init = ktensor(M_init);
     
     % feed problem and guess to gcp, cp-opt

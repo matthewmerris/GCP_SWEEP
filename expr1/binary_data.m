@@ -1,6 +1,6 @@
 % some basic params
 size = [100 100 100];
-R = 100;
+R = 10;
 num_runs = 10;
 
 losses = {'normal' 'bernoulli-odds' 'bernoulli-logit'};
@@ -25,7 +25,6 @@ cossim_gcp = zeros(num_losses, num_runs);
 for run = 1:num_runs
     % create a problem
     X, M_true, info = create_problem_binary(size, R);
-    X = full(X);
     % create a guess
     M_init = create_guess('Data', X, 'Num_factors', R,'Factor_Generator', 'nvecs');
     M_init = ktensor(M_init);
