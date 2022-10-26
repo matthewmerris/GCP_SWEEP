@@ -57,3 +57,5 @@ title('Score')
 subplot(1,3,3);
 scatter(categorical(losses), mean(cossim_gcp,2));
 title('Cos Similarity');
+
+sgtitle('Normal Data');
