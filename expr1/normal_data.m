@@ -46,11 +46,14 @@ for run = 1:num_runs
 end
 
 
-%% one plot to rule them all
+%% one plot to rule them all, higher scores are better
 figure;
-subplot(1,3,1);
-scatter(categorical(losses), mean(fits_gcp,2));
-subplot(1,3,2);
+subplot(1,3,1)
+scatter(categorical(losses), mean(fits_gcp,2))
+title('Fit')
+subplot(1,3,2)
 scatter(categorical(losses), mean(scores_gcp,2));
+title('Score')
 subplot(1,3,3);
 scatter(categorical(losses), mean(cossim_gcp,2));
+title('Cos Similarity');
