@@ -1,5 +1,5 @@
 % some basic params
-sz = [50 50 50];
+sz = [20 20 10];
 R = 5;
 num_runs = 100;
 dims = length(sz);
@@ -52,18 +52,32 @@ for noise_lvl = 0.1:0.2:1
 
 
     % one plot to rule them all, higher scores are better
-    subplot(5,3,counter*3 + 1)
+    subplot(5,6,counter*6 + 1)
     scatter(categorical(losses), mean(fits_gcp,2))
 %     ylim([-inf, 1.01]);
+    title('Fit - mean')
+    
+    subplot(5,6,counter*6 + 2)
+    boxplot(fits_gcp.', losses)
     title('Fit')
-    subplot(5,3,counter*3 + 2)
+    
+    subplot(5,6,counter*6 + 3);
     scatter(categorical(losses), mean(scores_gcp,2));
 %     ylim([-0.01, 1.01]);
+    title('Score - mean')
+    
+    subplot(5,6,counter*6 + 4);
+    boxplot(scores_gcp.', losses);
     title('Score')
-    subplot(5,3,counter*3 + 3);
+    
+    subplot(5,6,counter*6 + 5);
     scatter(categorical(losses), mean(cossim_gcp,2));
 %     ylim([-0.01, 1.01]);
-    title('Cos Similarity');
+    title('Cos Similarity - mean');
+    
+    subplot(5,6,counter*6 + 6);
+    boxplot(cossim_gcp.', losses)
+    title('Cos Similarity')
     counter = counter + 1;
     
 end
