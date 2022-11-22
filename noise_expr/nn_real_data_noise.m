@@ -1,14 +1,14 @@
 % some basic params
-sz = [20 20 10];
-R = 5;
-num_runs = 100;
+sz = [10 10 10];
+R = 3;
+num_runs = 5000;
 dims = length(sz);
 
 losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
 num_losses = length(losses);
 counter = 0;
 
-for noise_lvl = 0.1:0.2:1
+for noise_lvl = 0:0.2:1
     % containers for results
     times_opt = zeros(1, num_runs);
     times_gcp = zeros(num_losses, num_runs);
@@ -29,13 +29,17 @@ for noise_lvl = 0.1:0.2:1
 
     for run = 1:num_runs
         % create a problem
-        info = NN_tensor_generator('Size', sz, 'Num_factors', R);
+        info = NN_tensor_generator_fancy('Size', sz, 'Num_factors', R);
         X = info.Data;
         M_true = info.Soln;
         % add gaussian noise to solution factors for initial guess
         M_init = info.Soln;
         for i = 1:dims
-            M_init.U{i} = M_init.U{i} + noise_lvl.*randn(size(M_init.U{i}));
+            % M_init.U{i} = M_init.U{i} +
+            % noise_lvl.*randn(size(M_init.U{i}));  ****DUBIOUS****
+            N = randn(size(M_init.U{i}));
+            nz_scale = norm(M_init.U{i}, 'fro')/norm(N,'fro');
+            M_init.U{i} = M_init.U{i} + noise_lvl * nz_scale * N;   % noisify
         end
         % feed problem and guess to gcp, cp-opt
         for i = 1:num_losses
@@ -52,34 +56,34 @@ for noise_lvl = 0.1:0.2:1
 
 
     % one plot to rule them all, higher scores are better
-    subplot(5,6,counter*6 + 1)
+    figure;
+    subplot(2,3,1)
     scatter(categorical(losses), mean(fits_gcp,2))
 %     ylim([-inf, 1.01]);
     title('Fit - mean')
     
-    subplot(5,6,counter*6 + 2)
+    subplot(2,3,4)
     boxplot(fits_gcp.', losses)
     title('Fit')
     
-    subplot(5,6,counter*6 + 3);
+    subplot(2,3,2);
     scatter(categorical(losses), mean(scores_gcp,2));
 %     ylim([-0.01, 1.01]);
     title('Score - mean')
     
-    subplot(5,6,counter*6 + 4);
+    subplot(2,3,5);
     boxplot(scores_gcp.', losses);
     title('Score')
     
-    subplot(5,6,counter*6 + 5);
+    subplot(2,3,3);
     scatter(categorical(losses), mean(cossim_gcp,2));
 %     ylim([-0.01, 1.01]);
     title('Cos Similarity - mean');
     
-    subplot(5,6,counter*6 + 6);
+    subplot(2,3,6);
     boxplot(cossim_gcp.', losses)
     title('Cos Similarity')
     counter = counter + 1;
-    
+    sgtitle("Non-negative Data (Rayleigh) - Noise level: " + noise_lvl + "*(Gaussian noise)");
 end
 
-sgtitle('Non-negative Data (Rayleigh)');
