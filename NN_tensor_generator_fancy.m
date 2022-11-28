@@ -39,7 +39,7 @@ switch pdf
     case 'rayleigh'
         factor_generator = @(m,n) raylrnd(10,m,n);
     case 'beta'
-        factor_generator = @(m,n) betarnd(11,13,m,n);
+        factor_generator = @(m,n) betarnd(1,3,m,n);
     case 'gamma'
         factor_generator = @(m,n) randg(11,m,n);
     otherwise 
