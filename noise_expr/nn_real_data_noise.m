@@ -4,16 +4,17 @@ R = 3;
 num_runs = 1000;
 dims = length(sz);
 
-losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};  
+% losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
+losses = {'beta (0.3)' 'gamma' 'huber (0.25)' 'normal' 'rayleigh'};
 num_losses = length(losses);
 counter = 0;
 
 % Non-negative factor generator types
-gen_types = {'rand', 'rayleigh', 'beta', 'gamma'};
+gen_types = {'rand', 'rayleigh', 'beta', 'gamma'}; % , 'rayleigh', 'beta', 'gamma'
 
 for k=1:length(gen_types)
-    % run suite of increasingly noisy experiments
-    for noise_lvl = 0:0.2:1
+    % run suite of increasingly perturbed experiments
+    for pturb_lvl = 0:0.2:1
         % containers for results
         times_opt = zeros(1, num_runs);
         times_gcp = zeros(num_losses, num_runs);
@@ -38,15 +39,15 @@ for k=1:length(gen_types)
                                         'Factor_Gen', gen_types{k});
             X = info.Data;
             M_true = info.Soln;
-            % add gaussian noise to solution factors for initial guess
-            M_init = info.Soln;
-            for i = 1:dims
-                % M_init.U{i} = M_init.U{i} +
-                % noise_lvl.*randn(size(M_init.U{i}));  ****DUBIOUS****
-                N = randn(size(M_init.U{i}));
-                nz_scale = norm(M_init.U{i}, 'fro')/norm(N,'fro');
-                M_init.U{i} = M_init.U{i} + (noise_lvl * nz_scale * N).^(1/3);   % noisify, only a cube root factor
-            end
+            % perturb solution factors for initial guess
+            if pturb_lvl == 1
+                M_init = create_guess('Soln',info.Soln, 'Factor_Generator', 'pertubation',...
+                                    'Pertubation', 0.99999);
+            else
+                M_init = create_guess('Soln',info.Soln, 'Factor_Generator', 'pertubation',...
+                                    'Pertubation', pturb_lvl);
+            end      
+            
             % feed problem and guess to gcp, cp-opt
             for i = 1:num_losses
                 % decompose and compare with gcp
@@ -56,7 +57,6 @@ for k=1:length(gen_types)
                 fits_gcp(i,run) = 1 - norm(X-full(M_gcp))/norm(X);
         %         loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
                 cossim_gcp(i,run) = cosSim(X, M_gcp, ndims(X));
-        %         fprintf('Final fit: %e \n\n', fits_gcp(i,run));
             end
         end
 
@@ -90,7 +90,7 @@ for k=1:length(gen_types)
         boxplot(cossim_gcp.', losses)
         title('Cos Similarity')
         counter = counter + 1;
-        sgtitle("Non-negative Data ("+ gen_types{k} + ") - Noise level: " + noise_lvl + "*(Gaussian noise)");
+        sgtitle("Non-negative Data ("+ gen_types{k} + ") - Perturbation: " + pturb_lvl);
     end
     
 end
