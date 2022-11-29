@@ -12,6 +12,7 @@ p.addParamValue('Soln', [], @(x) isempty(x) || isa(x,'ktensor') || isa(x,'ttenso
 p.addParamValue('Type', 'CP', @(x) ismember(lower(x),{'cp','tucker'}));
 p.addParamValue('Size', [100 100 100], @all);
 p.addParamValue('Num_Factors', 2, @all);
+p.addParamValue('Factor_Gen', 'rand', @(x) ismember(lower(x), {'rand', 'rayleigh', 'beta', 'gamma'}));
 
 p.parse(varargin{:});
 params = p.Results;
@@ -23,7 +24,9 @@ defaultStream.State = params.State;
 info = struct;
 
 % hijacking Rayleigh example from 
-% http://www.tensortoolbox.org/gcp_opt_doc.html#12
+% http://www.tensortoolbox.org/gcp_opt_doc.html#12 
+% modifying method to absorb the pdf samples into the
+% first factor matrix
 nc = params.Num_Factors;
 sz = params.Size;
 nd = length(sz);
@@ -34,11 +37,23 @@ for k=1:nd
     U{k} = V(:,randperm(nc));
 end
 M_true = normalize(ktensor(U));
+% apply specific data distribution type
+pdf = lower(params.Factor_Gen);
+switch pdf
+    case 'rand'
+        M_true.U{1} = M_true.U{1}.*rand(size(M_true.U{1}));
+    case 'rayleigh'
+        M_true.U{1} = M_true.U{1}.*raylrnd(10,size(M_true.U{1}));
+    case 'beta'
+        M_true.U{1} = M_true.U{1}.*betarnd(1,3,size(M_true.U{1}));
+    case 'gamma'
+        M_true.U{1} = M_true.U{1}.*randg(11,size(M_true.U{1}));
+    otherwise
+        M_true.U{1} = M_true.U{1}.*rand(size(M_true.U{1}));
+end
+        
 info.Soln = M_true;
-
-% UPDATE THIS FOR OTHER NN DATA TYPES (GAMMA, etc)
-X = tenfun(@raylrnd, full(M_true));
-info.Data = X;
+info.Data = full(M_true);
 
 end
 

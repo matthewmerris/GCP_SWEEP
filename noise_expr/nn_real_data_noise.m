@@ -35,7 +35,7 @@ for k=1:length(gen_types)
 
         for run = 1:num_runs
             % create a problem
-            info = NN_tensor_generator_fancy('Size', sz, 'Num_factors', R, ...
+            info = NN_tensor_generator('Size', sz, 'Num_factors', R, ...
                                         'Factor_Gen', gen_types{k});
             X = info.Data;
             M_true = info.Soln;
