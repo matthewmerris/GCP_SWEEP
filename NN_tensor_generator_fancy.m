@@ -35,7 +35,7 @@ nz = params.Noise;
 pdf = lower(params.Factor_Gen);
 switch pdf
     case 'rand'
-        factor_generator = @(m,n) 100* rand(m,n);
+        factor_generator = @(m,n) rand(m,n) + ones(m,n);
     case 'rayleigh'
         factor_generator = @(m,n) raylrnd(10,m,n);
     case 'beta'

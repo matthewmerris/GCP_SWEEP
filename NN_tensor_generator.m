@@ -41,7 +41,7 @@ M_true = normalize(ktensor(U));
 pdf = lower(params.Factor_Gen);
 switch pdf
     case 'rand'
-        M_true.U{1} = M_true.U{1}.*rand(size(M_true.U{1}));
+        M_true.U{1} = M_true.U{1}.*(randn(size(M_true.U{1})) + 10.*ones(size(M_true.U{1})));
     case 'rayleigh'
         M_true.U{1} = M_true.U{1}.*raylrnd(10,size(M_true.U{1}));
     case 'beta'
