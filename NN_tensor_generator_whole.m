@@ -10,6 +10,7 @@ p = inputParser;
 p.addParamValue('State', defaultStream.State, @(x) true);
 p.addParamValue('Size', [100 100 100], @all);
 p.addParamValue('Gen_type', 'rand', @(x) ismember(lower(x), {'rand', 'rayleigh', 'beta', 'gamma'}));
+p.addParamValue('Sparsity', 0, @(x) x >= 0 && x < 1);
 
 p.parse(varargin{:});
 params = p.Results;
@@ -20,8 +21,7 @@ defaultStream.State = params.State;
 % initialize return structure for data generated
 info = struct;
 
-% hijacking custom factor generator example from 
-% https://www.tensortoolbox.org/test_problems_doc.html
+% gather useful information
 sz = params.Size;
 nd = length(sz);
 
@@ -44,7 +44,16 @@ switch gen_type
         X = randn(sz) + ones(sz);
 end
 
-info.data = tensor(X);
+% handle sparsity case
+if params.Sparsity > 0
+    numElements = prod(sz);
+    nonZeros = (1 - params.Sparsity)*numElements;
+    mask = zeros(sz);
+    mask(randperm(numel(mask), nonZeros)) = 1;
+    info.data = sptensor(X.*mask);
+else
+    info.data = tensor(X);
+end
 
 % estimate resulting rank
 

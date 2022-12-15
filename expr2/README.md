@@ -5,7 +5,7 @@ in the tensor is all drawn from a specified statistical distribution.
 
 Currently supported:
 ---
-**Non-negative data tensors types**
+**Non-negative data tensors types (including sparse generation)**
 - rand
 - randn
 - rayleigh
