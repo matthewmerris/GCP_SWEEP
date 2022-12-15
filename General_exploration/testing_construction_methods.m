@@ -80,3 +80,5 @@ subplot(3,2,5)
 histfit(x10,12)
 title('Gen_{type} - gamma')
 sgtitle('NN\_tensor\_generator\_whole');
+
+%% Look at some KS-test results
