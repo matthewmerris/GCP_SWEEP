@@ -9,7 +9,7 @@ defaultStream = RandStream.getGlobalStream;
 p = inputParser;
 p.addParamValue('State', defaultStream.State, @(x) true);
 p.addParamValue('Size', [100 100 100], @all);
-p.addParamValue('Gen_type', 'rand', @(x) ismember(lower(x), {'rand', 'rayleigh', 'beta', 'gamma'}));
+p.addParamValue('Gen_type', 'rand', @(x) ismember(lower(x), {'rand','randn', 'rayleigh', 'beta', 'gamma'}));
 p.addParamValue('Sparsity', 0, @(x) x >= 0 && x < 1);
 
 p.parse(varargin{:});
@@ -50,9 +50,9 @@ if params.Sparsity > 0
     nonZeros = (1 - params.Sparsity)*numElements;
     mask = zeros(sz);
     mask(randperm(numel(mask), nonZeros)) = 1;
-    info.data = sptensor(X.*mask);
+    info.Data = sptensor(X.*mask);
 else
-    info.data = tensor(X);
+    info.Data = tensor(X);
 end
 
 % estimate resulting rank

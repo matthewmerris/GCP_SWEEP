@@ -35,7 +35,7 @@ nz = params.Noise;
 pdf = lower(params.Factor_Gen);
 switch pdf
     case 'randn'
-        factor_generator = @(m,n) randn(m,n) + ones(m,n);
+        factor_generator = @(m,n) randn(m,n) + 3.*ones(m,n);
     case 'rayleigh'
         factor_generator = @(m,n) raylrnd(10,m,n);
     case 'beta'
@@ -43,7 +43,7 @@ switch pdf
     case 'gamma'
         factor_generator = @(m,n) randg(11,m,n);
     otherwise 
-        factor_generator = @(m,n) 100*rand(m,n);
+        factor_generator = @(m,n) rand(m,n);
 end
 
 % Make the problem tensor

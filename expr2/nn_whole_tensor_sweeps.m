@@ -5,7 +5,7 @@ num_runs = 1000;
 dims = length(sz);
 
 % losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
-losses = {'beta (0.3)' 'gamma' 'huber (0.25)' 'normal'}; % 'rayleigh'
+losses = {'beta (0.3)' 'gamma' 'huber (0.25)' 'normal','rayleigh'}; % 
 num_losses = length(losses);
 counter = 0;
 
@@ -94,6 +94,3 @@ for k=1:length(gen_types)
     end
     
 end
-
-
-
