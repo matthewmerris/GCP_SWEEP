@@ -31,7 +31,7 @@ gen_type = lower(params.Gen_type);
 % build a full tensor based Gen_type
 switch gen_type
     case 'rand'
-        X = rand(sz);
+        X = rand(sz) + ones(sz);
     case 'rayleigh'
         X = raylrnd(10,sz);
     case 'beta'

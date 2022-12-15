@@ -13,7 +13,7 @@ p.addParamValue('Type', 'CP', @(x) ismember(lower(x),{'cp','tucker'}));
 p.addParamValue('Size', [100 100 100], @all);
 p.addParamValue('Num_Factors', 2, @all);
 p.addParamValue('Noise', 0.0, @all);
-p.addParamValue('Factor_Gen', 'rand', @(x) ismember(lower(x), {'rand', 'rayleigh', 'beta', 'gamma'}));
+p.addParamValue('Factor_Gen', 'rand', @(x) ismember(lower(x), {'rand','randn', 'rayleigh', 'beta', 'gamma'}));
 
 p.parse(varargin{:});
 params = p.Results;
@@ -34,8 +34,8 @@ nz = params.Noise;
 % Set up a factor generator
 pdf = lower(params.Factor_Gen);
 switch pdf
-    case 'rand'
-        factor_generator = @(m,n) rand(m,n) + ones(m,n);
+    case 'randn'
+        factor_generator = @(m,n) randn(m,n) + ones(m,n);
     case 'rayleigh'
         factor_generator = @(m,n) raylrnd(10,m,n);
     case 'beta'
