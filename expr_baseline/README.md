@@ -54,4 +54,4 @@ LOSSES:
 
 ## Data collection regime
 - 1000 runs generation-type (i.e. normal, rayleigh, beta, poisson-log, etc).
-- A run consists of steps 1-4 detailed in *General experimental structure* section.
+- A run consists of steps 1-4 detailed in **General experimental structure** section.
