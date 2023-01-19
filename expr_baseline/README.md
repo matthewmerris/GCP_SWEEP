@@ -16,8 +16,11 @@ The research questions being pursued are:
 ## Cases to explore
 There are 4 general data cases to consider: 
 
-- [ ] real,
-- [ ] non-negative real,
-- [ ] binary, 
-- [ ] count.
+- [ ] real {LOSSES: normal, huber},
+- [ ] non-negative real {LOSSES: normal (w/nn constraints), huber (w/nn constraints), rayleigh, gamma, negative-binomial, beta},
+- [ ] binary {LOSSES: normal (w/nn constraints), huber (w/nn constraints), binary, bernoulli-logit}, 
+- [ ] count {LOSSES: normal (w/nn constraints), huber (w/nn constraints), count, poisson-log}.
 
+## Data collection regime
+- 1000 runs generation-type (i.e. normal, rayleigh, beta, poisson-log, etc)
+- 
