@@ -23,7 +23,7 @@ LOSSES:
 - normal 
 - huber
 
-- [ ] non-negative real 
+- [ ] **NON-NEGATIVE REAL (continuous)**  
 
 LOSSES: 
 
@@ -34,7 +34,7 @@ LOSSES:
 - negative-binomial
 - beta
 
-- [ ] binary 
+- [ ] **BINARY** 
 
 LOSSES: 
 
@@ -43,7 +43,7 @@ LOSSES:
 - binary
 - bernoulli-logit
 
-- [ ] count 
+- [ ] **COUNT** 
 
 LOSSES: 
 
