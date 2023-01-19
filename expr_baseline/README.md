@@ -1,5 +1,5 @@
 # Experiment Overview
-This experiment is a baseline experiment using the GCP's myriad loss functions to perform decompositions on data tensors drawn from a variety of known statistical distributions corresponding to the available loss funcitons.
+This experiment is a baseline experiment using the [GCP's myriad loss functions](https://www.tensortoolbox.org/gcp_opt_fg_options_doc.html) to perform decompositions on data tensors drawn from a variety of known statistical distributions corresponding to the available loss funcitons.
 
 The research questions being pursued are:
 
