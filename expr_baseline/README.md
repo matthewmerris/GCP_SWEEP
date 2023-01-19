@@ -20,21 +20,38 @@ There are 4 general data cases to consider:
 
 LOSSES: 
 
-- normal, 
+- normal 
 - huber
 
 - [ ] non-negative real 
 
-{LOSSES: normal (w/nn constraints), huber (w/nn constraints), rayleigh, gamma, negative-binomial, beta},
+LOSSES: 
+
+- normal (w/nn constraints)
+- huber (w/nn constraints)
+- rayleigh
+- gamma
+- negative-binomial
+- beta
 
 - [ ] binary 
 
-{LOSSES: normal (w/nn constraints), huber (w/nn constraints), binary, bernoulli-logit},
+LOSSES: 
+
+- normal (w/nn constraints)
+- huber (w/nn constraints)
+- binary
+- bernoulli-logit
 
 - [ ] count 
 
-{LOSSES: normal (w/nn constraints), huber (w/nn constraints), count, poisson-log}.
+LOSSES: 
+
+- normal (w/nn constraints)
+- huber (w/nn constraints)
+- count
+- poisson-log
 
 ## Data collection regime
-- 1000 runs generation-type (i.e. normal, rayleigh, beta, poisson-log, etc)
-- 
+- 1000 runs generation-type (i.e. normal, rayleigh, beta, poisson-log, etc).
+- A run consists of steps 1-4 detailed in *General experimental structure* section.
