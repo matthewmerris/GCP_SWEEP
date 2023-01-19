@@ -18,7 +18,10 @@ There are 4 general data cases to consider:
 
 - [ ] real
 
-{LOSSES: normal, huber},
+LOSSES: 
+
+- normal, 
+- huber
 
 - [ ] non-negative real 
 
