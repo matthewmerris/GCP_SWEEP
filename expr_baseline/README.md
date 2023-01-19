@@ -16,7 +16,7 @@ The research questions being pursued are:
 ## Cases to explore
 There are 4 general data cases to consider: 
 
-- [ ] real
+- [ ] **REAL**
 
 LOSSES: 
 
