@@ -17,6 +17,7 @@ The research questions being pursued are:
 There are 4 general data cases to consider: 
 
 - [ ] real
+
 {LOSSES: normal, huber},
 
 - [ ] non-negative real 
