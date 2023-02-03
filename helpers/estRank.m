@@ -1,17 +1,22 @@
-function [rank,kten] = estRank(X)
+function [rank,factors] = estRank(X)
 %ESTRANK Provides a CP-rank estimate as well as a K-tensor initialization
 %        for some tensor X
 %   Utilizes singular value thresholding on a series of modal unfoldings of
 %   a tensor to arrive at an estimate of the tensor's CP-rank.
 %   Optional: Initialize a k-tensor using the left singular vectors from SVDs 
 %   of modal unfoldings using the estimated CP-rank.
+%   TEMPORARY MODIFICATION: ktensor() is misbehaving, changing to return a 
+%                           cell array of factor matrices for the time
+%                           being.
 rank = 1;
 modes = ndims(X);
 
+% disp('Modes: ' + modes)
 % identify the modal unfolding with the largest number of singular values
 
 for i = 1:modes
-    [~,S,~,flag] = svt(double(tenmat(X,i)), 'method', 'succession');
+    [~,S,~,flag] = svt(double(tenmat(X,i)), 'method', 'succession',...
+                        'lambda', 1e-2);
     if flag
         disp('Eigs not converged!')
     end
@@ -31,7 +36,7 @@ for i = 1:modes
     factors{i} = U;
 end
 
-kten = ktensor(factors);
+% kten = ktensor(ones(rank,1),factors);
     
 end
 
