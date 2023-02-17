@@ -1,7 +1,7 @@
 % some basic params
 sz = [100 100 100];
 % R = 5;
-num_runs = 1;
+num_runs = 10;
 
 gen_types = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gen_types);
@@ -39,15 +39,18 @@ for type = 1:num_gens
             tic, [M_gcp, M_0, out_gcp] = gcp_opt(X, est_rank, 'type', losses{gcp_type},'printitn', 0, 'init', factors);
             % gather metrics
             times_gcp(gcp_type,run) = toc;
-%             scores_gcp(gcp_type,run) = score(M_gcp, M_true, 'greedy', false);
+            %  CANT USE SCORE, DONT HAVE THE GENERATING K-TENSOR IN THIS
+            %  EXPRIMENT *************************************
+            %             scores_gcp(gcp_type,run) = score(M_gcp, M_true, 'greedy', false);
             fits_gcp(gcp_type,run) = 1 - norm(X-full(M_gcp))/norm(X);
-            %         loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
+%             loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
             cossim_gcp(gcp_type,run) = cosSim(X, M_gcp, ndims(X));
         end
     end
 end
 t_total = toc(t_start);
-fprintf('%d runs, took %f seconds.\n',num_runs, t_total);
+fprintf('%d runs for each of %d generators. | %d total generated tensors.\n', num_runs, num_gens, num_runs*num_gens);
+fprintf('GCP decomps using %d loss functions took %f seconds. | %d total decompositions performed. \n',num_losses, t_total, num_runs*num_gens*num_losses);
 % display(num_runs + ' runs, took ' + t_total + 'seconds.');
 % display(num_runs + ' runs, using ' + num_gens + ' generators, applying ' + num_losses + ' took ' + t_total + 'seconds.');
 %% OLD CODE (expr 1)

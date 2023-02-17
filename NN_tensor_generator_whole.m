@@ -37,7 +37,7 @@ switch gen_type
     case 'beta'
         X = betarnd(1,3,sz);
     case 'gamma'
-        X = randg(11,sz);
+        X = randg(11,sz) + ones(sz);
     case 'randn'
         X = randn(sz) + ones(sz);
     otherwise 
