@@ -27,6 +27,7 @@ cossim_gcp = zeros(num_losses, num_runs);
 % perform a series of runs on a naively generated artificial tensor
 t_start = tic;
 for type = 1:num_gens
+    % *************>   move results container initialization here
     for run = 1:num_runs
         % Generate tensor
         info = NN_tensor_generator_whole('Size', sz, 'Gen_type', gen_types{type});
@@ -47,6 +48,7 @@ for type = 1:num_gens
             cossim_gcp(gcp_type,run) = cosSim(X, M_gcp, ndims(X));
         end
     end
+    % ****************>  generate and save plots here.
 end
 t_total = toc(t_start);
 fprintf('%d runs for each of %d generators. | %d total generated tensors.\n', num_runs, num_gens, num_runs*num_gens);
