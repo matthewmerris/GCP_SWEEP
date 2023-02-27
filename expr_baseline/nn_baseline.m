@@ -1,33 +1,48 @@
+%% Clear the workspace
+clear; clc;
+
+%% Create unique directory for experiment run
+dirPath = './GSdata_' + string(datetime("now"));
+mkdir(dirPath);
+
+%%
+mkdir("./GSdata_" + string(datetime("now")));
+
+
+%%
 % some basic params
 sz = [100 100 100];
 % R = 5;
-num_runs = 10;
+num_runs = 2;
 
 gen_types = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gen_types);
 losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
 num_losses = length(losses);
 
-% containers for results
+% containers for results **(move if incorporating cp_opt results)**;
 times_opt = zeros(1, num_runs);
-times_gcp = zeros(num_losses, num_runs);
 
 fits_opt = zeros(1, num_runs);
-fits_gcp = zeros(num_losses, num_runs);
 
 % scores_opt = zeros(1, num_runs);
 % scores_gcp = zeros(num_losses, num_runs);
 
+% ***(encountering tensor toolbox error of unknown origin,
+% *** around log likelihood, troubleshooting) ***
+
 % loglikes_opt = zeros(1, num_runs);
-% loglikes_gcp = zeros(num_losses, num_runs);
+% loglikes_gcp = zeros(num_losses, num_runs);  
 
 cossim_opt = zeros(1, num_runs);
-cossim_gcp = zeros(num_losses, num_runs);
 
 % perform a series of runs on a naively generated artificial tensor
 t_start = tic;
 for type = 1:num_gens
     % *************>   move results container initialization here
+    times_gcp = zeros(num_losses, num_runs);
+    fits_gcp = zeros(num_losses, num_runs);
+    cossim_gcp = zeros(num_losses, num_runs);
     for run = 1:num_runs
         % Generate tensor
         info = NN_tensor_generator_whole('Size', sz, 'Gen_type', gen_types{type});
@@ -48,11 +63,26 @@ for type = 1:num_gens
             cossim_gcp(gcp_type,run) = cosSim(X, M_gcp, ndims(X));
         end
     end
-    % ****************>  generate and save plots here.
+    % ****************>  generate and save plots here, save the data too.
+    filepath = dirPath + '/gen_types.csv';
+    writecell(gen_types, filepath);
+    
+    filepath = dirPath + '/losses.csv';
+    writecell(losses, filepath);
+    
+    filepath = dirPath + '/generator_' + gen_types(type) + '_' + string(num_runs) + ' runs_times.csv';
+    writematrix(times_gcp, filepath);
+    
+    filepath = dirPath + '/generator_' + gen_types(type) + '_' + string(num_runs) + ' runs_fits.csv';
+    writematrix(fits_gcp, filepath);
+    
+    filepath = dirPath + '/generator_' + gen_types(type) + '_' + string(num_runs) + ' runs_cosSim.csv';
+    writematrix(cossim_gcp, filepath);
+    
 end
 t_total = toc(t_start);
 fprintf('%d runs for each of %d generators. | %d total generated tensors.\n', num_runs, num_gens, num_runs*num_gens);
-fprintf('GCP decomps using %d loss functions took %f seconds. | %d total decompositions performed. \n',num_losses, t_total, num_runs*num_gens*num_losses);
+fprintf('GCP decomps using %d loss functions took %f minutes. | %d total decompositions performed. \n',num_losses, t_total/60, num_runs*num_gens*num_losses);
 % display(num_runs + ' runs, took ' + t_total + 'seconds.');
 % display(num_runs + ' runs, using ' + num_gens + ' generators, applying ' + num_losses + ' took ' + t_total + 'seconds.');
 %% OLD CODE (expr 1)
