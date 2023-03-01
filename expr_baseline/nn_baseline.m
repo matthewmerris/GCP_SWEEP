@@ -6,14 +6,14 @@ dirPath = './GSdata_' + string(datetime("now"));
 mkdir(dirPath);
 
 %%
-mkdir("./GSdata_" + string(datetime("now")));
+% mkdir("./GSdata_" + string(datetime("now")));
 
 
 %%
 % some basic params
 sz = [100 100 100];
 % R = 5;
-num_runs = 2;
+num_runs = 5;
 
 gen_types = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gen_types);
@@ -63,7 +63,22 @@ for type = 1:num_gens
             cossim_gcp(gcp_type,run) = cosSim(X, M_gcp, ndims(X));
         end
     end
-    % ****************>  generate and save plots here, save the data too.
+    % ****************>  generate and save plots here, 
+    figure;
+    subplot(1,3,1)
+    scatter(categorical(losses), mean(fits_gcp,2))
+    title('Fit')
+    subplot(1,3,2)
+    scatter(categorical(losses), mean(cossim_gcp,2));
+    title('Cos Similarity')
+    subplot(1,3,3);
+    scatter(categorical(losses), mean(times_gcp,2));
+    title('Time');
+    figure_title = "Non-negative Data (" + gen_types{type} + ")";
+    sgtitle(figure_title);
+    saveas(gcf, figure_title);
+    
+    % ****************>  save the data too.
     filepath = dirPath + '/gen_types.csv';
     writecell(gen_types, filepath);
     
