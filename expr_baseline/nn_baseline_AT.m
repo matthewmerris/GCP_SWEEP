@@ -2,7 +2,7 @@
 clear; clc;
 
 %% Create unique directory for experiment run
-dirPath = './GSdata_' + string(datetime("now"));
+dirPath = './GSdata_AT_' + string(datetime("now"));
 mkdir(dirPath);
 
 %%
@@ -11,14 +11,15 @@ mkdir(dirPath);
 
 %%
 % some basic params
-sz = [100 100 100];
+sz = [20 20 30];
 % R = 5;
-num_runs = 5;
+num_runs = 1;
 
-gen_types = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
+% gen_types = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
+gen_types = {'rand'};
 num_gens = length(gen_types);
-% losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
-losses = {'normal' 'rayleigh' 'gamma' 'beta (0.3)'};
+losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
+% losses = {'normal' 'rayleigh' 'gamma' 'beta (0.3)'};
 num_losses = length(losses);
 
 % containers for results **(move if incorporating cp_opt results)**;
@@ -48,17 +49,16 @@ for type = 1:num_gens
         % Generate tensor
         info = NN_tensor_generator_whole('Size', sz, 'Gen_type', gen_types{type});
         X = info.Data;
-        % Estimate rank and initialize guess (based on modal unfolding svd)
-        [est_rank, factors] = estRank(X);
+        % Estimate rank using AutoTen
+        F_max = ((sz(1) + 1) * (sz(2) + 1)) / 16;
+        [factors,c, est_rank, loss] = AutoTen(X,F_max,1);
+        % Might need to do a different initialization strategy
         % Perform GCP decompositions for all available loss functions
         for gcp_type = 1:num_losses
             % decompose
             tic, [M_gcp, M_0, out_gcp] = gcp_opt(X, est_rank, 'type', losses{gcp_type},'printitn', 0, 'init', factors);
             % gather metrics
             times_gcp(gcp_type,run) = toc;
-            %  CANT USE SCORE, DONT HAVE THE GENERATING K-TENSOR IN THIS
-            %  EXPRIMENT *************************************
-            %             scores_gcp(gcp_type,run) = score(M_gcp, M_true, 'greedy', false);
             fits_gcp(gcp_type,run) = 1 - norm(X-full(M_gcp))/norm(X);
 %             loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
             cossim_gcp(gcp_type,run) = cosSim(X, M_gcp, ndims(X));
@@ -103,43 +103,3 @@ fprintf('GCP decomps using %d loss functions took %f minutes. | %d total decompo
 % display(num_runs + ' runs, using ' + num_gens + ' generators, applying ' + num_losses + ' took ' + t_total + 'seconds.');
 
 
-%% OLD CODE (expr 1)
-% for run = 1:num_runs
-%     % create a problem
-% %     info = create_problem('Size', size, 'Num_factors', R, 'Factor_Generator', 'rand');
-%     info = NN_tensor_generator('Size', size, 'Num_factors', R);
-%     X = info.Data;
-%     M_true = info.Soln;
-%     viz(M_true, 'Figure', 1);
-%     % create a guess
-%     M_init = create_guess('Data', X, 'Num_factors', R,'Factor_Generator', 'rand');
-%     M_init = ktensor(M_init);
-%     
-%     % feed problem and guess to gcp, cp-opt
-%     for i = 1:num_losses
-%         % decompose and compare with gcp
-%         tic, [M_gcp, M_0, out_gcp] = gcp_opt(X, R, 'type', losses{i},'printitn', 0, 'init', M_init); 
-%         %tic, [M_gcp, M_0, out_gcp] = gcp_opt(X, R, 'type', losses{i},'printitn', 0);
-%         times_gcp(i,run) = toc;
-%         scores_gcp(i,run) = score(M_gcp, M_true, 'greedy', false);
-%         fits_gcp(i,run) = 1 - norm(X-full(M_gcp))/norm(X);
-%         %         loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
-%         cossim_gcp(i,run) = cosSim(X, M_gcp, ndims(X));
-% %         fprintf('Final fit: %e \n\n', fits_gcp(i,run));
-% %         viz(M_gcp, 'Figure', i+1);
-%     end
-% end
-% 
-% %% one plot to rule them all, higher scores are better
-% figure;
-% subplot(1,3,1)
-% scatter(categorical(losses), mean(fits_gcp,2))
-% title('Fit')
-% subplot(1,3,2)
-% scatter(categorical(losses), mean(scores_gcp,2));
-% title('Score')
-% subplot(1,3,3);
-% scatter(categorical(losses), mean(cossim_gcp,2));
-% title('Cos Similarity');
-% 
-% sgtitle('Non-negative Data');
