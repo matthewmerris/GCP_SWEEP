@@ -13,11 +13,11 @@ mkdir(dirPath);
 % some basic params
 sz = [100 100 100];
 % R = 5;
-num_runs = 5;
+num_runs = 1;
 
 gen_types = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gen_types);
-losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
+losses = {'normal' 'rayleigh' 'gamma' 'beta (0.3)'}; % 'huber (0.25)'
 num_losses = length(losses);
 
 % containers for results **(move if incorporating cp_opt results)**;
@@ -31,8 +31,7 @@ fits_opt = zeros(1, num_runs);
 % ***(encountering tensor toolbox error of unknown origin,
 % *** around log likelihood, troubleshooting) ***
 
-% loglikes_opt = zeros(1, num_runs);
-% loglikes_gcp = zeros(num_losses, num_runs);  
+% loglikes_opt = zeros(1, num_runs);  
 
 cossim_opt = zeros(1, num_runs);
 
@@ -43,6 +42,7 @@ for type = 1:num_gens
     times_gcp = zeros(num_losses, num_runs);
     fits_gcp = zeros(num_losses, num_runs);
     cossim_gcp = zeros(num_losses, num_runs);
+    loglikes_gcp = zeros(num_losses, num_runs);
     for run = 1:num_runs
         % Generate tensor
         info = NN_tensor_generator_whole('Size', sz, 'Gen_type', gen_types{type});
@@ -59,24 +59,27 @@ for type = 1:num_gens
             %  EXPRIMENT *************************************
             %             scores_gcp(gcp_type,run) = score(M_gcp, M_true, 'greedy', false);
             fits_gcp(gcp_type,run) = 1 - norm(X-full(M_gcp))/norm(X);
-%             loglikes_gcp(i,run) = tt_loglikelihood(X, M_gcp);
+            loglikes_gcp(gcp_type,run) = tt_loglikelihood(X, M_gcp);
             cossim_gcp(gcp_type,run) = cosSim(X, M_gcp, ndims(X));
         end
     end
     % ****************>  generate and save plots here, 
     figure;
-    subplot(1,3,1)
+    subplot(1,4,1)
     scatter(categorical(losses), mean(fits_gcp,2))
     title('Fit')
-    subplot(1,3,2)
+    subplot(1,4,2)
     scatter(categorical(losses), mean(cossim_gcp,2));
     title('Cos Similarity')
-    subplot(1,3,3);
+    subplot(1,4,3);
+    scatter(categorical(losses), mean(loglikes_gcp,2));
+    title('Log Likelihood')
+    subplot(1,4,4);
     scatter(categorical(losses), mean(times_gcp,2));
     title('Time');
     figure_title = "Non-negative Data (" + gen_types{type} + ")";
     sgtitle(figure_title);
-    saveas(gcf, figure_title);
+    saveas(gcf, dirPath + "/" + figure_title);
     
     % ****************>  save the data too.
     filepath = dirPath + '/gen_types.csv';
