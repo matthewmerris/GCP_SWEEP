@@ -40,6 +40,7 @@ num_modes = length(sz);         % number of tensor modes
 rng(13);
 t_start = tic;
 for type = 1:num_types
+    % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
     for run = 1:num_runs
         % generate data tensor
         ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', ttypes{type});
