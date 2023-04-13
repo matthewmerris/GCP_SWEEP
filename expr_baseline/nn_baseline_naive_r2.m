@@ -3,7 +3,7 @@ clear; clc;
 rng('default');
 
 %% check for results directory, make it if not there
-datafolder = "results";
+datafolder = "/home/mmerris/scractch/GCPSWEEPS_nn_results";
 if ~isfolder(datafolder)
     mkdir(datafolder)
 end
@@ -38,6 +38,7 @@ num_types = length(ttypes);     % number of generators
 num_losses = length(ltypes);    % number of GCP loss functions
 num_modes = length(sz);         % number of tensor modes
 rng(13);
+parpool(228);  % Set pool size for parfor (8 nodes, 28 cores/node = 228
 t_start = tic;
 for type = 1:num_types
     % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
