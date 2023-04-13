@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ### Specify job arguements
 
 #SBATCH -p defq
