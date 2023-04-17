@@ -2,6 +2,9 @@
 clear; clc;
 rng('default');
 
+%% RUN THIS SECTION ON R2/BORAH ONLY!!! adds dependencies to path
+addpath(genpath("/home/mmerris/wares/matlab_tools"));
+
 %% check for results directory, make it if not there
 datafolder = "/home/mmerris/scratch/GCPSWEEPS_nn_results";
 if ~isfolder(datafolder)
