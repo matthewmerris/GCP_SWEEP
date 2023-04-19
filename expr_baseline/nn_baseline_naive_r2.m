@@ -13,9 +13,9 @@ if ~isfolder(datafolder)
 end
 
 % general experiment paramenters 
-sz = [20, 20, 30];  % tensor size
+sz = [100, 100, 100];  % tensor size
 rank = 10;
-num_runs = 1;        % number of runs, i.e. number of tensors generated
+num_runs = 100;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
 ltypes = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
 
@@ -29,8 +29,8 @@ outputfile = datafolder + "/" + "nn_base_naive-size_" + strcat(num2str(sz)) + ..
 if ~isfile(outputfile)
     fprintf("Output file DNE ... creating\n");
     fileID = fopen(outputfile,"w");
-    % HEADER: Generator, Run, Loss, Time, Fit, Log-Like, Cos Sim
-    fprintf(fileID, "Generator,Run,Loss,Time,Fit,Cos Sim\n"); % Log-Like, 
+    % HEADER: Generator, Run, Loss, Time, Fit, Cos-Sim, Est-Rank
+    fprintf(fileID, "Generator,Run,Loss,Time,Fit,Cos Sim,Est Rank\n"); % Log-Like, 
     fclose(fileID);
 else
     fprintf("Output file exists ... not creating\n");
@@ -42,7 +42,7 @@ num_types = length(ttypes);     % number of generators
 num_losses = length(ltypes);    % number of GCP loss functions
 num_modes = length(sz);         % number of tensor modes
 rng(13);
-parpool(8);  % Set pool size for parfor (8 nodes, 28 cores/node = 228
+parpool(28);  % Set pool size for parfor (8 nodes, 28 cores/node = 228
 t_start = tic;
 for type = 1:num_types
     % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
@@ -68,8 +68,8 @@ for type = 1:num_types
             cossim = cosSim(X, M_gcp, num_modes);
             % write results to file
             fileID = fopen(outputfile, "a");
-            fprintf(fileID,"%s, %u, %s, %f, %f, %f, %f", ttypes{type}, run, ltypes{loss}, ...
-                                                            t, fit, cossim);
+            fprintf(fileID,"%s,%u,%s,%f,%f,%f,%f,%f", ttypes{type}, run, ltypes{loss}, ...
+                                                            t, fit, cossim, est_rank);
             fprintf(fileID, '\n');
             fclose(fileID);
         end
@@ -81,3 +81,6 @@ end
 t_total = toc(t_start);
 fprintf('%d runs for each of %d generators. | %d total generated tensors.\n', num_runs, num_types, num_runs*num_types);
 fprintf('GCP decomps using %d loss functions took %f minutes. | %d total decompositions performed. \n',num_losses, t_total/60, num_runs*num_types*num_losses);
+
+exit;
+

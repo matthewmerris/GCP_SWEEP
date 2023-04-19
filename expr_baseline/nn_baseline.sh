@@ -21,4 +21,8 @@ module load matlab/r2021a
 # MATLAB_TOOLS_PATH = "/home/mmerris/wares/matlab_tools"
 # EXPR_SRC_PATH = "/home/mmerris/GCP_SWEEPS"
 # matlab -nodisplay -nosplash -r "try, addlibrarypath(MATLAB_TOOLS_PATH, EXPR_SRC_PATH), catch me, fprintf('%s / %s\n',me.identifier,me.message), exit(1), end, exit(0)"
-matlab -nodisplay -nosplash -r < /home/mmerris/GCP_SWEEP/expr_baseline/nn_baseline_naive_r2.m > /home/mmerris/scratch/out_nn_%J.txt
+
+cd $PWD
+CURRENTDATE='date +"%m-%d-%y-%H:%M:%S"'
+OUTFILE="/home/mmerris/scratch/out_nn_"+"%{CURRENTDATE}"+".txt"
+matlab -nodisplay -nosplash -r  nn_baseline_naive_r2 >${OUTFILE}
