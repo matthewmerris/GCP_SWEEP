@@ -2,9 +2,9 @@
 
 ### Specify job arguements
 
-#SBATCH -p defq
+#SBATCH -p bsudfq
 #SBATCH -N 1
-#SBATCH -n 28
+#SBATCH -n 48
 #SBATCH -t 01-12:00:00
 #SBATCH -o outfiles/%x-%j.out
 #SBATCH -J naive_nn
@@ -12,8 +12,8 @@
 
 ### Get Matlab in loaded
 
-module load r2-applications
-module load matlab/r2021a
+module load borah-applications
+module load matlab/r2020a
 
 
 ### Get dipendencies added to Matlab path
@@ -24,5 +24,5 @@ module load matlab/r2021a
 
 cd $PWD
 CURRENTDATE=$( date +'%m-%d-%y-%H:%M:%S')
-OUTFILE="/home/mmerris/scratch/out_nn_${CURRENTDATE}.txt"
-matlab -nodisplay -nosplash -r  nn_baseline_naive_r2 >${OUTFILE}
+OUTFILE="/bsuhome/mmerris/scratch/out_nn_${CURRENTDATE}.txt"
+matlab -nodisplay -nosplash -r  nn_baseline_naive_borah >${OUTFILE}
