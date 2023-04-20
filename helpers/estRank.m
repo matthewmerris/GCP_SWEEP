@@ -16,7 +16,7 @@ min_dim = min(size(X));
 % disp('Modes: ' + modes)
 
 % identify the modal unfolding with the largest number of singular values
-min_k = floor(min_dim/modes);
+min_k = 5;
 for i = 1:modes
     [~,S,~,flag] = svt(double(tenmat(X,i)), 'method', 'succession',...
                         'k', min_k, 'lambda', 1e-5, 'incre', 2);
