@@ -29,8 +29,9 @@ outputfile = datafolder + "/" + "nn_base_naive-size_" + strcat(num2str(sz)) + ..
 if ~isfile(outputfile)
     fprintf("Output file DNE ... creating\n");
     fileID = fopen(outputfile,"w");
-    % HEADER: Generator, Run, Loss, Time, Fit, Cos-Sim, Est-Rank
-    fprintf(fileID, "Generator,Run,Loss,Time,Fit,Cos Sim,Est Rank\n"); % Log-Like, 
+    % HEADER: Generator, Run, Loss, Time, Fit, Cos-Sim, Est-Rank,
+    % Iterations
+    fprintf(fileID, "Generator,Run,Loss,Time,Fit,Cos Sim,Est Rank,Iters\n"); % Log-Like, 
     fclose(fileID);
 else
     fprintf("Output file exists ... not creating\n");
@@ -68,8 +69,8 @@ for type = 1:num_types
             cossim = cosSim(X, M_gcp, num_modes);
             % write results to file
             fileID = fopen(outputfile, "a");
-            fprintf(fileID,"%s,%u,%s,%f,%f,%f,%f,%f", ttypes{type}, run, ltypes{loss}, ...
-                                                            t, fit, cossim, est_rank);
+            fprintf(fileID,"%s,%u,%s,%f,%f,%f,%f,%f,%f", ttypes{type}, run, ltypes{loss}, ...
+                                                            t, fit, cossim, est_rank,out_gcp.lbfgsout.totalIterations);
             fprintf(fileID, '\n');
             fclose(fileID);
         end
