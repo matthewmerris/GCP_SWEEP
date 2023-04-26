@@ -15,7 +15,7 @@ end
 % general experiment paramenters 
 sz = [100, 100, 100];  % tensor size
 rank = 10;
-num_runs = 100;        % number of runs, i.e. number of tensors generated
+num_runs = 1000;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
 ltypes = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
 
