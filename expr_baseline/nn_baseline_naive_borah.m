@@ -15,9 +15,10 @@ end
 % general experiment paramenters 
 sz = [100, 100, 100];  % tensor size
 rank = 10;
-num_runs = 1000;        % number of runs, i.e. number of tensors generated
+num_runs = 1;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
 ltypes = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
+itypes = {'rand', 'randn', 'orthogonal', 'stochastic', 'nvecs'};
 
 % prep a general output filepath seed, use datetime for uniqueness
 formatOut = 'yyyy_mm_dd_HH_MM_SS_FFF';
@@ -39,6 +40,7 @@ end
 
 %% Get into the experiment
 
+num_inits = length(itypes);
 num_types = length(ttypes);     % number of generators
 num_losses = length(ltypes);    % number of GCP loss functions
 num_modes = length(sz);         % number of tensor modes
@@ -69,7 +71,7 @@ for type = 1:num_types
             cossim = cosSim(X, M_gcp, num_modes);
             % write results to file
             fileID = fopen(outputfile, "a");
-            fprintf(fileID,"%s,%u,%s,%f,%f,%f,%f,%f,%f", ttypes{type}, run, ltypes{loss}, ...
+            fprintf(fileID,"%s,%u,%s,%f,%f,%f,%f,%d,%d", ttypes{type}, run, ltypes{loss}, ...
                                                             t, fit, cossim, est_rank,out_gcp.lbfgsout.totalIterations);
             fprintf(fileID, '\n');
             fclose(fileID);
