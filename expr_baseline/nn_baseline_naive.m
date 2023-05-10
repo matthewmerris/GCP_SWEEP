@@ -14,7 +14,7 @@ rank = 10;
 num_runs = 1;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
 ltypes = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
-itypes = {'rand', 'randn', 'orthogonal', 'stochastic', 'nvecs'};
+itypes = {'rand', 'randn', 'nvecs'}; % {'rand', 'randn', 'orthogonal', 'stochastic', 'nvecs'}
 
 % prep a general output filepath seed, use datetime for uniqueness
 formatOut = 'yyyy_mm_dd_HH_MM_SS_FFF';
@@ -27,7 +27,7 @@ if ~isfile(outputfile)
     fprintf("Output file DNE ... creating\n");
     fileID = fopen(outputfile,"w");
     % HEADER: Generator, Run, Loss, Time, Fit, Log-Like, Cos Sim
-    fprintf(fileID, "Generator,Run,Loss,Time,Fit,Cos Sim\n"); % Log-Like, 
+    fprintf(fileID, "Generator,Init,Run,Loss,Time,Fit,Cos Sim,Est-Rank,Iterations\n"); % Log-Like, 
     fclose(fileID);
 else
     fprintf("Output file exists ... not creating\n");
@@ -50,16 +50,11 @@ for init_type = 1:num_inits
             X = ten.Data;
             % Estimate rank and initialize guess (based on modal unfolding svd)
             [est_rank, ~] = estRank(X);
-            if strcmp(itypes{init_type}, 'nvecs')
-                factors = initializeCP(X,'Factor_Generator', itypes{init_type}, 'Num_Factors', est_rank, 'Data',X);
-            else
-                factors = initializeCP(X,'Factor_Generator', itypes{init_type}, 'Num_Factors', est_rank);
-            end
-            
-            %M_init = ktensor(factors);
+            factors = initializeCP(X,'Factor_Generator', itypes{init_type}, 'Num_Factors', est_rank);
+            M_init = ktensor(factors);
             % perform decompositions with available loss functions
             for loss = 1:num_losses
-                tic, [M_gcp, M_0, out_gcp] = gcp_opt(X, est_rank, 'type',ltypes{loss}, 'printitn',0, 'init', factors);
+                tic, [M_gcp, M_0, out_gcp] = gcp_opt(X, est_rank, 'type',ltypes{loss}, 'printitn',0, 'init', M_init);
                 t = toc;
                 fit = 1 - norm(X-full(M_gcp))/norm(X);
                 cossim = cosSim(X, M_gcp, num_modes);

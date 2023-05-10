@@ -44,6 +44,10 @@ switch gen_type
         X = randn(sz) + ones(sz);
 end
 
+% brute force non-negativity
+eps = 1e-8;
+X = max(X,eps);
+
 % handle sparsity case
 if params.Sparsity > 0
     numElements = prod(sz);
