@@ -19,7 +19,7 @@ min_dim = min(size(X));
 min_k = 5;
 for i = 1:modes
     [~,S,~,flag] = svt(double(tenmat(X,i)), 'method', 'succession',...
-                        'k', min_k, 'lambda', 1e-5, 'incre', 2);
+                        'k', min_k, 'lambda', 1e-4, 'incre', 2);
     if flag
         disp('Eigs not converged!')
     end
