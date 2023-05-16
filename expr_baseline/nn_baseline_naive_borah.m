@@ -18,7 +18,7 @@ rank = 10;
 num_runs = 100;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
 ltypes = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
-itypes = {'rand', 'randn', 'orthogonal', 'stochastic', 'nvecs'};
+itypes = {'rand', 'randn','nvecs'};
 
 % prep a general output filepath seed, use datetime for uniqueness
 formatOut = 'yyyy_mm_dd_HH_MM_SS_FFF';
@@ -44,13 +44,14 @@ num_inits = length(itypes);
 num_types = length(ttypes);     % number of generators
 num_losses = length(ltypes);    % number of GCP loss functions
 num_modes = length(sz);         % number of tensor modes
-rng(13);
-parpool(48);  % Set pool size for parfor (8 nodes, 48 cores/node = 384 cores
+% rng(13);
+% parpool(48);  % Set pool size for parfor (8 nodes, 48 cores/node = 384 cores
 t_start = tic;
 for init_type = 1:num_inits
+    rng(1339);
     for type = 1:num_types
     % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
-        parfor run = 1:num_runs
+        for run = 1:num_runs
             % generate data tensor
             ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', ttypes{type});
             X = ten.Data;
@@ -67,7 +68,7 @@ for init_type = 1:num_inits
                 cossim = cosSim(X, M_gcp, num_modes);
                 % write results to file
                 fileID = fopen(outputfile, "a");
-                fprintf(fileID,"%s,%u,%s,%f,%f,%f,%f,%d,%d", ttypes{type}, itypes{init_type}, run, ltypes{loss}, ...
+                fprintf(fileID,"%s,%s,%d,%s,%f,%f,%f,%d,%d", ttypes{type}, itypes{init_type}, run, ltypes{loss}, ...
                                                                 t, fit, cossim, est_rank,out_gcp.lbfgsout.totalIterations);
                 fprintf(fileID, '\n');
                 fclose(fileID);
