@@ -9,7 +9,7 @@ if ~isfolder(datafolder)
 end
 
 % general experiment paramenters 
-sz = [20, 20, 30];  % tensor size
+sz = [100, 100, 100];  % tensor size
 rank = 10;
 num_runs = 10;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
