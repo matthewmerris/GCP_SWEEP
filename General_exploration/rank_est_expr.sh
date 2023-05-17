@@ -5,7 +5,7 @@
 #SBATCH -p bsudfq
 #SBATCH -N 1
 #SBATCH -n 48
-#SBATCH -t 01-12:00:00
+#SBATCH -t 04-12:00:00
 #SBATCH -o outfiles/%x-%j.out
 #SBATCH -J naive_nn
 
