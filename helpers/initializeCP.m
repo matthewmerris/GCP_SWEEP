@@ -28,7 +28,7 @@ switch(params.Factor_Generator)
     case 'orthogonal'
         U = create_guess('Factor_Generator', 'orthogonal', 'Size', sz, 'Num_Factors', params.Num_Factors);
     case 'stochastic'
-        U = create_guess('Factor_Generator', 'Stochastic', 'Size', sz, 'Num_Factors', params.Num_Factors);
+        U = create_guess('Factor_Generator', 'stochastic', 'Size', sz, 'Num_Factors', params.Num_Factors);
     case 'nvecs'
         U = create_guess('Factor_Generator', 'nvecs', 'Size', sz, 'Num_Factors', params.Num_Factors, ...
             'Data', X);
