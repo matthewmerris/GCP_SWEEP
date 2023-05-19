@@ -23,6 +23,9 @@ params = p.Results;
 switch(params.Factor_Generator)
     case 'rand'       
         U = create_guess('Factor_Generator', 'rand', 'Size', sz, 'Num_Factors', params.Num_Factors);
+        for i = 1:nd
+            U{i} = U{i} + 0.1;
+        end
     case 'randn'       
         U = create_guess('Factor_Generator', 'randn', 'Size', sz, 'Num_Factors', params.Num_Factors);
     case 'orthogonal'
