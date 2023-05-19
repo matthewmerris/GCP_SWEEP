@@ -18,7 +18,7 @@ rank = 10;
 num_runs = 100;        % number of runs, i.e. number of tensors generated
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types | 
 ltypes = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
-itypes = {'rand', 'randn','nvecs'};
+itypes = {'rand', 'randn','nvecs','stochastic'};
 
 % prep a general output filepath seed, use datetime for uniqueness
 formatOut = 'yyyy_mm_dd_HH_MM_SS_FFF';
