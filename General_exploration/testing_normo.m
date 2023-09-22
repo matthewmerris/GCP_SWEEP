@@ -6,7 +6,7 @@ losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss t
 gens = {'rand'}; %,'randn', 'rayleigh', 'beta', 'gamma'};
 num_losses = length(losses);
 num_gens = length(gens);
-runs = 10;
+runs = 4;
 
 ranks = zeros(runs, num_gens);
 ranks_time = zeros(runs, num_gens);
@@ -22,10 +22,10 @@ for i = 1:num_gens
         % estimate rank
         [ranks(j,i), ranks_time(j,i)] = b_NORMO(data, F, 0.7, rando);
         % initialize solution
-        %Minit = create_guess("Data", X.Data);
+        Minit = cp_als(X.Data, ranks(j,i), 'maxiters', 10, 'printitn', 0);
         for k = 1:num_losses
             % perform decomposition
-            [M1,M0,out] = gcp_opt(X.Data, ranks(j,i), 'type', losses{k}, 'printitn', 0); 
+            [M1,M0,out] = gcp_opt(X.Data, ranks(j,i), 'type', losses{k}, 'printitn', 0, 'init', Minit); 
             % collect metrics
             fits(j,k) = fitScore(X.Data, M1);
             corcondias(j,k) = efficient_corcondia(X.Data, M1);
@@ -33,8 +33,8 @@ for i = 1:num_gens
     end
 end
 total_time = toc;
-fprintf("total time:\n");
-fprintf(total_time);
+disp("total time:\n");
+disp(total_time);
 
 %%
 
