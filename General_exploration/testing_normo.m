@@ -22,7 +22,7 @@ for i = 1:num_gens
         % estimate rank
         [ranks(j,i), ranks_time(j,i)] = b_NORMO(data, F, 0.7, rando);
         % initialize solution
-        Minit = cp_als(X.Data, ranks(j,i), 'maxiters', 10, 'printitn', 0);
+        Minit = cp_als(X.Data, ranks(j,i), 'maxiters', 2, 'printitn', 0);
         for k = 1:num_losses
             % perform decomposition
             [M1,M0,out] = gcp_opt(X.Data, ranks(j,i), 'type', losses{k}, 'printitn', 0, 'init', Minit); 
