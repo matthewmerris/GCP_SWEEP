@@ -39,9 +39,11 @@ switch gen_type
     case 'gamma'
         X = randg(11,sz) + ones(sz);
     case 'randn'
-        X = randn(sz) + ones(sz);
+        a = 5;
+        b = 100;
+        X = a.*randn(sz) + b;
     otherwise 
-        X = randn(sz) + ones(sz);
+        X = randn(sz) + 2*ones(sz);
 end
 
 % handle sparsity case

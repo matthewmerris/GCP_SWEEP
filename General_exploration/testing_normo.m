@@ -6,7 +6,7 @@ losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss t
 gens = {'rand','randn', 'rayleigh', 'beta', 'gamma'};
 num_losses = length(losses);
 num_gens = length(gens);
-runs = 10;
+runs = 4;
 
 ranks = zeros(runs, num_gens);
 ranks_time = zeros(runs, num_gens);
@@ -23,8 +23,8 @@ for i = 1:num_gens
         % estimate rank
         [ranks(j,i), ranks_time(j,i)] = b_NORMO(data, F, 0.7, rando);
         % initialize solution
-        Minit = cp_als(X.Data, ranks(j,i), 'maxiters', 2, 'printitn', 0);
-%         Minit = create_guess('Data', X.Data, 'Num_Factors', ranks(j,i), 'Factor_Generator', 'nvecs');
+%         Minit = cp_als(X.Data, ranks(j,i), 'maxiters', 2, 'printitn', 0);
+        Minit = create_guess('Data', X.Data, 'Num_Factors', ranks(j,i), 'Factor_Generator', 'nvecs');
         for k = 1:num_losses
             % perform decomposition
             [M1,M0,out] = gcp_opt(X.Data, ranks(j,i), 'type', losses{k}, 'printitn', 0, 'init', Minit); 
