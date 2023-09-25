@@ -3,17 +3,28 @@ rando = rng("default");
 F = 50;
 sz = [100 100 100];
 losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
+<<<<<<< HEAD
 gens = {'rand','randn', 'rayleigh', 'beta', 'gamma'};
 num_losses = length(losses);
 num_gens = length(gens);
 runs = 10;
+=======
+gens = {'rayleigh'}; % {'rand','randn', 'rayleigh', 'beta', 'gamma'};
+num_losses = length(losses);
+num_gens = length(gens);
+runs = 1;
+>>>>>>> 37ca3d0dd555d768333fb35f8a8201a3167594db
 
 ranks = zeros(runs, num_gens);
 ranks_time = zeros(runs, num_gens);
 fits = zeros(num_gens, runs, num_losses);
 corcondias = zeros(num_gens, runs, num_losses);
 
+<<<<<<< HEAD
 start_time = tic;
+=======
+t_start = tic;
+>>>>>>> 37ca3d0dd555d768333fb35f8a8201a3167594db
 for i = 1:num_gens
     disp("Tensor Generation Type: " + gens{i});
     for j = 1:runs
@@ -34,7 +45,11 @@ for i = 1:num_gens
         end
     end
 end
+<<<<<<< HEAD
 total_time = toc(start_time);
+=======
+total_time = toc(t_start);
+>>>>>>> 37ca3d0dd555d768333fb35f8a8201a3167594db
 disp("total time:\n");
 disp(total_time / 60);
 
