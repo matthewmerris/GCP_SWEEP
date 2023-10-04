@@ -11,6 +11,7 @@ runs = 4;
 ranks = zeros(runs, num_gens);
 ranks_time = zeros(runs, num_gens);
 fits = zeros(num_gens, runs, num_losses);
+
 corcondias = zeros(num_gens, runs, num_losses);
 
 t_start = tic;
