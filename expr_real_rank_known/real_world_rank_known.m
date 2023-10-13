@@ -63,10 +63,10 @@ for i = 1:runs
         % perform decomposition, GCP default init is 'rand'
         [M1,M0,out] = gcp_opt(X_dorrit, nc, 'type', losses{j}, 'printitn', 0, 'init', M_init);
         % collect metrics
-        amino_fits(i,j) = fitScore(X_amino, M1);
-        amino_cossims(i,j) = cosSim(X_amino, M1, 3);
+        amino_fits(i,j) = fitScore(X_dorrit, M1);
+        amino_cossims(i,j) = cosSim(X_dorrit, M1, 3);
         amino_times(i,j) = out.mainTime;
-        [amino_corcondias(i,j),~] = efficient_corcondia(X_amino, M1);
+        [amino_corcondias(i,j),~] = efficient_corcondia(X_dorrit, M1);
     end
 end
 
