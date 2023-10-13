@@ -17,26 +17,29 @@ adj_by = -1 * min_val + 10*eps;
 X_amino = X_amino + adj_by;
 
 %% Perform decompositions of amino data and collect metrics
-losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'}; % GCP loss types
+losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'}; % GCP loss types
 num_losses = length(losses);
 runs = 100;
 sz = size(X_amino);
-rand_fit_results = zeros(runs,num_losses);
-rand_cossim_results = zeros(runs,num_losses);
-rand_time_results = zeros(runs,num_losses);
-rand_corcondia_results = zeros(runs,num_losses);
-for j = 1:num_losses
-    rng('default');  % ensure a set of runs gets the same initialization for each loss
-    for i = 1:runs
+amino_fits = zeros(runs,num_losses);
+amino_cossims = zeros(runs,num_losses);
+amino_corcondias = zeros(runs,num_losses);
+amino_times = zeros(runs,num_losses);
+
+for i = 1:runs
+    M_init = create_guess('Data', X_amino,'Num_Factors', nc);
+%     M_init = create_guess('Data', X_amino,'Num_Factors', nc,'Factor_Generator', 'nvecs');
+    for j = 1:num_losses
         % perform decomposition, GCP default init is 'rand'
-        [M1,M0,out] = gcp_opt(X_amino, nc, 'type', losses{j}, 'printitn', 0);
+        [M1,M0,out] = gcp_opt(X_amino, nc, 'type', losses{j}, 'printitn', 0, 'init', M_init);
         % collect metrics
-        rand_fit_results(i,j) = fitScore(X_amino, M1);
-        rand_cossim_results(i,j) = cosSim(X_amino, M1, 3);
-        rand_time_results(i,j) = out.mainTime;
-        [rand_corcondia_results(i,j),~] = efficient_corcondia(X_amino, M1);
+        amino_fits(i,j) = fitScore(X_amino, M1);
+        amino_cossims(i,j) = cosSim(X_amino, M1, 3);
+        amino_times(i,j) = out.mainTime;
+        [amino_corcondias(i,j),~] = efficient_corcondia(X_amino, M1);
     end
 end
+clear X_amino;
 
 %% load dorrit data
 load(dorrit_path);
@@ -48,20 +51,22 @@ X_dorrit = X_dorrit + adj_by;
 
 nc = 4;
 
-rand_fit_results_dorrit = zeros(runs,num_losses);
-rand_cossim_results_dorrit = zeros(runs,num_losses);
-rand_time_results_dorrit = zeros(runs,num_losses);
-rand_corcondia_results_dorrit = zeros(runs,num_losses);
-for j = 1:num_losses
-    rng('default');  % ensure a set of runs gets the same initialization for each loss
-    for i = 1:runs
+dorrit_fits = zeros(runs,num_losses);
+dorrit_cossims = zeros(runs,num_losses);
+dorrit_times = zeros(runs,num_losses);
+dorrit_corcondias = zeros(runs,num_losses);
+
+for i = 1:runs
+    M_init = create_guess('Data', X_dorrit,'Num_Factors', nc);
+%     M_init = create_guess('Data', X_dorrit,'Num_Factors', nc,'Factor_Generator', 'nvecs');
+    for j = 1:num_losses
         % perform decomposition, GCP default init is 'rand'
-        [M1,M0,out] = gcp_opt(X_dorrit, nc, 'type', losses{j}, 'printitn', 0);
+        [M1,M0,out] = gcp_opt(X_dorrit, nc, 'type', losses{j}, 'printitn', 0, 'init', M_init);
         % collect metrics
-        rand_fit_results_dorrit(i,j) = fitScore(X_dorrit, M1);
-        rand_cossim_results_dorrit(i,j) = cosSim(X_dorrit, M1, 3);
-        rand_time_results_dorrit(i,j) = out.mainTime;
-        [rand_corcondia_results_dorrit(i,j),~] = efficient_corcondia(X_dorrit, M1);
+        amino_fits(i,j) = fitScore(X_amino, M1);
+        amino_cossims(i,j) = cosSim(X_amino, M1, 3);
+        amino_times(i,j) = out.mainTime;
+        [amino_corcondias(i,j),~] = efficient_corcondia(X_amino, M1);
     end
 end
 
