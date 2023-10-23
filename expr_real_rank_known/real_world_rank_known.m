@@ -23,16 +23,19 @@ runs = 100;
 sz = size(X_amino);
 
 amino_fits = zeros(runs,num_losses);
-best_amino_fits = cell(num_losses,3);
+best_amino_fits = cell(num_losses,4);
 
 amino_cossims = zeros(runs,num_losses);
-best_amino_cossims = cell(num_losses,3);
+best_amino_cossims = cell(num_losses,4);
 
 amino_corcondias = zeros(runs,num_losses);
-best_amino_corcondias = cell(num_losses,3);
+best_amino_corcondias = cell(num_losses,4);
 
 amino_times = zeros(runs,num_losses);
-best_amino_times = cell(num_losses,3);
+best_amino_times = cell(num_losses,4);
+
+amino_angles = cell(runs, num_losses);
+% best_amino_angles = cell(num_losses, 4);
 
 for i = 1:runs
     M_init = create_guess('Data', X_amino,'Num_Factors', nc);
@@ -46,6 +49,7 @@ for i = 1:runs
             best_amino_fits{j,1} = amino_fits(i,j);
             best_amino_fits{j,2} = M1;
             best_amino_fits{j,3} = out;
+            best_amino_fits{j,4} = i;
         end
         
         amino_cossims(i,j) = cosSim(X_amino, M1, 3);
@@ -53,6 +57,7 @@ for i = 1:runs
             best_amino_cossims{j,1} = amino_cossims(i,j);
             best_amino_cossims{j,2} = M1;
             best_amino_cossims{j,3} = out;
+            best_amino_cossims{j,4} = i;
         end
 
         amino_times(i,j) = out.mainTime;
@@ -60,6 +65,7 @@ for i = 1:runs
             best_amino_times{j,1} = amino_times(i,j);
             best_amino_times{j,2} = M1;
             best_amino_times{j,3} = out;
+            best_amino_times{j,4} = i;
         end
 
         [amino_corcondias(i,j),~] = efficient_corcondia(X_amino, M1);
@@ -67,10 +73,14 @@ for i = 1:runs
             best_amino_corcondias{j,1} = amino_corcondias(i,j);
             best_amino_corcondias{j,2} = M1;
             best_amino_corcondias{j,3} = out;
+            best_amino_corcondias{j,4} = i;
         end
+
+        amino_angles{i,j} = subspaceAngles(X_amino, M1);
+
     end
 end
-clear X_amino;
+% clear X_amino;
 
 %% load dorrit data
 load(dorrit_path);
@@ -83,16 +93,18 @@ X_dorrit = X_dorrit + adj_by;
 nc = 4;
 
 dorrit_fits = zeros(runs,num_losses);
-best_dorrit_fits = cell(num_losses, 3);
+best_dorrit_fits = cell(num_losses, 4);
 
 dorrit_cossims = zeros(runs,num_losses);
-best_dorrit_cossims = cell(num_losses, 3);
+best_dorrit_cossims = cell(num_losses, 4);
 
 dorrit_times = zeros(runs,num_losses);
-best_dorrit_times  = cell(num_losses, 3);
+best_dorrit_times  = cell(num_losses, 4);
 
 dorrit_corcondias = zeros(runs,num_losses);
-best_dorrit_corcondias  = cell(num_losses, 3);
+best_dorrit_corcondias  = cell(num_losses, 4);
+
+dorrit_angles = cell(runs, num_losses);
 
 for i = 1:runs
     M_init = create_guess('Data', X_dorrit,'Num_Factors', nc);
@@ -107,6 +119,7 @@ for i = 1:runs
             best_dorrit_fits{j,1} = dorrit_fits(i,j);
             best_dorrit_fits{j,2} = M1;
             best_dorrit_fits{j,3} = out;
+            best_dorrit_fits{j,4} = i;
         end
         
         dorrit_cossims(i,j) = cosSim(X_dorrit, M1, 3);
@@ -114,6 +127,7 @@ for i = 1:runs
             best_dorrit_cossims{j,1} = dorrit_cossims(i,j);
             best_dorrit_cossims{j,2} = M1;
             best_dorrit_cossims{j,3} = out;
+            best_dorrit_cossims{j,4} = i;
         end
 
         dorrit_times(i,j) = out.mainTime;
@@ -121,6 +135,7 @@ for i = 1:runs
             best_dorrit_times{j,1} = dorrit_times(i,j);
             best_dorrit_times{j,2} = M1;
             best_dorrit_times{j,3} = out;
+            best_dorrit_times{j,4} = i;
         end
 
         [dorrit_corcondias(i,j),~] = efficient_corcondia(X_dorrit, M1);
@@ -128,7 +143,10 @@ for i = 1:runs
             best_dorrit_corcondias{j,1} = dorrit_corcondias(i,j);
             best_dorrit_corcondias{j,2} = M1;
             best_dorrit_corcondias{j,3} = out;
+            best_dorrit_corcondias{j,4} = i;
         end
+        
+        dorrit_angles{i,j} = subspaceAngles(X_dorrit, M1);
     end
 end
 
