@@ -81,6 +81,68 @@ for i = 1:runs
     end
 end
 % clear X_amino;
+%% visualize amino
+
+% BEST METRICS OUT OF 100 RUNS PER LOSS FUNCTION
+c = linspace(1,5,length(losses));
+figure;
+scatter(categorical(losses), cell2mat(best_amino_fits(:,1)),[],c, "filled");
+title('Best Fit Scores Of 100 Runs - Amino');
+
+figure;
+scatter(categorical(losses), cell2mat(best_amino_cossims(:,1)),[],c, "filled");
+title('Best Cosine Similarity Of 100 Runs - Amino');
+
+figure;
+scatter(categorical(losses), cell2mat(best_amino_corcondias(:,1)),[],c, "filled");
+title('Best Corcondias Of 100 Runs - Amino');
+
+% SUMMARY METRICS 100 RUNS
+% Fit Scores - Top 3 Normal, Huber, Beta
+figure;
+plot(amino_fits);
+legend(losses);
+xlabel('Fit Score');
+ylabel('Run');
+title('Fit Score - 100 runs - Amino');
+
+figure;
+plot(amino_fits(:,1:2));
+legend(losses{1:2});
+xlabel('Fit Score');
+ylabel('Run');
+title('Fit Score - 100 runs - Amino');
+
+% Cosine Similarity
+figure;
+plot(amino_cossims);
+legend(losses);
+xlabel('Cosine Similarity');
+ylabel('Run');
+title('Cosine Similarity - 100 runs - Amino');
+
+figure;
+plot(amino_cossims(:,1:2));
+legend(losses{1:2});
+xlabel('Cosine Similarity');
+ylabel('Run');
+title('Cosine Similarity - 100 runs - Amino');
+
+% Corcondia Scores
+figure;
+plot(amino_corcondias);
+legend(losses);
+xlabel('Corcondia Score');
+ylabel('Run');
+title('Corcondia Scores - 100 runs - Amino');
+
+figure;
+plot(amino_corcondias(:,1:2));
+legend(losses{1:2});
+xlabel('Corcondia Score');
+ylabel('Run');
+title('Corcondia Scores - 100 runs - Amino');
+
 
 %% load dorrit data
 load(dorrit_path);
@@ -150,5 +212,85 @@ for i = 1:runs
     end
 end
 
+%% build up versions of subspace angle info: 
+% 1 - sum across mode
+% 2 - average across modes
+dorrit_angle_sums = zeros(runs, num_losses);
+dorrit_angle_avgs = zeros(runs, num_losses);
+dorrit_angle_stds = zeros(runs, num_losses);
+for i = 1:runs
+    for j = 1:num_losses
+        dorrit_angle_sums(i,j) = sum(dorrit_angles{i,j});
+        dorrit_angle_avgs(i,j) = mean(dorrit_angles{i,j});
+        dorrit_angle_stds(i,j) = std(dorrit_angles{i,j});
+    end
+end
 
+%% visualize dorrit
 
+% BEST METRICS OUT OF 100 RUNS PER LOSS FUNCTION
+c = linspace(1,5,length(losses));
+c_mod = linspace(1,4,length(losses)-1);
+figure;
+scatter(categorical(losses), cell2mat(best_dorrit_fits(:,1)),[],c, "filled");
+title('Best Fit Scores Of 100 Runs - Dorrit');
+
+figure;
+scatter(categorical(losses), cell2mat(best_dorrit_cossims(:,1)),[],c, "filled");
+title('Best Cosine Similarity Of 100 Runs - Dorrit');
+
+figure;
+scatter(categorical(losses), cell2mat(best_dorrit_corcondias(:,1)),[],c, "filled");
+title('Best Corcondias Of 100 Runs - Dorrit');
+
+figure;
+scatter(categorical(losses(2:5)), cell2mat(best_dorrit_corcondias(2:5,1)),[],c_mod, "filled");
+title('Best Corcondias Scores Of 100 Runs - Dorrit');
+
+%% SUMMARY METRICS 100 RUNS
+% Fit Scores - Top 3 Normal, Huber, Beta
+figure;
+plot(dorrit_fits);
+legend(losses);
+xlabel('Fit Score');
+ylabel('Run');
+title('Fit Score - 100 runs - Dorrit');
+
+figure;
+hold on;
+plot(dorrit_fits(:,1));
+plot(dorrit_fits(:,3));
+legend(losses{1}, losses{3});
+xlabel('Fit Score');
+ylabel('Run');
+title('Fit Score - 100 runs - Dorrit');
+
+% Cosine Similarity
+figure;
+plot(dorrit_cossims);
+legend(losses);
+xlabel('Cosine Similarity');
+ylabel('Run');
+title('Cosine Similarity - 100 runs - Dorrit');
+
+figure;
+plot(dorrit_cossims(:,1:2));
+legend(losses{1:2});
+xlabel('Cosine Similarity');
+ylabel('Run');
+title('Cosine Similarity - 100 runs - Dorrit');
+
+% Corcondia Scores
+figure;
+plot(dorrit_corcondias);
+legend(losses);
+xlabel('Corcondia Score');
+ylabel('Run');
+title('Corcondia Scores - 100 runs - Dorrit');
+
+figure;
+plot(dorrit_corcondias(:,2:5));
+legend(losses{2:5});
+xlabel('Corcondia Score');
+ylabel('Run');
+title('Corcondia Scores - 100 runs - Dorrit');

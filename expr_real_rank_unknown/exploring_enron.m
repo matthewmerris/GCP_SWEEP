@@ -104,6 +104,17 @@ ylabel('Fit Score');
 title('Fit Scores - Enron 100 runs');
 legend(losses);
 
+% plot fit scores without rayleigh
+figure
+hold on
+plot(fits(:,1:3));
+plot(fits(:,5:6));
+xlabel('Run');
+ylabel('Fit Score');
+title('Fit Scores - Enron 100 runs (no Rayleigh)');
+legend(losses{1:3}, losses{5:6});
+hold off
+
 % plot cossims
 figure
 plot(cossims);
@@ -111,6 +122,14 @@ xlabel('Run');
 ylabel('Cosine Similarity');
 title('Cosine Similarity - Enron 100 runs');
 legend(losses);
+
+% plot cossims, omit beta b/c complex
+figure
+plot(cossims(:,1:5))
+xlabel('Run');
+ylabel('Cosine Similarity');
+title('Cosine Similarity - Enron 100 runs (no Beta)');
+legend(losses{1:5});
 
 % plot corcondias
 figure
