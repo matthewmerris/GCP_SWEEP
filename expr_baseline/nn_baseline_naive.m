@@ -1,6 +1,6 @@
 %% Clear the workspace & set up random seed
 clear; clc;
-rando = rng('default');
+
 
 %% check for results directory, make it if not there
 datafolder = "results";
@@ -9,21 +9,22 @@ if ~isfolder(datafolder)
 end
 
 %% general experiment paramenters
-
+rando = rng('default');
 % tensor size & number of modes
 sz = [20, 20, 30]; 
 num_modes = length(sz);
+F = floor(max(sz)/2);
 
 % tensor generators | number of generators
 gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 10;
-num_runs = 10;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 6;
+num_runs = 4;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
-losses = {'normal' 'rayleigh' 'gamma' 'huber (0.25)' 'beta (0.3)'};
+losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
 num_losses = length(losses);
 
 % Instantiate general metrics containers
@@ -67,7 +68,7 @@ for i = 1:num_gens
         ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{i});
         X = ten.Data;
         % Estimate number of components, ie. rank
-        [nc, ~] = b_NORMO(double(X), F, 0.7, rando);
+        [nc, ~] = b_NORMO(double(X), F, 0.8, rando);
         ranks(j,i) = nc;
         for k = 1:num_runs
             % generate solution initialization
@@ -118,6 +119,6 @@ end
 
 % Summerize the job size and time required
 
-t_total = toc(t_start);
+t_total = toc(t_start)
 % fprintf('%d runs for each of %d generators. | %d total generated tensors.\n', num_runs, num_types, num_runs*num_types);
 % fprintf('GCP decomps using %d loss functions took %f minutes. | %d total decompositions performed. \n',num_losses, t_total/60, num_runs*num_types*num_losses);
