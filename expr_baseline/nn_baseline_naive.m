@@ -62,9 +62,11 @@ best_corcondias = cell(num_gens, num_tensors, num_losses, 4);
 
 t_start = tic;
 for i = 1:num_gens
+    fprintf('Tensor Generator:\t%s\n', gens{i});
     % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
     for j = 1:num_tensors
         % generate data tensor
+        fprintf('Processing tensor: %d\n', j);
         ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{i});
         X = ten.Data;
         % Estimate number of components, ie. rank
@@ -122,3 +124,14 @@ end
 t_total = toc(t_start)
 % fprintf('%d runs for each of %d generators. | %d total generated tensors.\n', num_runs, num_types, num_runs*num_types);
 % fprintf('GCP decomps using %d loss functions took %f minutes. | %d total decompositions performed. \n',num_losses, t_total/60, num_runs*num_types*num_losses);
+
+%% Save results in single .mat 
+results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
+                            num_runs, num_losses)+ string(datetime("now"));
+% save gens, losses, fits, cossims, times, corcondias, angles, ranks,
+% best_fits, best_cossims, best_times, best_corcondias
+save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times', 'corcondias','angles', 'ranks', ...
+    'best_fits', 'best_cossims', 'best_times', 'best_corcondias');
+
+
+
