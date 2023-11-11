@@ -1,6 +1,11 @@
 %% Clear the workspace & set up random seed
 clear; clc;
 
+%% ADD NESSARY PATH INFO (** BORAH SPECIFIC **)
+expr_path = "/bsuhome/mmerris/GCP_SWEEP";
+tools_path = "/bsuhome/mmerris/wares/matlab_tools/active";
+addpath(genpath(expr_path));
+addpath(genpath(tools_path));
 
 %% check for results directory, make it if not there
 datafolder = "results";
