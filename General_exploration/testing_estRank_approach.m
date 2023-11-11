@@ -13,7 +13,7 @@ addpath(genpath("/bsuhome/mmerris/GCP_SWEEP"));
 sz = [100,100,100];
 ttypes = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'}; % tensor generator types |
 num_types = length(ttypes);
-runs = 30;
+runs = 5;
 
 % Initialize results containers
 rand_ranks = zeros(runs,1);
