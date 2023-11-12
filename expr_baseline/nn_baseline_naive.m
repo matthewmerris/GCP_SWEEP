@@ -2,10 +2,19 @@
 clear; clc;
 
 %% ADD NESSARY PATH INFO (** BORAH SPECIFIC **)
+% experimental code
 expr_path = "/bsuhome/mmerris/GCP_SWEEP";
-tools_path = "/bsuhome/mmerris/wares/matlab_tools/active";
 addpath(genpath(expr_path));
-addpath(genpath(tools_path));
+
+% dependencies
+tt_path = "/bsuhome/mmerris/wares/matlab_tools/tensor_toolbox";
+addpath(genpath(tt_path));
+autoten_path = "/bsuhome/mmerris/wares/matlab_tools/AutoTen";
+addpath(genpath(autoten_path));
+normo_path = "/bsuhome/mmerris/wares/matlab_tools/NORMO";
+addpath(genpath(normo_path));
+nway_path = "/bsuhome/mmerris/wares/matlab_tools/NwayTBv3.5";
+addpath(genpath(nway_path));
 
 %% check for results directory, make it if not there
 datafolder = "results";
