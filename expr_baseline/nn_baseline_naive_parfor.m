@@ -88,6 +88,15 @@ for i = 1:num_gens
         % Estimate number of components, ie. rank
         [nc, ~] = b_NORMO(double(X), F, 0.8, rando);
         ranks(j,i) = nc;
+        
+        tmp_mdls = cell(num_runs, num_losses,2); % hold model and output info
+        tmp_fits = zeros(num_runs, num_losses);
+        tmp_cossims = zeros(num_runs, num_losses);
+        tmp_times = zeros(num_runs, num_losses);
+        tmp_corcondias = zeros(num_runs, num_losses);
+
+        best_mdls = cell(num_losses,3);
+
         for k = 1:num_runs
             % generate solution initialization
             M_init = create_guess('Data', X,'Num_Factors', ranks(j,i), ...
@@ -97,41 +106,64 @@ for i = 1:num_gens
             for l = 1:num_losses
                 tic, [M1, M0, out] = gcp_opt(X, nc, 'type',losses{l}, 'printitn',0, 'init', M_init);
                 t = toc;
-                fits(i,j,k,l) = fitScore(X,M1);
-                if isempty(best_fits{i,j,l,1}) || fits(i,j,k,l) > best_fits{i,j,l,1}
-                    best_fits{i,j,l,1} = fits(i,j,k,l);
-                    best_fits{i,j,l,2} = M1;
-                    best_fits{i,j,l,3} = out;
-                    best_fits{i,j,l,4} = k;
-                end
+                tmp_fits(k,l) = fitScore(X,M1);
+%                 if isempty(best_fits{i,j,l,1}) || fits(i,j,k,l) > best_fits{i,j,l,1}
+%                     best_fits{i,j,l,1} = fits(i,j,k,l);
+%                     best_fits{i,j,l,2} = M1;
+%                     best_fits{i,j,l,3} = out;
+%                     best_fits{i,j,l,4} = k;
+%                 end
                 
-                cossims(i,j,k,l) = cosSim(X,M1,num_modes);
-                if isempty(best_cossims{i,j,l,1}) || cossims(i,j,k,l) > best_cossims{i,j,l,1}
-                    best_cossims{i,j,l,1} = fits(i,j,k,l);
-                    best_cossims{i,j,l,2} = M1;
-                    best_cossims{i,j,l,3} = out;
-                    best_cossims{i,j,l,4} = k;
-                end
+                tmp_cossims(k,l) = cosSim(X,M1,num_modes);
+%                 if isempty(best_cossims{i,j,l,1}) || cossims(i,j,k,l) > best_cossims{i,j,l,1}
+%                     best_cossims{i,j,l,1} = fits(i,j,k,l);
+%                     best_cossims{i,j,l,2} = M1;
+%                     best_cossims{i,j,l,3} = out;
+%                     best_cossims{i,j,l,4} = k;
+%                 end
                 
-                times(i,j,k,l) = out.mainTime;
-                if isempty(best_times{i,j,l,1}) || times(i,j,k,l) > best_times{i,j,l,1}
-                    best_times{i,j,l,1} = fits(i,j,k,l);
-                    best_times{i,j,l,2} = M1;
-                    best_times{i,j,l,3} = out;
-                    best_times{i,j,l,4} = k;
-                end
+                tmp_times(k,l) = out.mainTime;
+%                 if isempty(best_times{i,j,l,1}) || times(i,j,k,l) > best_times{i,j,l,1}
+%                     best_times{i,j,l,1} = fits(i,j,k,l);
+%                     best_times{i,j,l,2} = M1;
+%                     best_times{i,j,l,3} = out;
+%                     best_times{i,j,l,4} = k;
+%                 end
 
-                [corcondias(i,j,k,l), ~] = efficient_corcondia(X,M1);
-                if isempty(best_corcondias{i,j,l,1}) || corcondias(i,j,k,l) > best_corcondias{i,j,l,1}
-                    best_corcondias{i,j,l,1} = fits(i,j,k,l);
-                    best_corcondias{i,j,l,2} = M1;
-                    best_corcondias{i,j,l,3} = out;
-                    best_corcondias{i,j,l,4} = k;
-                end
+                [tmp_corcondias(k,l), ~] = efficient_corcondia(X,M1);
+%                 if isempty(best_corcondias{i,j,l,1}) || corcondias(i,j,k,l) > best_corcondias{i,j,l,1}
+%                     best_corcondias{i,j,l,1} = fits(i,j,k,l);
+%                     best_corcondias{i,j,l,2} = M1;
+%                     best_corcondias{i,j,l,3} = out;
+%                     best_corcondias{i,j,l,4} = k;
+%                 end
 
                 angles{i,j,k,l} = subspaceAngles(X,M1);
+                tmp_mdls{k,l,1} = M1;
+                tmp_mdls{k,l,2} = out;
             end
         end
+        fits(i,j,:,:) = tmp_fits(:,:);
+        cossims(i,j,:,:) = tmp_cossims(:,:);
+        times(i,j,:,:) = tmp_times(:,:);
+        corcondias(i,j,:,:) = tmp_corcondias(:,:);
+
+        % update "best results" for a run of initializations for each of
+        % the losses
+        b_fits = zeros(num_losses,2);
+        b_cossims = zeros(num_losses,2);
+        b_times = zeros(num_losses,2);
+        b_corcondias = zeros(num_losses,2);
+        for l = 1:num_losses
+            [b_fits(l,1),b_fits(l,2)] = max(tmp_fits(:,l));
+            [b_cossims(l,1), b_cossims(l,2)] = max(tmp_cossims(:,l));
+            [b_times(l,1), b_times(l,2)] = max(tmp_times(:,l));
+            [b_corcondias(l,1), b_corcondias(l,2)] = max(tmp_corcondias(:,l));
+        end
+        % place fit, index (best run), model and output
+        best_fits{i,j,:,1} = b_fits(:,1);
+        
+
     end
 end
 
