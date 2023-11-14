@@ -34,8 +34,8 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 6;
-num_runs = 4;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 100;
+num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -74,11 +74,13 @@ best_corcondias = cell(num_gens, num_tensors, num_losses, 4);
 
 %% Get into the experiment
 
+parpool(48);
+
 t_start = tic;
 for i = 1:num_gens
     fprintf('Tensor Generator:\t%s\n', gens{i});
     % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
-    for j = 1:num_tensors
+    parfor j = 1:num_tensors
         % generate data tensor
         fprintf('Processing tensor: %d\n', j);
         ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{i});

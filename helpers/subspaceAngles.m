@@ -8,7 +8,7 @@ angles = zeros(num_modes,1);
 for i = 1:num_modes
     % matricize tensors and calculate angle between subspaces
     angles(i) = subspace(unfold(X,i), unfold(M_full,i));
-end
+    %angles(i) = subspace(double(tenmat(X,i)), double(tenmat(M_full,i)));
 
 end
 

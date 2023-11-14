@@ -19,4 +19,5 @@ module load matlab/r2020a
 cd $PWD
 CURRENTDATE=$( date +'%m-%d-%y-%H:%M:%S')
 OUTFILE="/bsuhome/mmerris/scratch/out_nn_${CURRENTDATE}.txt"
-matlab -nodisplay -nosplash -r  nn_baseline_naive >${OUTFILE}  1 #!/bin/sh
+# matlab -nodisplay -nosplash -r  nn_baseline_naive >${OUTFILE}
+matlab -nodisplay -nosplash -r  nn_baseline_naive 
