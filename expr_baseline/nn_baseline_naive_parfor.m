@@ -34,8 +34,8 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 2;
-num_runs = 16;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 10;
+num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -55,23 +55,6 @@ best_cossims = cell(num_gens, num_tensors, num_losses, 4);
 best_times = cell(num_gens, num_tensors, num_losses, 4);
 best_corcondias = cell(num_gens, num_tensors, num_losses, 4);
 
-%% prep a general output filepath seed, use datetime for uniqueness (POSSIBLE DELETE)
-% formatOut = 'yyyy_mm_dd_HH_MM_SS_FFF';
-% dt = string(datetime("now"));
-% 
-% outputfile = datafolder + "/" + "nn_base_naive-size_" + strcat(num2str(sz)) + ...
-%             "-runs_" + num2str(num_runs) + "-" + dt + ".csv";
-% 
-% if ~isfile(outputfile)
-%     fprintf("Output file DNE ... creating\n");
-%     fileID = fopen(outputfile,"w");
-%     % HEADER: Generator, Run, Loss, Time, Fit, Log-Like, Cos Sim
-%     fprintf(fileID, "Generator,Run,Loss,Time,Fit,Cos Sim\n"); % Log-Like, 
-%     fclose(fileID);
-% else
-%     fprintf("Output file exists ... not creating\n");
-% end
-
 %% Get into the experiment
 
 parpool(16);
@@ -80,7 +63,7 @@ t_start = tic;
 for i = 1:num_gens
     fprintf('Tensor Generator:\t%s\n', gens{i});
     % CONVERT FOLLOWING FOR-LOOP TO PARFOR-loop
-    parfor j = 1:num_tensors
+    for j = 1:num_tensors
         % generate data tensor
         fprintf('Processing tensor: %d\n', j);
         ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{i});
@@ -97,7 +80,7 @@ for i = 1:num_gens
 
         best_mdls = cell(num_losses,3);
 
-        for k = 1:num_runs
+        parfor k = 1:num_runs
             % generate solution initialization
             M_init = create_guess('Data', X,'Num_Factors', ranks(j,i), ...
                 'Factor_Generator', 'rand');     % default 'rand' initialization scheme
@@ -139,8 +122,9 @@ for i = 1:num_gens
 %                 end
 
                 angles{i,j,k,l} = subspaceAngles(X,M1);
-                tmp_mdls{k,l,1} = M1;
-                tmp_mdls{k,l,2} = out;
+                [tmp_mdls{k,l,:}] = deal(M1, out);
+%                 tmp_mdls{k,l,1} = M1;
+%                 tmp_mdls{k,l,2} = out;
             end
         end
         fits(i,j,:,:) = tmp_fits(:,:);
@@ -161,9 +145,30 @@ for i = 1:num_gens
             [b_corcondias(l,1), b_corcondias(l,2)] = max(tmp_corcondias(:,l));
         end
         % place fit, index (best run), model and output
-        best_fits{i,j,:,1} = b_fits(:,1);
-        
-
+        [best_fits{i,j,:,1}] = deal(b_fits(:,1));
+        [best_fits{i,j,:,4}] = deal(b_fits(:,2));
+        [best_cossims{i,j,:,1}] = deal(b_cossims(:,1));
+        [best_cossims{i,j,:,4}] = deal(b_cossims(:,2));
+        [best_times{i,j,:,1}] = deal(b_times(:,1));
+        [best_times{i,j,:,4}] = deal(b_times(:,2));
+        [best_corcondias{i,j,:,1}] = deal(b_corcondias(:,1));
+        [best_corcondias{i,j,:,4}] = deal(b_corcondias(:,2));
+%         for l = 1:num_losses
+%             best_fits{i,j,l,2} = tmp_mdls{b_fits(l,2), l, 1};
+%             
+%             best_cossims{i,j,l,2} = tmp_mdls{b_cossims(l,2), l, 1};
+%             
+%             best_times{i,j,l,2} = tmp_mdls{b_times(l,2), l, 1};
+%             
+%             best_corcondias{i,j,l,2} = tmp_mdls{b_corcondias(l,2), l, 1};
+%             
+%         end
+%         for l = 1:num_losses
+%             best_fits{i,j,l,3} = tmp_mdls{b_fits(l,2), l, 2};
+%             best_cossims{i,j,l,3} = tmp_mdls{b_cossims(l,2), l, 2};
+%             best_times{i,j,l,3} = tmp_mdls{b_times(l,2), l, 2};
+%             best_corcondias{i,j,l,3} = tmp_mdls{b_corcondias(l,2), l, 2};
+%         end
     end
 end
 
