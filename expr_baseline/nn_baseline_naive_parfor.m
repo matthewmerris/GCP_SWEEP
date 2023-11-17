@@ -30,7 +30,8 @@ num_modes = length(sz);
 F = floor(max(sz)/2);
 
 % tensor generators | number of generators
-gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
+% gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
+gens = {'rand'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
@@ -57,7 +58,7 @@ best_corcondias = cell(num_gens, num_tensors, num_losses, 4);
 
 %% Get into the experiment
 
-parpool(16);
+parpool(8);
 
 t_start = tic;
 for i = 1:num_gens
@@ -153,16 +154,16 @@ for i = 1:num_gens
         [best_times{i,j,:,4}] = deal(b_times(:,2));
         [best_corcondias{i,j,:,1}] = deal(b_corcondias(:,1));
         [best_corcondias{i,j,:,4}] = deal(b_corcondias(:,2));
-%         for l = 1:num_losses
-%             best_fits{i,j,l,2} = tmp_mdls{b_fits(l,2), l, 1};
-%             
-%             best_cossims{i,j,l,2} = tmp_mdls{b_cossims(l,2), l, 1};
-%             
-%             best_times{i,j,l,2} = tmp_mdls{b_times(l,2), l, 1};
-%             
-%             best_corcondias{i,j,l,2} = tmp_mdls{b_corcondias(l,2), l, 1};
-%             
-%         end
+        for l = 1:num_losses
+            best_fits{i,j,l,2} = tmp_mdls{b_fits(l,2), l, 1};
+            best_fits{i,j,l,3} = tmp_mdls{b_fits(l,2), l, 2};
+            best_cossims{i,j,l,2} = tmp_mdls{b_cossims(l,2), l, 1};
+            best_cossims{i,j,l,3} = tmp_mdls{b_cossims(l,2), l, 2};
+            best_times{i,j,l,2} = tmp_mdls{b_times(l,2), l, 1};
+            best_times{i,j,l,3} = tmp_mdls{b_times(l,2), l, 2};
+            best_corcondias{i,j,l,2} = tmp_mdls{b_corcondias(l,2), l, 1};
+            best_corcondias{i,j,l,3} = tmp_mdls{b_corcondias(l,2), l, 2};
+        end
 %         for l = 1:num_losses
 %             best_fits{i,j,l,3} = tmp_mdls{b_fits(l,2), l, 2};
 %             best_cossims{i,j,l,3} = tmp_mdls{b_cossims(l,2), l, 2};
