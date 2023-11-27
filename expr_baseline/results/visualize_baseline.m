@@ -12,7 +12,7 @@ load("5-gens_100-tens_100-init_5-losses_17-Nov-2023 21:09:59.mat");
 gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 %% Plot best results for each tensor for every loss
 % rand_fits = cell2mat(squeeze(best_fits(1,:,:,1)));
-rand_fits = cell2mat(best_fits(1,:,1,1));
+%  rand_fits = cell2mat(best_fits(1,:,1,1));
 
 %% Brute force best metrics
 rand_fits = zeros(100,5);
@@ -84,3 +84,206 @@ for j = 1:5
         gamma_times(i,j) = min(times(5,i,:,j));
     end
 end
+
+%% visualize best results
+
+% mean and std of best results for each loss function
+
+% rand generator
+isOut = isoutlier(rand_fits);
+rand_fits_clean = rand_fits;
+rand_fits_clean(isOut) = NaN;
+
+isOut = isoutlier(rand_cossims);
+rand_cossims_clean = rand_cossims;
+rand_cossims_clean(isOut) = NaN;
+
+isOut = isoutlier(rand_corcondias);
+rand_corcondias_clean = rand_corcondias;
+rand_corcondias_clean(isOut) = NaN;
+
+isOut = isoutlier(rand_times);
+rand_times_clean = rand_times;
+rand_times_clean(isOut) = NaN;
+
+figure();
+sgtitle('Rand Generator');
+ax(1) = subplot(1,4,1);
+boxplot(ax(1),rand_fits_clean, 'Labels', losses);
+title(ax(1), 'Fit Score');
+grid(ax(1),'on');
+
+ax(2) = subplot(1,4,2);
+boxplot(ax(2),rand_cossims_clean, 'Labels', losses);
+title(ax(2), 'Cosign Similarity');
+grid(ax(2),'on');
+
+ax(3) = subplot(1,4,3);
+boxplot(ax(3),rand_corcondias_clean, 'Labels', losses);
+title(ax(3), 'Corcondia Score');
+grid(ax(3),'on');
+
+ax(4) = subplot(1,4,4);
+boxplot(ax(4),rand_times_clean, 'Labels', losses);
+title(ax(4), 'Time');
+grid(ax(4),'on');
+
+% randn generator
+isOut = isoutlier(randn_fits);
+randn_fits_clean = randn_fits;
+randn_fits_clean(isOut) = NaN;
+
+isOut = isoutlier(randn_cossims);
+randn_cossims_clean = randn_cossims;
+randn_cossims_clean(isOut) = NaN;
+
+isOut = isoutlier(randn_corcondias);
+randn_corcondias_clean = randn_corcondias;
+randn_corcondias_clean(isOut) = NaN;
+
+isOut = isoutlier(randn_times);
+randn_times_clean = randn_times;
+randn_times_clean(isOut) = NaN;
+
+figure();
+sgtitle('Randn Generator');
+ax(1) = subplot(1,4,1);
+boxplot(ax(1),randn_fits_clean, 'Labels', losses);
+title(ax(1), 'Fit Score');
+grid(ax(1),'on');
+
+ax(2) = subplot(1,4,2);
+boxplot(ax(2),randn_cossims_clean, 'Labels', losses);
+title(ax(2), 'Cosign Similarity');
+grid(ax(2),'on');
+
+ax(3) = subplot(1,4,3);
+boxplot(ax(3),randn_corcondias_clean, 'Labels', losses);
+title(ax(3), 'Corcondia Score');
+grid(ax(3),'on');
+
+ax(4) = subplot(1,4,4);
+boxplot(ax(4),randn_times_clean, 'Labels', losses);
+title(ax(4), 'Time');
+grid(ax(4),'on');
+
+% rayleigh generator
+isOut = isoutlier(rayleigh_fits);
+rayleigh_fits_clean = rayleigh_fits;
+rayleigh_fits_clean(isOut) = NaN;
+
+isOut = isoutlier(rayleigh_cossims);
+rayleigh_cossims_clean = rayleigh_cossims;
+rayleigh_cossims_clean(isOut) = NaN;
+
+isOut = isoutlier(rayleigh_corcondias);
+rayleigh_corcondias_clean = rayleigh_corcondias;
+rayleigh_corcondias_clean(isOut) = NaN;
+
+isOut = isoutlier(rayleigh_times);
+rayleigh_times_clean = rayleigh_times;
+rayleigh_times_clean(isOut) = NaN;
+
+figure();
+sgtitle('Rayleigh Generator');
+ax(1) = subplot(1,4,1);
+boxplot(ax(1),rayleigh_fits_clean, 'Labels', losses);
+title(ax(1), 'Fit Score');
+grid(ax(1),'on');
+
+ax(2) = subplot(1,4,2);
+boxplot(ax(2),rayleigh_cossims_clean, 'Labels', losses);
+title(ax(2), 'Cosign Similarity');
+grid(ax(2),'on');
+
+ax(3) = subplot(1,4,3);
+boxplot(ax(3),rayleigh_corcondias_clean, 'Labels', losses);
+title(ax(3), 'Corcondia Score');
+grid(ax(3),'on');
+
+ax(4) = subplot(1,4,4);
+boxplot(ax(4),rayleigh_times_clean, 'Labels', losses);
+title(ax(4), 'Time');
+grid(ax(4),'on');
+
+% beta generator
+isOut = isoutlier(beta_fits);
+beta_fits_clean = beta_fits;
+beta_fits_clean(isOut) = NaN;
+
+isOut = isoutlier(beta_cossims);
+beta_cossims_clean = beta_cossims;
+beta_cossims_clean(isOut) = NaN;
+
+isOut = isoutlier(beta_corcondias);
+beta_corcondias_clean = beta_corcondias;
+beta_corcondias_clean(isOut) = NaN;
+
+isOut = isoutlier(beta_times);
+beta_times_clean = beta_times;
+beta_times_clean(isOut) = NaN;
+
+figure();
+sgtitle('Beta Generator');
+ax(1) = subplot(1,4,1);
+boxplot(ax(1),beta_fits_clean, 'Labels', losses);
+title(ax(1), 'Fit Score');
+grid(ax(1),'on');
+
+ax(2) = subplot(1,4,2);
+boxplot(ax(2),beta_cossims_clean, 'Labels', losses);
+title(ax(2), 'Cosign Similarity');
+grid(ax(2),'on');
+
+ax(3) = subplot(1,4,3);
+boxplot(ax(3),beta_corcondias_clean, 'Labels', losses);
+title(ax(3), 'Corcondia Score');
+grid(ax(3),'on');
+
+ax(4) = subplot(1,4,4);
+boxplot(ax(4),beta_times_clean, 'Labels', losses);
+title(ax(4), 'Time');
+grid(ax(4),'on');
+
+% gamma generator
+isOut = isoutlier(gamma_fits);
+gamma_fits_clean = gamma_fits;
+gamma_fits_clean(isOut) = NaN;
+
+isOut = isoutlier(gamma_cossims);
+gamma_cossims_clean = gamma_cossims;
+gamma_cossims_clean(isOut) = NaN;
+
+isOut = isoutlier(gamma_corcondias);
+gamma_corcondias_clean = gamma_corcondias;
+gamma_corcondias_clean(isOut) = NaN;
+
+isOut = isoutlier(gamma_times);
+gamma_times_clean = gamma_times;
+gamma_times_clean(isOut) = NaN;
+
+figure();
+sgtitle('Gamma Generator');
+ax(1) = subplot(1,4,1);
+boxplot(ax(1),gamma_fits_clean, 'Labels', losses);
+title(ax(1), 'Fit Score');
+grid(ax(1),'on');
+
+ax(2) = subplot(1,4,2);
+boxplot(ax(2),gamma_cossims_clean, 'Labels', losses);
+title(ax(2), 'Cosign Similarity');
+grid(ax(2),'on');
+
+ax(3) = subplot(1,4,3);
+boxplot(ax(3),gamma_corcondias_clean, 'Labels', losses);
+title(ax(3), 'Corcondia Score');
+grid(ax(3),'on');
+
+ax(4) = subplot(1,4,4);
+boxplot(ax(4),gamma_times_clean, 'Labels', losses);
+title(ax(4), 'Time');
+grid(ax(4),'on');
+
+%% Subspace angles visualization
+% Calculate SUM of subspace angles
+angles_sums = zeros(100,5);
