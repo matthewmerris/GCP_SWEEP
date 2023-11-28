@@ -13,6 +13,9 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 %% Plot best results for each tensor for every loss
 % rand_fits = cell2mat(squeeze(best_fits(1,:,:,1)));
 %  rand_fits = cell2mat(best_fits(1,:,1,1));
+num_runs = 100;
+num_gens = length(gens);
+num_losses = length(losses);
 
 %% Brute force best metrics
 rand_fits = zeros(100,5);
@@ -20,8 +23,8 @@ rand_cossims = zeros(100,5);
 rand_corcondias = zeros(100,5);
 rand_times = zeros(100,5);
 
-for j = 1:5
-    for i = 1:100
+for j = 1:num_losses
+    for i = 1:num_runs
         rand_fits(i,j) = max(fits(1,i,:,j));
         rand_cossims(i,j) =  max(cossims(1,i,:,j));
         rand_corcondias(i,j) = max(corcondias(1,i,:,j));
@@ -34,8 +37,8 @@ randn_cossims = zeros(100,5);
 randn_corcondias = zeros(100,5);
 randn_times = zeros(100,5);
 
-for j = 1:5
-    for i = 1:100
+for j = 1:num_losses
+    for i = 1:num_runs
         randn_fits(i,j) = max(fits(2,i,:,j));
         randn_cossims(i,j) =  max(cossims(2,i,:,j));
         randn_corcondias(i,j) = max(corcondias(2,i,:,j));
@@ -48,8 +51,8 @@ rayleigh_cossims = zeros(100,5);
 rayleigh_corcondias = zeros(100,5);
 rayleigh_times = zeros(100,5);
 
-for j = 1:5
-    for i = 1:100
+for j = 1:num_losses
+    for i = 1:num_runs
         rayleigh_fits(i,j) = max(fits(3,i,:,j));
         rayleigh_cossims(i,j) =  max(cossims(3,i,:,j));
         rayleigh_corcondias(i,j) = max(corcondias(3,i,:,j));
@@ -62,8 +65,8 @@ beta_cossims = zeros(100,5);
 beta_corcondias = zeros(100,5);
 beta_times = zeros(100,5);
 
-for j = 1:5
-    for i = 1:100
+for j = 1:num_losses
+    for i = 1:num_runs
         beta_fits(i,j) = max(fits(4,i,:,j));
         beta_cossims(i,j) =  max(cossims(4,i,:,j));
         beta_corcondias(i,j) = max(corcondias(4,i,:,j));
@@ -76,8 +79,8 @@ gamma_cossims = zeros(100,5);
 gamma_corcondias = zeros(100,5);
 gamma_times = zeros(100,5);
 
-for j = 1:5
-    for i = 1:100
+for j = 1:num_losses
+    for i = 1:num_runs
         gamma_fits(i,j) = max(fits(5,i,:,j));
         gamma_cossims(i,j) =  max(cossims(5,i,:,j));
         gamma_corcondias(i,j) = max(corcondias(5,i,:,j));
@@ -286,4 +289,9 @@ grid(ax(4),'on');
 
 %% Subspace angles visualization
 % Calculate SUM of subspace angles
-angles_sums = zeros(100,5);
+angles_sums_rand = zeros(100,5);
+angles_sums_randn = zeros(100,5);
+angles_sums_rayleigh = zeros(100,5);
+angles_sums_beta = zeros(100,5);
+angles_sums_gamma = zeros(100,5);
+
