@@ -299,11 +299,11 @@ angles_sums_gamma = zeros(num_tens,num_runs,num_losses);
 for i = 1:num_tens
     for j = 1:num_runs
         for k = 1:num_losses
-            angles_sums_rand(i,j,k) = sum(angles{1,i,j,k});
-            angles_sums_randn(i,j,k) = sum(angles{2,i,j,k});
-            angles_sums_rayleigh(i,j,k) = sum(angles{3,i,j,k});
-            angles_sums_beta(i,j,k) = sum(angles{4,i,j,k});
-            angles_sums_gamma(i,j,k) = sum(angles{5,i,j,k});
+            angles_sums_rand(i,j,k) = 1 - sum(rad2deg(angles{1,i,j,k}));
+            angles_sums_randn(i,j,k) = sum(rad2deg(angles{2,i,j,k}));
+            angles_sums_rayleigh(i,j,k) = sum(rad2deg(angles{3,i,j,k}));
+            angles_sums_beta(i,j,k) = sum(rad2deg(angles{4,i,j,k}));
+            angles_sums_gamma(i,j,k) = sum(rad2deg(angles{5,i,j,k}));
         end
     end
 end
@@ -316,10 +316,10 @@ best_sums_gamma = zeros(num_tens, num_losses);
 
 for i = 1:num_tens
     for j = 1:num_losses
-        best_sums_rand(i,j) = max(angles_sums_rand(i,:,j));
-        best_sums_randn(i,j) = max(angles_sums_randn(i,:,j));
-        best_sums_rayleigh(i,j) = max(angles_sums_rayleigh(i,:,j));
-        best_sums_beta(i,j) = max(angles_sums_beta(i,:,j));
-        best_sums_gamma(i,j) = max(angles_sums_gamma(i,:,j));
+        best_sums_rand(i,j) = min(angles_sums_rand(i,:,j));
+        best_sums_randn(i,j) = min(angles_sums_randn(i,:,j));
+        best_sums_rayleigh(i,j) = min(angles_sums_rayleigh(i,:,j));
+        best_sums_beta(i,j) = min(angles_sums_beta(i,:,j));
+        best_sums_gamma(i,j) = min(angles_sums_gamma(i,:,j));
     end
 end
