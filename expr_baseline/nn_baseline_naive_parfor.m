@@ -23,7 +23,7 @@ if ~isfolder(datafolder)
 end
 
 %% general experiment paramenters
-rando = rng('default');
+rando = rng(1339);
 % tensor size & number of modes
 sz = [100, 100, 100]; 
 num_modes = length(sz);
@@ -35,7 +35,7 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 100;
+num_tensors = 10;
 num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
@@ -58,7 +58,7 @@ best_corcondias = cell(num_gens, num_tensors, num_losses, 4);
 
 %% Get into the experiment
 
-parpool(48);
+parpool(8);
 
 t_start = tic;
 for i = 1:num_gens

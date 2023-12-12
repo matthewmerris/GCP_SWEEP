@@ -1,6 +1,6 @@
 %% load the naive baseline data
-load("5-gens_100-tens_100-init_5-losses_17-Nov-2023 21:09:59.mat");
-
+%load("5-gens_100-tens_100-init_5-losses_17-Nov-2023 21:09:59.mat");
+load("5-gens_100-tens_100-init_5-losses_05-Dec-2023 21:11:38.mat");
 % N-way arrays: fits, cossims, corcondias, times 
 % Index mapping:    generators x tensor x run x loss function (5 x 100 x 100 x 5)
 
