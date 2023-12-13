@@ -59,7 +59,8 @@ switch pdf
         lambda = sort(lambda,'descend');
 end
 
-M_true = normalize(ktensor(lambda',U));
+% M_true = normalize(ktensor(lambda',U));
+M_true = ktensor(lambda',U);
 
 info.Soln = M_true;
 info.Data = full(M_true);
