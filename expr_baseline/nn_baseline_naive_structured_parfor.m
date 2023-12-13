@@ -35,9 +35,9 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 10;
-num_runs = 10;          % number of runs, 1 run performs a GCP decomposition
-nf = 5;
+num_tensors = 100;
+num_runs = 100;          % number of runs, 1 run performs a GCP decomposition
+nf = 10;
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
