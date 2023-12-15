@@ -16,7 +16,7 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_runs = 100;
 num_gens = length(gens);
 num_losses = length(losses);
-num_tens = 100;
+num_tensors = 100;
 
 %% Brute force best metrics
 rand_fits = zeros(100,5);
@@ -290,13 +290,13 @@ grid(ax(4),'on');
 
 %% Subspace angles visualization
 % Calculate SUM of subspace angles
-angles_sums_rand = zeros(num_tens,num_runs,num_losses);
-angles_sums_randn = zeros(num_tens,num_runs,num_losses);
-angles_sums_rayleigh = zeros(num_tens,num_runs,num_losses);
-angles_sums_beta = zeros(num_tens,num_runs,num_losses);
-angles_sums_gamma = zeros(num_tens,num_runs,num_losses);
+angles_sums_rand = zeros(num_tensors,num_runs,num_losses);
+angles_sums_randn = zeros(num_tensors,num_runs,num_losses);
+angles_sums_rayleigh = zeros(num_tensors,num_runs,num_losses);
+angles_sums_beta = zeros(num_tensors,num_runs,num_losses);
+angles_sums_gamma = zeros(num_tensors,num_runs,num_losses);
 
-for i = 1:num_tens
+for i = 1:num_tensors
     for j = 1:num_runs
         for k = 1:num_losses
             angles_sums_rand(i,j,k) = 1 - sum(rad2deg(angles{1,i,j,k}));
@@ -308,13 +308,13 @@ for i = 1:num_tens
     end
 end
 
-best_sums_rand = zeros(num_tens,num_losses);
-best_sums_randn = zeros(num_tens, num_losses);
-best_sums_rayleigh = zeros(num_tens, num_losses);
-best_sums_beta = zeros(num_tens, num_losses);
-best_sums_gamma = zeros(num_tens, num_losses);
+best_sums_rand = zeros(num_tensors,num_losses);
+best_sums_randn = zeros(num_tensors, num_losses);
+best_sums_rayleigh = zeros(num_tensors, num_losses);
+best_sums_beta = zeros(num_tensors, num_losses);
+best_sums_gamma = zeros(num_tensors, num_losses);
 
-for i = 1:num_tens
+for i = 1:num_tensors
     for j = 1:num_losses
         best_sums_rand(i,j) = min(angles_sums_rand(i,:,j));
         best_sums_randn(i,j) = min(angles_sums_randn(i,:,j));
