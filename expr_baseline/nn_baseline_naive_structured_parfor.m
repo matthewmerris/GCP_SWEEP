@@ -71,9 +71,6 @@ for i = 1:num_gens
         ten = NN_tensor_generator_structured('Size', sz, 'Lambda_Gen', gens{i},...
                                                 'Num_factors', nf);
         X = ten.Data;
-        % Estimate number of components, ie. rank
-%         [nc, ~] = b_NORMO(double(X), F, 0.8, rando);
-%         ranks(j,i) = nc;
         
         tmp_mdls = cell(num_runs, num_losses,2); % hold model and output info
         tmp_fits = zeros(num_runs, num_losses);

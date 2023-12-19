@@ -35,7 +35,7 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 10;
+num_tensors = 100;
 num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
@@ -88,7 +88,8 @@ for i = 1:num_gens
 
             % perform decompositions with available loss functions
             for l = 1:num_losses
-                tic, [M1, M0, out] = gcp_opt(X, nc, 'type',losses{l}, 'printitn',0, 'init', M_init);
+                M_0 = M_init;
+                tic, [M1, M0, out] = gcp_opt(X, nc, 'type',losses{l}, 'printitn',0, 'init', M_0);
                 t = toc;
                 tmp_fits(k,l) = fitScore(X,M1);
 %                 if isempty(best_fits{i,j,l,1}) || fits(i,j,k,l) > best_fits{i,j,l,1}
@@ -185,7 +186,8 @@ results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gen
 % save gens, losses, fits, cossims, times, corcondias, angles, ranks,
 % best_fits, best_cossims, best_times, best_corcondias
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times', 'corcondias','angles', 'ranks', ...
-    'best_fits', 'best_cossims', 'best_times', 'best_corcondias');
+    'best_fits', 'best_cossims', 'best_times', 'best_corcondias', 'losses', 'gens', 'num_runs', 'num_losses', ...
+    'num_tensors', 'num_gens');
 
 
 
