@@ -19,10 +19,10 @@ num_losses = length(losses);
 num_tensors = 100;
 
 %% Brute force best metrics
-rand_fits = zeros(100,5);
-rand_cossims = zeros(100,5);
-rand_corcondias = zeros(100,5);
-rand_times = zeros(100,5);
+rand_fits = zeros(num_tensors, num_losses);
+rand_cossims = zeros(num_tensors, num_losses);
+rand_corcondias = zeros(num_tensors, num_losses);
+rand_times = zeros(num_tensors, num_losses);
 
 for j = 1:num_losses
     for i = 1:num_runs
@@ -33,10 +33,10 @@ for j = 1:num_losses
     end
 end
 
-randn_fits = zeros(100,5);
-randn_cossims = zeros(100,5);
-randn_corcondias = zeros(100,5);
-randn_times = zeros(100,5);
+randn_fits = zeros(num_tensors, num_losses);
+randn_cossims = zeros(num_tensors, num_losses);
+randn_corcondias = zeros(num_tensors, num_losses);
+randn_times = zeros(num_tensors, num_losses);
 
 for j = 1:num_losses
     for i = 1:num_runs
@@ -47,10 +47,10 @@ for j = 1:num_losses
     end
 end
 
-rayleigh_fits = zeros(100,5);
-rayleigh_cossims = zeros(100,5);
-rayleigh_corcondias = zeros(100,5);
-rayleigh_times = zeros(100,5);
+rayleigh_fits = zeros(num_tensors, num_losses);
+rayleigh_cossims = zeros(num_tensors, num_losses);
+rayleigh_corcondias = zeros(num_tensors, num_losses);
+rayleigh_times = zeros(num_tensors, num_losses);
 
 for j = 1:num_losses
     for i = 1:num_runs
@@ -61,10 +61,10 @@ for j = 1:num_losses
     end
 end
 
-beta_fits = zeros(100,5);
-beta_cossims = zeros(100,5);
-beta_corcondias = zeros(100,5);
-beta_times = zeros(100,5);
+beta_fits = zeros(num_tensors, num_losses);
+beta_cossims = zeros(num_tensors, num_losses);
+beta_corcondias = zeros(num_tensors, num_losses);
+beta_times = zeros(num_tensors, num_losses);
 
 for j = 1:num_losses
     for i = 1:num_runs
@@ -75,10 +75,10 @@ for j = 1:num_losses
     end
 end
 
-gamma_fits = zeros(100,5);
-gamma_cossims = zeros(100,5);
-gamma_corcondias = zeros(100,5);
-gamma_times = zeros(100,5);
+gamma_fits = zeros(num_tensors, num_losses);
+gamma_cossims = zeros(num_tensors, num_losses);
+gamma_corcondias = zeros(num_tensors, num_losses);
+gamma_times = zeros(num_tensors, num_losses);
 
 for j = 1:num_losses
     for i = 1:num_runs
