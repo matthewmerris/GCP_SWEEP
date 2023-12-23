@@ -40,7 +40,7 @@ switch gen_type
         X = gamrnd(11,5,sz); % + ones(sz);
     case 'randn'
         a = 5;      % sigma
-        b = 100;    % mu
+        b = 20;    % mu
         X = a.*randn(sz) + b;
     otherwise 
         a = 5;
