@@ -49,9 +49,9 @@ tensors = cell(num_tensors, num_gens);
 ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(8);
-%% - Generate tensors
-tic;
+parpool(16);
+% - Generate tensors
+t_start = tic;
 for j=1:num_gens
     for i=1:num_tensors
         tensors{i,j} = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{j});
@@ -67,7 +67,7 @@ for j=1:num_gens
     end
 end
 
-%% - Generate initializations
+% - Generate initializations
 % sc = parallel.pool.Constant(RandStream('mrg32k3a'));
 for j=1:num_gens
     for i=1:num_tensors
@@ -84,27 +84,30 @@ for j=1:num_gens
         end
     end
 end
-toc;
+toc(t_start)
 fprintf("Data Generation Complete\n");
 %%
+% make parallel pool constants for generated tensors and initializations
+c_tensors = parallel.pool.Constant(tensors);
+c_inits = parallel.pool.Constant(inits);
+
+fits = zeros(num_gens, num_tensors, num_runs, num_losses);
+cossims = zeros(num_gens, num_tensors, num_runs, num_losses);
+times = zeros(num_gens, num_tensors, num_runs, num_losses);
+corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);
+angles = cell(num_gens, num_tensors,num_runs, num_losses);
+models = cell(num_gens, num_tensors, num_runs,num_losses);
+
 tic;
 for j=1:num_gens
     for i=1:num_tensors
         fprintf("Gen: %d \t Tensor: %d\n",j,i);
-        % generate synthetic tensor
-        ten = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{j});
-        tensors{i,j} = ten;
-        
-        % Estimate number of components, ie. rank
-        X = ten.Data;
-        [nc, ~] = b_NORMO(double(X), F, 0.8);
-        ranks(j,i) = nc;
-        
-
         % generate requisite initializations
         for k=1:num_runs
-            inits{i,j,k} = create_guess('Data', X,'Num_Factors', nc, ...
-                'Factor_Generator', 'rand');     % default 'rand' initialization scheme
+            for l=1:num_losses
+                % do decomposition
+                % calculate metrics
+            end
         end
     end
 end
