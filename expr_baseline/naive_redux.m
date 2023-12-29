@@ -100,13 +100,26 @@ models = cell(num_gens, num_tensors, num_runs,num_losses);
 
 tic;
 for j=1:num_gens
-    for i=1:num_tensors
+    parfor i=1:num_tensors
         fprintf("Gen: %d \t Tensor: %d\n",j,i);
         % generate requisite initializations
+        % retrieve the data
+        tmp_tn = c_tensors.Value{i,j};
+        X = tmp_tn.Data;
         for k=1:num_runs
+            % retrieve initialization
+            M_init = c_inits.Value{i,j,k};
             for l=1:num_losses
+                M_0 = M_init;
                 % do decomposition
+                tic, [M1, M0, out] = gcp_opt(X, nc, 'type',losses{l}, 'printitn',0, 'init', M_0);
+                t = toc;
                 % calculate metrics
+                fit = fitScore(X,M1);
+                cossim = cosSim(X,M1,num_modes);
+                time = out.mainTime;
+                [corcondia, ~] = efficient_corcondia(X,M1);
+                ss_angles = subspaceAngles(X,M1);
             end
         end
     end
