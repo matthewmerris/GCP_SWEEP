@@ -36,8 +36,8 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 10;
-num_runs = 10;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 8;
+num_runs = 5;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -49,7 +49,7 @@ tensors = cell(num_tensors, num_gens);
 ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(16);
+parpool(8);
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -60,27 +60,26 @@ end
 
 % - Estimate ranks
 for j=1:num_gens
+    % *** NEED TO PRESERVE GLOBAL RANDOM STREAM STATE ***
     parfor i=1:num_tensors
         X = tensors{i,j}.Data;
         [nc, ~] = b_NORMO(double(X), F, 0.8,'shuffle');
         ranks(i,j) = nc;
     end
+    % *** NEED TO RESTORE GLOBAL RANDOM STREAM STATE ***
 end
 
-% - Generate initializations
-% sc = parallel.pool.Constant(RandStream('mrg32k3a'));
+%% - Generate initializations
 for j=1:num_gens
     for i=1:num_tensors
         ten = tensors{i,j};
         X = ten.Data;
         nc = ranks(i,j);
-%         stream = sc.Value;
-%         stream.Substream = i;
         fprintf("Gen: %d \t Tensor: %d\n",j,i);
         % generate requisite initializations
         for k=1:num_runs
             inits{i,j,k} = create_guess('Data', X,'Num_Factors', nc, ...
-                'Factor_Generator', 'rand');     % default 'rand' initialization scheme
+                'Factor_Generator', 'rand', 'Size', sz);     % default 'rand' initialization scheme
         end
     end
 end
@@ -90,6 +89,7 @@ fprintf("Data Generation Complete\n");
 % make parallel pool constants for generated tensors and initializations
 c_tensors = parallel.pool.Constant(tensors);
 c_inits = parallel.pool.Constant(inits);
+c_losses = parallel.pool.Constant(losses);
 
 fits = zeros(num_gens, num_tensors, num_runs, num_losses);
 cossims = zeros(num_gens, num_tensors, num_runs, num_losses);
@@ -110,9 +110,9 @@ for j=1:num_gens
             % retrieve initialization
             M_init = c_inits.Value{i,j,k};
             for l=1:num_losses
-                M_0 = M_init;
+                M_0 = ktensor(M_init);
                 % do decomposition
-                tic, [M1, M0, out] = gcp_opt(X, nc, 'type',losses{l}, 'printitn',0, 'init', M_0);
+                tic, [M1, M0, out] = gcp_opt(X, nc, 'type',c_losses.Value{l}, 'printitn',0, 'init', M_0);
                 t = toc;
                 % calculate metrics
                 fit = fitScore(X,M1);
