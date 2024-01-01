@@ -69,7 +69,7 @@ for j=1:num_gens
     % *** NEED TO RESTORE GLOBAL RANDOM STREAM STATE ***
 end
 
-%% - Generate initializations
+% - Generate initializations
 for j=1:num_gens
     for i=1:num_tensors
         ten = tensors{i,j};
@@ -90,6 +90,7 @@ fprintf("Data Generation Complete\n");
 c_tensors = parallel.pool.Constant(tensors);
 c_inits = parallel.pool.Constant(inits);
 c_losses = parallel.pool.Constant(losses);
+c_ranks = parallel.pool.Constant(ranks);
 
 fits = zeros(num_gens, num_tensors, num_runs, num_losses);
 cossims = zeros(num_gens, num_tensors, num_runs, num_losses);
@@ -106,6 +107,8 @@ for j=1:num_gens
         % retrieve the data
         tmp_tn = c_tensors.Value{i,j};
         X = tmp_tn.Data;
+        % retrieve the rank
+        nc = c_ranks.Value(i,j);
         for k=1:num_runs
             % retrieve initialization
             M_init = c_inits.Value{i,j,k};

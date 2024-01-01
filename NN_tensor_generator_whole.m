@@ -39,11 +39,11 @@ switch gen_type
     case 'gamma'
         X = gamrnd(11,5,sz); % + ones(sz);
     case 'randn'
-        a = 5;      % sigma
+        a = 2;      % sigma
         b = 20;    % mu
         X = a.*randn(sz) + b;
     otherwise 
-        a = 5;
+        a = 2;
         b = 20;
         X = a.*randn(sz) + b;
 end
