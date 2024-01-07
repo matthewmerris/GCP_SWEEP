@@ -36,8 +36,8 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 8;
-num_runs = 5;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 100;
+num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -92,12 +92,12 @@ c_inits = parallel.pool.Constant(inits);
 c_losses = parallel.pool.Constant(losses);
 c_ranks = parallel.pool.Constant(ranks);
 
-fits = zeros(num_gens, num_tensors, num_runs, num_losses);
-cossims = zeros(num_gens, num_tensors, num_runs, num_losses);
-times = zeros(num_gens, num_tensors, num_runs, num_losses);
-corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);
-angles = cell(num_gens, num_tensors,num_runs, num_losses);
-models = cell(num_gens, num_tensors, num_runs,num_losses);
+fits = zeros(num_gens, num_tensors, num_runs, num_losses);          % j,i,k,l
+cossims = zeros(num_gens, num_tensors, num_runs, num_losses);       % j,i,k,l
+times = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
+corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
+angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
+models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
 tic;
 for j=1:num_gens
@@ -119,16 +119,19 @@ for j=1:num_gens
                 t = toc;
                 % calculate metrics
                 fit = fitScore(X,M1);
+                fits(j,i,k,l) = fit;
                 cossim = cosSim(X,M1,num_modes);
+                cossims(j,i,k,l) = cossim;
                 time = out.mainTime;
+                times(j,i,k,l) = time;
                 [corcondia, ~] = efficient_corcondia(X,M1);
+                corcondias(j,i,k,l) = corcondia;
                 ss_angles = subspaceAngles(X,M1);
+                angles{j,i,k,l} = ss_angles;
             end
         end
     end
 end
 toc;
 
-%% set up results containers
-
-%% perform decompositions
+%% save results
