@@ -99,6 +99,8 @@ corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
 angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
 models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
+best_fits = zeros(num_gens,num_tensors, num_losses);
+
 tic;
 for j=1:num_gens
     parfor i=1:num_tensors
