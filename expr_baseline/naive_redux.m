@@ -49,7 +49,7 @@ tensors = cell(num_tensors, num_gens);
 ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(8);
+parpool(48);
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -100,6 +100,9 @@ angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
 models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
 best_fits = zeros(num_gens,num_tensors, num_losses);
+best_cossims = zeros(num_gens,num_tensors, num_losses);
+best_times = zeros(num_gens,num_tensors, num_losses);
+best_corcondias = zeros(num_gens,num_tensors, num_losses);
 
 tic;
 for j=1:num_gens
@@ -111,6 +114,8 @@ for j=1:num_gens
         X = tmp_tn.Data;
         % retrieve the rank
         nc = c_ranks.Value(i,j);
+        % models container
+        models = cell(num_runs,num_losses);
         for k=1:num_runs
             % retrieve initialization
             M_init = c_inits.Value{i,j,k};
@@ -130,10 +135,31 @@ for j=1:num_gens
                 corcondias(j,i,k,l) = corcondia;
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
+                % store model
+                models{k,l} = M1;
             end
         end
+        % collect best metrics and models
     end
 end
 toc;
 
+%% sorting out best_ metrics collecting
+for j=1:num_gens
+    for i=1:num_tensors
+        best_fits(j,i,:) = max(squeeze(fits(j,i,:,:)));
+        best_cossims(j,i,:) = max(squeeze(cossims(j,i,:,:)));
+        best_times(j,i,:) = max(squeeze(times(j,i,:,:)));
+        best_corcondias(j,i,:) = max(squeeze(corcondias(j,i,:,:)));
+    end
+end
+                
+
 %% save results
+results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
+                            num_runs, num_losses)+ string(datetime("now"));
+
+save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
+    'corcondias','angles', 'ranks','best_fits', 'best_cossims',...
+    'best_times', 'best_corcondias', 'num_runs',...
+    'num_losses','num_tensors', 'num_gens');
