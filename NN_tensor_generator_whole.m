@@ -33,11 +33,11 @@ switch gen_type
     case 'rand'
         X = rand(sz) + ones(sz);
     case 'rayleigh'
-        X = raylrnd(5,sz);
+        X = raylrnd(.5,sz);
     case 'beta'
-        X = betarnd(5,2,sz);
+        X = betarnd(2,5,sz);
     case 'gamma'
-        X = gamrnd(11,5,sz); % + ones(sz);
+        X = gamrnd(3,3,sz); % + ones(sz);
     case 'randn'
         a = 2;      % sigma
         b = 20;    % mu

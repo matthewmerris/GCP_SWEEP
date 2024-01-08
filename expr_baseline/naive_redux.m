@@ -24,7 +24,7 @@ end
 
 %% general experiment paramenters
 rng("shuffle"); % seed based on current time
-
+% rng(1339);
 % tensor size & number of modes
 sz = [100, 100, 100]; 
 num_modes = length(sz);
@@ -58,16 +58,18 @@ for j=1:num_gens
     end
 end
 
+% *** NEED TO PRESERVE GLOBAL RANDOM STREAM STATE ***
+globalStream = RandStream.getGlobalStream;
 % - Estimate ranks
 for j=1:num_gens
-    % *** NEED TO PRESERVE GLOBAL RANDOM STREAM STATE ***
     parfor i=1:num_tensors
         X = tensors{i,j}.Data;
         [nc, ~] = b_NORMO(double(X), F, 0.8,'shuffle');
         ranks(i,j) = nc;
     end
-    % *** NEED TO RESTORE GLOBAL RANDOM STREAM STATE ***
 end
+% *** NEED TO RESTORE GLOBAL RANDOM STREAM STATE ***
+RandStream.setGlobalStream(globalStream);
 
 % - Generate initializations
 for j=1:num_gens
