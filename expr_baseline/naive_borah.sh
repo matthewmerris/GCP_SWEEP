@@ -20,4 +20,4 @@ cd $PWD
 CURRENTDATE=$( date +'%m-%d-%y-%H:%M:%S')
 OUTFILE="/bsuhome/mmerris/scratch/out_nn_${CURRENTDATE}.txt"
 # matlab -nodisplay -nosplash -r  nn_baseline_naive >${OUTFILE}
-matlab -nodisplay -nosplash -r  nn_baseline_naive_parfor 
+matlab -nodisplay -nosplash -r  naive_redux 

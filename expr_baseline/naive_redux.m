@@ -23,8 +23,9 @@ if ~isfolder(datafolder)
 end
 
 %% general experiment paramenters
-rng("shuffle"); % seed based on current time
-% rng(1339);
+% rng("shuffle"); % seed based on current time
+rng(1339);
+
 % tensor size & number of modes
 sz = [100, 100, 100]; 
 num_modes = length(sz);
