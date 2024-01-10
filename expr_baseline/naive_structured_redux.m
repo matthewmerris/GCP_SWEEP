@@ -36,8 +36,8 @@ gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 48;
-num_runs = 10;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 100;
+num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -48,7 +48,7 @@ num_losses = length(losses);
 tensors = cell(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(16);
+parpool(48);
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -151,9 +151,9 @@ end
 
 %% save results
 results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
-                            num_runs, num_losses)+ string(datetime("now"));
+                            num_runs, num_losses)+ string(datetime("now")+'_structured');
 
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
     'corcondias','angles','scores', 'best_fits', 'best_cossims',...
     'best_times', 'best_corcondias', 'best_scores','num_runs',...
-    'num_losses','num_tensors', 'num_gens');
+    'num_losses','num_tensors', 'num_gens','nf');
