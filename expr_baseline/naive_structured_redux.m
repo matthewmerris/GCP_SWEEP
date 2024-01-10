@@ -23,17 +23,15 @@ if ~isfolder(datafolder)
 end
 
 %% general experiment paramenters
-% rng("shuffle"); % seed based on current time
-rng(1339);
-
+rng("shuffle"); % seed based on current time
+% rng(1339);
 % tensor size & number of modes
 sz = [100, 100, 100]; 
 num_modes = length(sz);
-F = floor(max(sz)/2);
+nf = 10;
 
 % tensor generators | number of generators
-% gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
-gens = {'beta'};
+gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 % gens = {'rand'};
 num_gens = length(gens);
 
@@ -48,7 +46,6 @@ num_losses = length(losses);
 %% generate tensor, estimate rank, and generate initializations
 
 tensors = cell(num_tensors, num_gens);
-ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
 parpool(16);
@@ -56,50 +53,39 @@ parpool(16);
 t_start = tic;
 for j=1:num_gens
     for i=1:num_tensors
-        tensors{i,j} = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{j});
+        tensors{i,j} = NN_tensor_generator_structured('Size', sz, 'Lambda_Gen', gens{j},...
+                                                'Num_factors', nf);
     end
 end
-
-% *** NEED TO PRESERVE GLOBAL RANDOM STREAM STATE ***
-globalStream = RandStream.getGlobalStream;
-% - Estimate ranks
-for j=1:num_gens
-    parfor i=1:num_tensors
-        X = tensors{i,j}.Data;
-        [nc, ~] = b_NORMO(double(X), F, 0.8,'shuffle');
-        ranks(i,j) = nc;
-    end
-end
-% *** NEED TO RESTORE GLOBAL RANDOM STREAM STATE ***
-RandStream.setGlobalStream(globalStream);
 
 % - Generate initializations
 for j=1:num_gens
     for i=1:num_tensors
         ten = tensors{i,j};
         X = ten.Data;
-        nc = ranks(i,j);
         fprintf("Gen: %d \t Tensor: %d\n",j,i);
         % generate requisite initializations
         for k=1:num_runs
-            inits{i,j,k} = create_guess('Data', X,'Num_Factors', nc, ...
+            inits{i,j,k} = create_guess('Data', X,'Num_Factors', nf, ...
                 'Factor_Generator', 'rand', 'Size', sz);     % default 'rand' initialization scheme
         end
     end
 end
 toc(t_start)
 fprintf("Data Generation Complete\n");
+
 %%
 % make parallel pool constants for generated tensors and initializations
 c_tensors = parallel.pool.Constant(tensors);
 c_inits = parallel.pool.Constant(inits);
 c_losses = parallel.pool.Constant(losses);
-c_ranks = parallel.pool.Constant(ranks);
+
 
 fits = zeros(num_gens, num_tensors, num_runs, num_losses);          % j,i,k,l
 cossims = zeros(num_gens, num_tensors, num_runs, num_losses);       % j,i,k,l
 times = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
+scores = zeros(num_gens, num_tensors, num_runs, num_losses);
 angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
 models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
@@ -107,6 +93,7 @@ best_fits = zeros(num_gens,num_tensors, num_losses);
 best_cossims = zeros(num_gens,num_tensors, num_losses);
 best_times = zeros(num_gens,num_tensors, num_losses);
 best_corcondias = zeros(num_gens,num_tensors, num_losses);
+best_scores = zeros(num_gens,num_tensors, num_losses);
 
 tic;
 for j=1:num_gens
@@ -117,7 +104,7 @@ for j=1:num_gens
         tmp_tn = c_tensors.Value{i,j};
         X = tmp_tn.Data;
         % retrieve the rank
-        nc = c_ranks.Value(i,j);
+        nc = nf;
         % models container
         models = cell(num_runs,num_losses);
         for k=1:num_runs
@@ -141,6 +128,9 @@ for j=1:num_gens
                 angles{j,i,k,l} = ss_angles;
                 % store model
                 models{k,l} = M1;
+                % calculate score of model against solution
+                sol = tmp_tn.Soln;
+                scores(j,i,k,l) = score(sol,M1);
             end
         end
         % collect best metrics and models
@@ -155,15 +145,15 @@ for j=1:num_gens
         best_cossims(j,i,:) = max(squeeze(cossims(j,i,:,:)));
         best_times(j,i,:) = max(squeeze(times(j,i,:,:)));
         best_corcondias(j,i,:) = max(squeeze(corcondias(j,i,:,:)));
+        best_scores(j,i,:) = max(squeeze(scores(j,i,:,:)));
     end
 end
-                
 
 %% save results
 results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
                             num_runs, num_losses)+ string(datetime("now"));
 
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
-    'corcondias','angles', 'ranks','best_fits', 'best_cossims',...
-    'best_times', 'best_corcondias', 'num_runs',...
+    'corcondias','angles','scores', 'best_fits', 'best_cossims',...
+    'best_times', 'best_corcondias', 'best_scores','num_runs',...
     'num_losses','num_tensors', 'num_gens');

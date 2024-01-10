@@ -35,7 +35,7 @@ switch gen_type
     case 'rayleigh'
         X = raylrnd(.5,sz);
     case 'beta'
-        X = betarnd(2,5,sz);
+        X = betarnd(1,.3,sz);
     case 'gamma'
         X = gamrnd(3,3,sz); % + ones(sz);
     case 'randn'
