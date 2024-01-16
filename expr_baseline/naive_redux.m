@@ -38,8 +38,8 @@ gens = {'beta'};
 num_gens = length(gens);
 
 % number of tensors generated per generator 
-num_tensors = 48;
-num_runs = 10;          % number of runs, 1 run performs a GCP decomposition 
+num_tensors = 100;
+num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -51,7 +51,7 @@ tensors = cell(num_tensors, num_gens);
 ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(16);
+parpool(48);
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -79,13 +79,14 @@ for j=1:num_gens
         ten = tensors{i,j};
         X = ten.Data;
         nc = ranks(i,j);
-        fprintf("Gen: %d \t Tensor: %d\n",j,i);
+%         fprintf("Gen: %d \t Tensor: %d\n",j,i);
         % generate requisite initializations
         for k=1:num_runs
             inits{i,j,k} = create_guess('Data', X,'Num_Factors', nc, ...
                 'Factor_Generator', 'rand', 'Size', sz);     % default 'rand' initialization scheme
         end
     end
+    fprintf("Gen: %s tensors complete.\n",gens{j});
 end
 toc(t_start)
 fprintf("Data Generation Complete\n");
@@ -119,7 +120,7 @@ for j=1:num_gens
         % retrieve the rank
         nc = c_ranks.Value(i,j);
         % models container
-        models = cell(num_runs,num_losses);
+%         models = cell(num_runs,num_losses);
         for k=1:num_runs
             % retrieve initialization
             M_init = c_inits.Value{i,j,k};
@@ -140,7 +141,7 @@ for j=1:num_gens
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
                 % store model
-                models{k,l} = M1;
+                models{j,i,k,l} = M1;
             end
         end
         % collect best metrics and models
@@ -166,4 +167,4 @@ results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gen
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
     'corcondias','angles', 'ranks','best_fits', 'best_cossims',...
     'best_times', 'best_corcondias', 'num_runs',...
-    'num_losses','num_tensors', 'num_gens');
+    'num_losses','num_tensors', 'num_gens', 'tensors', 'models');
