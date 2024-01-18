@@ -32,8 +32,8 @@ num_modes = length(sz);
 F = floor(max(sz)/2);
 
 % tensor generators | number of generators
-% gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
-gens = {'beta'};
+gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
+% gens = {'beta'};
 % gens = {'rand'};
 num_gens = length(gens);
 
@@ -51,7 +51,9 @@ tensors = cell(num_tensors, num_gens);
 ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
+% start parallel pool
 parpool(48);
+
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -89,8 +91,16 @@ for j=1:num_gens
     fprintf("Gen: %s tensors complete.\n",gens{j});
 end
 toc(t_start)
+
+% close parallel pool
+delete(gcp('nocreate'));
+
 fprintf("Data Generation Complete\n");
+
 %%
+% start parallel pool
+parpool(48);
+
 % make parallel pool constants for generated tensors and initializations
 c_tensors = parallel.pool.Constant(tensors);
 c_inits = parallel.pool.Constant(inits);
@@ -108,6 +118,7 @@ best_fits = zeros(num_gens,num_tensors, num_losses);
 best_cossims = zeros(num_gens,num_tensors, num_losses);
 best_times = zeros(num_gens,num_tensors, num_losses);
 best_corcondias = zeros(num_gens,num_tensors, num_losses);
+
 
 tic;
 for j=1:num_gens
@@ -148,6 +159,9 @@ for j=1:num_gens
     end
 end
 toc;
+
+% close parallel pool
+delete(gcp('nocreate'));
 
 %% sorting out best_ metrics collecting
 for j=1:num_gens
