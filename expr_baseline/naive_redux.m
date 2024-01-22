@@ -93,13 +93,13 @@ end
 toc(t_start)
 
 % close parallel pool
-delete(gcp('nocreate'));
+% delete(gcp('nocreate'));
 
 fprintf("Data Generation Complete\n");
 
 %%
 % start parallel pool
-parpool(48);
+% parpool(48);
 
 % make parallel pool constants for generated tensors and initializations
 c_tensors = parallel.pool.Constant(tensors);
@@ -112,7 +112,7 @@ cossims = zeros(num_gens, num_tensors, num_runs, num_losses);       % j,i,k,l
 times = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
 angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
-models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
+% models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
 best_fits = zeros(num_gens,num_tensors, num_losses);
 best_cossims = zeros(num_gens,num_tensors, num_losses);
@@ -152,7 +152,7 @@ for j=1:num_gens
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
                 % store model
-                models{j,i,k,l} = M1;
+%                models{j,i,k,l} = M1;
             end
         end
         % collect best metrics and models
@@ -177,8 +177,14 @@ end
 %% save results
 results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
                             num_runs, num_losses)+ string(datetime("now"));
-
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
     'corcondias','angles', 'ranks','best_fits', 'best_cossims',...
     'best_times', 'best_corcondias', 'num_runs',...
-    'num_losses','num_tensors', 'num_gens', 'tensors', 'models');
+    'num_losses','num_tensors', 'num_gens');
+
+data_filename = strcat(results_filename,'_data.mat');
+m = matfile(data_filename,'Writable',true);
+m.tensors = tensors;
+m.inits = inits;
+% m.models = models;
+
