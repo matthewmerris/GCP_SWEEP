@@ -1,6 +1,11 @@
 %% load the data
 load('5-gens_10-tens_100-init_5-losses_19-Jan-2024 20:20:06.mat');
 load('5-gens_10-tens_100-init_5-losses_19-Jan-2024 20:20:06_data.mat');
+load('ratpack.mat');
+load('exception.mat');
+
+
+
 
 %% identify indices of problematic tensors
 idxs = find(fits > 1);
@@ -44,3 +49,27 @@ beta_culprits{5,1} = tensors{10,4};
 exception{1} = tensors{1,4};
 exception{2} = inits{1,4,80};
 exception{3} = inits{1,4,81};
+
+%% pickup
+excp_ten = exception{1};
+init_good = exception{2};
+nc = size(init_good{1});
+nc = nc(2);
+init_good = ktensor(init_good);
+init_bad = ktensor(exception{3});
+
+losses_bad = {'rayleigh' 'gamma' 'beta'};
+
+[M1_good,M0_good,out_good] = gcp_opt(excp_ten.Data, nc, 'type', losses_bad{1}, 'init', init_good);
+[M1_bad, M0_bad, out_bad] = gcp_opt(excp_ten.Data, nc, 'type', losses_bad{1}, 'init', init_bad);
+[M1_normal, M0_normal, out_normal] = gcp_opt(excp_ten.Data, nc, 'type', 'normal', 'init', init_bad);
+
+%%
+full_good = full(M1_good);
+full_bad = full(M1_bad);
+full_normal = full(M1_normal);
+
+% calc fitscore without helpers
+fit_good = 1 - norm(excp_ten.Data - full_good)/norm(excp_ten.Data);
+fit_bad = 1 - norm(excp_ten.Data - full_bad)/norm(excp_ten.Data);
+fit_normal = 1 - norm(excp_ten.Data - full_normal)/norm(excp_ten.Data);
