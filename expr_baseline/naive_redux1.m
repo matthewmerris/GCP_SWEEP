@@ -52,7 +52,7 @@ ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
 % start parallel pool
-parpool(10);
+parpool(48);
 
 % - Generate tensors
 t_start = tic;
@@ -111,6 +111,7 @@ fits = zeros(num_gens, num_tensors, num_runs, num_losses);          % j,i,k,l
 cossims = zeros(num_gens, num_tensors, num_runs, num_losses);       % j,i,k,l
 times = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
+rmses = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
 % models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
@@ -118,6 +119,7 @@ best_fits = zeros(num_gens,num_tensors, num_losses);
 best_cossims = zeros(num_gens,num_tensors, num_losses);
 best_times = zeros(num_gens,num_tensors, num_losses);
 best_corcondias = zeros(num_gens,num_tensors, num_losses);
+best_rmses = zeros(num_gens,num_tensors, num_losses);
 
 
 tic;
@@ -152,6 +154,7 @@ for j=1:num_gens
                 times(j,i,k,l) = time;
                 [corcondia, ~] = efficient_corcondia(X,M1);
                 corcondias(j,i,k,l) = corcondia;
+                rmses(j,i,k,l) = rmse(X,M1);
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
                 % store model
@@ -173,6 +176,7 @@ for j=1:num_gens
         best_cossims(j,i,:) = max(squeeze(cossims(j,i,:,:)));
         best_times(j,i,:) = max(squeeze(times(j,i,:,:)));
         best_corcondias(j,i,:) = max(squeeze(corcondias(j,i,:,:)));
+        best_rmses(j,i,:) = max(squeeze(rmses(j,i,:,:)));
     end
 end
                 
@@ -181,8 +185,9 @@ end
 results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
                             num_runs, num_losses)+ string(datetime("now"));
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
-    'corcondias','angles', 'ranks','best_fits', 'best_cossims',...
-    'best_times', 'best_corcondias', 'num_runs',...
+    'corcondias','angles', 'ranks','rsmes',...
+    'best_fits', 'best_cossims','best_times', ...
+    'best_corcondias', 'best_rsmes','num_runs',...
     'num_losses','num_tensors', 'num_gens');
 
 data_filename = strcat(results_filename,'_data.mat');
