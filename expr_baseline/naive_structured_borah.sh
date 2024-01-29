@@ -6,7 +6,7 @@
 #SBATCH -N 1
 #SBATCH -n 48
 #SBATCH -t 01-12:00:00
-#SBATCH -o outfiles/%x-%j.out
+#SBATCH -o outfiles/%x-%j_structured.out
 #SBATCH -J naive_nn
 
 
