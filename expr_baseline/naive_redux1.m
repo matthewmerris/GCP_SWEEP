@@ -154,7 +154,7 @@ for j=1:num_gens
                 times(j,i,k,l) = time;
                 [corcondia, ~] = efficient_corcondia(X,M1);
                 corcondias(j,i,k,l) = corcondia;
-                rmses(j,i,k,l) = rmse(X,M1);
+                rmses(j,i,k,l) = rms_err(X,M1);
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
                 % store model
