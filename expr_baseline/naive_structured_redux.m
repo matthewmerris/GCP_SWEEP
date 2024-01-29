@@ -28,7 +28,7 @@ rng("shuffle"); % seed based on current time
 % tensor size & number of modes
 sz = [100, 100, 100]; 
 num_modes = length(sz);
-nf = 10;
+nf = 20;
 
 % tensor generators | number of generators
 gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
@@ -48,7 +48,7 @@ num_losses = length(losses);
 tensors = cell(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(48);
+parpool(8);
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -76,7 +76,7 @@ fprintf("Data Generation Complete\n");
 
 %%
 % make parallel pool constants for generated tensors and initializations
-c_tensors = parallel.pool.Constant(tensors);
+% c_tensors = parallel.pool.Constant(tensors);
 c_inits = parallel.pool.Constant(inits);
 c_losses = parallel.pool.Constant(losses);
 
@@ -86,22 +86,27 @@ cossims = zeros(num_gens, num_tensors, num_runs, num_losses);       % j,i,k,l
 times = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
 scores = zeros(num_gens, num_tensors, num_runs, num_losses);
+rmses = zeros(num_gens, num_tensors, num_runs, num_losses);
+
 angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
-models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
+% models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
 best_fits = zeros(num_gens,num_tensors, num_losses);
 best_cossims = zeros(num_gens,num_tensors, num_losses);
 best_times = zeros(num_gens,num_tensors, num_losses);
 best_corcondias = zeros(num_gens,num_tensors, num_losses);
 best_scores = zeros(num_gens,num_tensors, num_losses);
+best_rmses = zeros(num_gens,num_tensors, num_losses);
 
 tic;
 for j=1:num_gens
+    tmp_tensors = tensors(:,j);
+    tmp_inits = inits(:,j,:);
     parfor i=1:num_tensors
         fprintf("Gen: %d \t Tensor: %d\n",j,i);
         % generate requisite initializations
         % retrieve the data
-        tmp_tn = c_tensors.Value{i,j};
+        tmp_tn = tmp_tensors{i};
         X = tmp_tn.Data;
         % retrieve the rank
         nc = nf;
@@ -109,7 +114,7 @@ for j=1:num_gens
         models = cell(num_runs,num_losses);
         for k=1:num_runs
             % retrieve initialization
-            M_init = c_inits.Value{i,j,k};
+            M_init = tmp_inits{i,1,k};
             for l=1:num_losses
                 M_0 = ktensor(M_init);
                 % do decomposition
@@ -124,10 +129,11 @@ for j=1:num_gens
                 times(j,i,k,l) = time;
                 [corcondia, ~] = efficient_corcondia(X,M1);
                 corcondias(j,i,k,l) = corcondia;
+                rmses(j,i,k,l) = rms_err(X,M1);
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
                 % store model
-                models{k,l} = M1;
+%                 models{k,l} = M1;
                 % calculate score of model against solution
                 sol = tmp_tn.Soln;
                 scores(j,i,k,l) = score(sol,M1);
