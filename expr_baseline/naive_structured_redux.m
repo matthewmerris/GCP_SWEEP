@@ -48,7 +48,7 @@ num_losses = length(losses);
 tensors = cell(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
-parpool(8);
+parpool(48);
 % - Generate tensors
 t_start = tic;
 for j=1:num_gens
@@ -143,6 +143,7 @@ for j=1:num_gens
     end
 end
 toc;
+delete(gcp('nocreate'));
 
 %% sorting out best_ metrics collecting
 for j=1:num_gens
@@ -157,8 +158,8 @@ for j=1:num_gens
 end
 
 %% save results
-results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_', num_gens, num_tensors, ...
-                            num_runs, num_losses)+ string(datetime("now")+'_structured');
+results_filename = sprintf('results/%d-gens_%d-tens_%d-init_%d-losses_structured', num_gens, num_tensors, ...
+                            num_runs, num_losses)+ string(datetime("now"));
 
 save(results_filename, 'gens', 'losses', 'fits', 'cossims', 'times',...
     'corcondias','rmses','angles','scores','best_fits',...
