@@ -87,7 +87,7 @@ times = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 corcondias = zeros(num_gens, num_tensors, num_runs, num_losses);    % j,i,k,l
 scores = zeros(num_gens, num_tensors, num_runs, num_losses);
 rmses = zeros(num_gens, num_tensors, num_runs, num_losses);
-
+objectives = zeros(num_gens, num_tensors, num_runs, num_losses);         % j,i,k,l
 angles = cell(num_gens, num_tensors,num_runs, num_losses);          % j,i,k,l
 % models = cell(num_gens, num_tensors, num_runs,num_losses);          % j,i,k,l
 
@@ -97,6 +97,7 @@ best_times = zeros(num_gens,num_tensors, num_losses);
 best_corcondias = zeros(num_gens,num_tensors, num_losses);
 best_scores = zeros(num_gens,num_tensors, num_losses);
 best_rmses = zeros(num_gens,num_tensors, num_losses);
+best_objectives = zeros(num_gens,num_tensors, num_losses);
 
 tic;
 for j=1:num_gens
@@ -130,6 +131,7 @@ for j=1:num_gens
                 [corcondia, ~] = efficient_corcondia(X,M1);
                 corcondias(j,i,k,l) = corcondia;
                 rmses(j,i,k,l) = rms_err(X,M1);
+                objectives(j,i,k,l) = out.finalf;
                 ss_angles = subspaceAngles(X,M1);
                 angles{j,i,k,l} = ss_angles;
                 % store model
@@ -153,7 +155,8 @@ for j=1:num_gens
         best_times(j,i,:) = max(squeeze(times(j,i,:,:)));
         best_corcondias(j,i,:) = max(squeeze(corcondias(j,i,:,:)));
         best_scores(j,i,:) = max(squeeze(scores(j,i,:,:)));
-        best_rmses(j,i,:) = max(squeeze(rmses(j,i,:,:)));
+        best_rmses(j,i,:) = min(squeeze(rmses(j,i,:,:)));
+        best_objectives(j,i,:) = min(squeeze(objectives(j,i,:,:)));
     end
 end
 
