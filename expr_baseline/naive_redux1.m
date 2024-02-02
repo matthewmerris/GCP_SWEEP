@@ -39,7 +39,7 @@ num_gens = length(gens);
 
 % number of tensors generated per generator 
 num_tensors = 100;
-num_runs = 100;          % number of runs, 1 run performs a GCP decomposition 
+num_runs = 1;          % number of runs, 1 run performs a GCP decomposition 
                         %
 % GCP losses | number of GCP loss functions
 losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'};
@@ -52,7 +52,7 @@ ranks = zeros(num_tensors, num_gens);
 inits = cell(num_tensors, num_gens, num_runs);
 
 % start parallel pool
-parpool(48);
+parpool(8);
 
 % - Generate tensors
 t_start = tic;
