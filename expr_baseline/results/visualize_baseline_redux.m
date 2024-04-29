@@ -1,4 +1,4 @@
-%% same, but split into individual figures for each generator type
+% same, but split into individual figures for each generator type
 for i=1:num_gens
     % brute force plot and boxplot to be same size in subplot
     % see https://www.mathworks.com/help/matlab/ref/subplot.html
