@@ -39,14 +39,29 @@ hold off;
 figure();
 hold on;
 for i = 1:num_losses
-%     corcondias_plot = plot(log10(corcondias(:,i)), 'LineStyle','none','Marker','o');
     corcondias_plot = plot(corcondias(:,i), 'LineStyle','none','Marker','o');
     set(corcondias_plot, 'markerfacecolor', get(corcondias_plot, 'color'));
 end
 legend(losses);
 ylabel('CORCONDIA');
-title('CORCONDIA Score (log scaled)')
+title('CORCONDIA Score')
 hold off;
+
+% corcondias (log-scale transformation)
+log_corcondias = corcondias;
+log_corcondias(log_corcondias > 0) = log10(1+log_corcondias(log_corcondias > 0));
+log_corcondias(log_corcondias < 0) = -log10(1-log_corcondias(log_corcondias < 0));
+
+figure();
+hold on;
+for i = 1:num_losses
+    log_corcondias_plot = plot(log_corcondias(:,i), 'LineStyle','none','Marker','o');
+    set(log_corcondias_plot, 'markerfacecolor', get(log_corcondias_plot, 'color'));
+end
+legend(losses);
+ylabel('CORCONDIA');
+title('CORCONDIA Score (log scale transform)')
+hold off
 
 
 %% repeat but for only for losses with non-negative fit scores (losses indices 2 & 5)
@@ -96,12 +111,27 @@ figure();
 hold on;
 for i = 1:num_losses
     if i ~= 2 && i ~=5
-        corcondias_plot = plot(log10(corcondias(:,i)), 'LineStyle','none','Marker','o');
-%         corcondias_plot = plot(corcondias(:,i), 'LineStyle','none','Marker','o');
+        corcondias_plot = plot(corcondias(:,i), 'LineStyle','none','Marker','o');
         set(corcondias_plot, 'markerfacecolor', get(corcondias_plot, 'color'));
     end
 end
 legend(losses_best);
 ylabel('CORCONDIA');
-title('CORCONDIA Score (log scaled)')
+title('CORCONDIA Score')
+hold off;
+
+% create log-scale version of CORCONDIAS
+
+figure();
+hold on;
+for i = 1:num_losses
+    if i ~= 2 && i ~=5
+        corcondias_plot = plot(log_corcondias(:,i), 'LineStyle','none','Marker','o',...
+            'MarkerSize',8);
+        set(corcondias_plot, 'markerfacecolor', get(corcondias_plot, 'color'));
+    end
+end
+legend(losses_best);
+ylabel('CORCONDIA');
+title('CORCONDIA Score (log scale transform)')
 hold off;
