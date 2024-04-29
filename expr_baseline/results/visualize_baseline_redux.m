@@ -27,7 +27,7 @@ for i=1:num_gens
 
     % best corcondias
     plt5 = figure;
-    plot(squeeze(best_corcondias(i,:,:)));
+    plot(log10(squeeze(best_corcondias(i,:,:))));
     legend(losses);
     ylabel('Corcondia Score');
     ax5 = gca;
@@ -47,40 +47,60 @@ for i=1:num_gens
     boxplot(squeeze(best_times(i,:,:)), 'Labels', losses);
     ax8 = gca;
 
+    % best rmses
+    plt9 = figure;
+    plot(squeeze(best_rmses(i,:,:)));
+    legend(losses);
+    ylabel('RMSEs');
+    ax9 = gca;
+
+    bx_plt10 = figure;
+    boxplot(squeeze(best_rmses(i,:,:)),'Labels', losses);
+    ax10 = gca;
+
     % build the plot & boxplot figure
     fnew = figure;
     
     ax1_copy = copyobj(ax1, fnew);
-    subplot(4,2,1,ax1_copy(1));
+    subplot(5,2,1,ax1_copy(1));
     legend(losses);
     ylabel('Fit Score');
     copies = copyobj(ax2, fnew);
     ax2_copy = copies(1);
-    subplot(4,2,2,ax2_copy);
+    subplot(5,2,2,ax2_copy);
 
     ax3_copy = copyobj(ax3, fnew);
-    subplot(4,2,3,ax3_copy(1));
+    subplot(5,2,3,ax3_copy(1));
     legend(losses);
     ylabel('Cos Similarity');
     copies = copyobj(ax4, fnew);
     ax4_copy = copies(1);
-    subplot(4,2,4,ax4_copy);
+    subplot(5,2,4,ax4_copy);
 
     ax5_copy = copyobj(ax5, fnew);
-    subplot(4,2,5,ax5_copy(1));
+    subplot(5,2,5,ax5_copy(1));
     legend(losses);
     ylabel('Corcondia Score');
     copies = copyobj(ax6, fnew);
     ax6_copy = copies(1);
-    subplot(4,2,6,ax6_copy);
+    subplot(5,2,6,ax6_copy);
 
     ax7_copy = copyobj(ax7, fnew);
-    subplot(4,2,7,ax7_copy(1));
+    subplot(5,2,7,ax7_copy(1));
     legend(losses);
     ylabel('Times');
     copies = copyobj(ax8, fnew);
     ax8_copy = copies(1);
-    subplot(4,2,8,ax8_copy);
+    subplot(5,2,8,ax8_copy);
+
+    ax9_copy = copyobj(ax9,fnew);
+    subplot(5,2,9,ax9_copy(1));
+    legend(losses);
+    ylabel('RMSEs');
+    copies = copyobj(ax10,fnew);
+    ax10_copy = copies(1);
+    subplot(5,2,10,ax10_copy);
+
 
 
     gen = strcat('Generator - ',gens{i});
@@ -102,6 +122,10 @@ for i=1:num_gens
     figure(plt7);
     close;
     figure(bx_plt8);
+    close;
+    figure(plt9);
+    close;
+    figure(bx_plt10);
     close;
 end
 

@@ -6,7 +6,7 @@ dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
 sugar_path = '~/datasets/real-world-rank-known/sugar/data.mat'; 
 
 % all datasets are known to be of rank 4, verified via domain experts
-nc = 3; 
+nc = 4; 
 
 %% load amino data
 load(amino_path);
@@ -39,7 +39,7 @@ amino_angles = cell(runs, num_losses);
 
 for i = 1:runs
 %     M_init = create_guess('Data', X_amino,'Num_Factors', nc);
-    M_init = create_guess('Data', X_amino,'Num_Factors', nc,'Factor_Generator', 'nvecs');
+    M_init = create_guess('Data', X_amino,'Num_Factors', nc,'Factor_Generator', 'rand');
     for j = 1:num_losses
         % perform decomposition, GCP default init is 'rand'
         [M1,M0,out] = gcp_opt(X_amino, nc, 'type', losses{j}, 'printitn', 0, 'init', M_init);
@@ -83,7 +83,7 @@ end
 % clear X_amino;
 
 %% Save amino results
-amino_results_path = sprintf('results/amino_nvecs-init_%d-runs_%d-losses',runs, num_losses);
+amino_results_path = sprintf('results/amino_rand-init_%d-runs_%d-losses',runs, num_losses);
 save(amino_results_path, 'losses', 'amino_angles', 'amino_corcondias', 'amino_cossims',...
     'amino_fits', 'amino_times', 'best_amino_corcondias', 'best_amino_cossims',...
     'best_amino_fits', 'best_amino_times');
@@ -177,7 +177,7 @@ dorrit_angles = cell(runs, num_losses);
 
 for i = 1:runs
 %     M_init = create_guess('Data', X_dorrit,'Num_Factors', nc);
-    M_init = create_guess('Data', X_dorrit,'Num_Factors', nc,'Factor_Generator', 'nvecs');
+    M_init = create_guess('Data', X_dorrit,'Num_Factors', nc,'Factor_Generator', 'rand');
     for j = 1:num_losses
         % perform decomposition, GCP default init is 'rand'
         [M1,M0,out] = gcp_opt(X_dorrit, nc, 'type', losses{j}, 'printitn', 0, 'init', M_init);
@@ -220,7 +220,7 @@ for i = 1:runs
 end
 
 %% Save Dorrit results
-dorrit_results_path = sprintf('results/dorrit_nvecs-init_%d-runs_%d-losses',runs, num_losses);
+dorrit_results_path = sprintf('results/dorrit_rand-init_%d-runs_%d-losses',runs, num_losses);
 save(dorrit_results_path, 'losses', 'dorrit_angles', 'dorrit_corcondias', 'dorrit_cossims', ...
     'dorrit_fits', 'dorrit_times','best_dorrit_corcondias', 'best_dorrit_cossims',...
     'best_dorrit_fits', 'best_dorrit_times');

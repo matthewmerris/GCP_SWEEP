@@ -5,7 +5,7 @@
 % http://www.cis.jhu.edu/~parky/Enron
 % open the files, all of em for now
 
-raw_data = dlmread('~/datasets/real-world-rank-unkown/FROSTT/Enron/DEDICOM-style/enron_counts.csv');
+raw_data = dlmread('~/datasets/real-world-rank-unknown/FROSTT/Enron/DEDICOM-style/enron_counts.csv');
 enron = sptensor(raw_data(:,1:3), raw_data(:,4));
 clear raw_data;
 
@@ -23,10 +23,12 @@ clear raw_data;
 % Lets decompose!
 sz = size(enron);
 nc = 7;     % literature indicates 7 is a reasonable approximation of rank for enron email tensor
-runs = 3;
-losses = {'count' 'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'}; % GCP loss types
+runs = 100;
+losses = {'count' 'poisson-log' 'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'}; % GCP loss types
 num_losses = length(losses);
 
+
+%% old code
 fits = zeros(runs,num_losses);
 best_fits = cell(num_losses,4);
 
@@ -49,7 +51,7 @@ t_start = tic;
 for i = 1:runs
     % generate a random initialization
 %     M_init = create_guess('Data', enron,'Num_Factors', 7);
-    M_init = create_guess('Data', enron,'Num_Factors', 7,'Factor_Generator', 'nvecs');
+    M_init = create_guess('Data', enron,'Num_Factors', 7,'Factor_Generator', 'rand');
     for j = 1:num_losses
         [M1, M0, out] = gcp_opt(enron, nc, 'type', losses{j},'init', M_init, 'printitn',0, 'maxiters', 5000);
         fits(i,j) = fitScore(enron, M1);
