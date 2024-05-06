@@ -218,7 +218,7 @@ parfor i = 1:num_runs
 end
 toc(t_start);
 
-%% Save sugar results
+% Save sugar results
 sugar_results_path = sprintf('results/sugar_rand-init_%d-runs_%d-losses',num_runs, num_losses) ...
     + string(datetime("now"));
 save(sugar_results_path, 'losses', 'sugar_fits', 'sugar_cossims', ...
