@@ -138,3 +138,12 @@ legend(losses{1},losses{3:5});
 ylabel('CORCONDIA');
 title('CORCONDIA Score (log scale transform)')
 hold off
+
+%% best results table
+ID = losses';
+OBJ = best_sugar_objectives;
+FIT = best_sugar_fits;
+COSSIM = best_sugar_cossims;
+CORCON = best_sugar_corcondias;
+
+T1 = table(ID,OBJ,FIT,COSSIM,CORCON)
