@@ -36,6 +36,8 @@
 ehthumbs.db
 Thumbs.db
 
-# Matlab recover files #
+# Matlab recover files & data files #
 #######################
+*.asv
 *.m~
+*.mat
