@@ -65,6 +65,7 @@ hold off
 
 
 %% repeat but for only for losses with non-negative fit scores (losses indices 2 & 5)
+
 figure();
 hold on;
 for i = 1:num_losses
@@ -77,7 +78,6 @@ legend(losses_best);
 ylabel('Objective');
 title('Final Objective Values (log scaled)')
 hold off;
-
 % fits
 figure();
 hold on;
@@ -135,3 +135,13 @@ legend(losses_best);
 ylabel('CORCONDIA');
 title('CORCONDIA Score (log scale transform)')
 hold off;
+
+%% table of best results
+ID = losses';
+OBJ = best_objectives;
+FIT = best_fits;
+COSSIM = best_cossims;
+CORCON = best_corcondias;
+TIMES = best_times;
+
+T1 = table(ID,OBJ,FIT,COSSIM,CORCON,TIMES)

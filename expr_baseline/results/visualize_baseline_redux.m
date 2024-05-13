@@ -251,4 +251,182 @@ for i=1:num_gens
     figure(bx_plt8);
     close;
 end
-%% make standard plots and boxplots of raw results (grouped by metric)
+%% Table: averages of best results from 100 intializations for each of
+% 100 generated tensors best_metric(num_gens, num_tensors, num_losses)
+for i = 1:num_gens
+    fprintf("Generator: %s - average of best", gens{i});
+    ID = losses';
+    OBJ = mean(squeeze(best_objectives(i,:,:)))';
+    FIT = mean(squeeze(best_fits(i,:,:)))';
+    COSSIM = mean(squeeze(best_cossims(i,:,:)))';
+    CORCON = mean(squeeze(best_corcondias(i,:,:)))';
+%     TIMES = mean(squeeze(best_times(i,:,:)))';
+    
+    T1 = table(ID,OBJ,FIT,COSSIM,CORCON)
+end
+
+%% Table: best of the best metrics (not sure if this is very informative)
+for i = 1:num_gens
+    fprintf("Generator: %s - best of best", gens{i});
+    ID = losses';
+    OBJ = min(squeeze(best_objectives(i,:,:)))';
+    FIT = max(squeeze(best_fits(i,:,:)))';
+    COSSIM = max(squeeze(best_cossims(i,:,:)))';
+    CORCON = max(squeeze(best_corcondias(i,:,:)))';
+%     TIMES = min(squeeze(best_times(i,:,:)))';
+    
+    T1 = table(ID,OBJ,FIT,COSSIM,CORCON)
+end
+
+%% build figures (plot) for best_metrics
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        objs_plot = plot(log10(best_objectives(i,:,j)), 'LineStyle','none','Marker','o');
+        set(objs_plot, 'markerfacecolor', get(objs_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Objective');
+    tmp = strcat("Best OBJs (log scale) - Gen: ", gens{i});
+    title(tmp);
+    hold off;
+end
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        fits_plot = plot(best_fits(i,:,j), 'LineStyle','none','Marker','o');
+        set(fits_plot, 'markerfacecolor', get(fits_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Fit Score');
+    tmp = strcat('Best FITs - Gen: ' ,gens{i});
+    title(tmp);
+    hold off;
+end
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        cossim_plot = plot(best_cossims(i,:,j), 'LineStyle','none','Marker','o');
+        set(cossim_plot, 'markerfacecolor', get(cossim_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Cosine Similarity');
+    tmp = strcat('Best COSs - Gen: ',gens{i});
+    title(tmp);
+    hold off;
+end
+% 
+% for i = 1:num_gens
+%     figure();
+%     hold on;
+%     for j = 1:num_losses
+%         corcondia_plot = plot(best_corcondias(i,:,j), 'LineStyle','none','Marker','o');
+%         set(corcondia_plot, 'markerfacecolor', get(corcondia_plot, 'color'));
+%     end
+%     legend(losses);
+%     ylabel('Corcondia Score');
+%     tmp = strcat('Best CORs - Gen: ',gens{i});
+%     title(tmp);
+%     hold off;
+% end
+
+log_best_corcondias = best_corcondias;
+log_best_corcondias(log_best_corcondias > 0) = log10(1+log_best_corcondias(log_best_corcondias>0));
+log_best_corcondias(log_best_corcondias < 0) = -log10(1-log_best_corcondias(log_best_corcondias<0));
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        log_corcondia_plot = plot(log_best_corcondias(i,:,j), 'LineStyle','none','Marker','o');
+        set(log_corcondia_plot, 'markerfacecolor', get(log_corcondia_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Corcondia Score');
+    tmp = strcat('Best CORs (log transform) - Gen: ',gens{i});
+    title(tmp);
+    hold off;
+end
+
+%% build figures (plot) for best_metrics - remove beta loss results from  *****WIP******
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        objs_plot = plot(log10(best_objectives(i,:,j)), 'LineStyle','none','Marker','o');
+        set(objs_plot, 'markerfacecolor', get(objs_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Objective');
+    tmp = strcat("Best OBJs (log scale) - Gen: ", gens{i});
+    title(tmp);
+    hold off;
+end
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        fits_plot = plot(best_fits(i,:,j), 'LineStyle','none','Marker','o');
+        set(fits_plot, 'markerfacecolor', get(fits_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Fit Score');
+    tmp = strcat('Best FITs - Gen: ' ,gens{i});
+    title(tmp);
+    hold off;
+end
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        cossim_plot = plot(best_cossims(i,:,j), 'LineStyle','none','Marker','o');
+        set(cossim_plot, 'markerfacecolor', get(cossim_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Cosine Similarity');
+    tmp = strcat('Best COSs - Gen: ',gens{i});
+    title(tmp);
+    hold off;
+end
+% 
+% for i = 1:num_gens
+%     figure();
+%     hold on;
+%     for j = 1:num_losses
+%         corcondia_plot = plot(best_corcondias(i,:,j), 'LineStyle','none','Marker','o');
+%         set(corcondia_plot, 'markerfacecolor', get(corcondia_plot, 'color'));
+%     end
+%     legend(losses);
+%     ylabel('Corcondia Score');
+%     tmp = strcat('Best CORs - Gen: ',gens{i});
+%     title(tmp);
+%     hold off;
+% end
+
+log_best_corcondias = best_corcondias;
+log_best_corcondias(log_best_corcondias > 0) = log10(1+log_best_corcondias(log_best_corcondias>0));
+log_best_corcondias(log_best_corcondias < 0) = -log10(1-log_best_corcondias(log_best_corcondias<0));
+
+for i = 1:num_gens
+    figure();
+    hold on;
+    for j = 1:num_losses
+        log_corcondia_plot = plot(log_best_corcondias(i,:,j), 'LineStyle','none','Marker','o');
+        set(log_corcondia_plot, 'markerfacecolor', get(log_corcondia_plot, 'color'));
+    end
+    legend(losses);
+    ylabel('Corcondia Score');
+    tmp = strcat('Best CORs (log transform) - Gen: ',gens{i});
+    title(tmp);
+    hold off;
+end
+%% mean and std of ranks
