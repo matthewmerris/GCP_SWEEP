@@ -1,5 +1,5 @@
 %% load data
-load("dorrit_rand-init_100-runs_5-losses06-May-2024 14:52:57.mat");
+load("dorrit_rand-init_100-runs_5-losses_rank4.mat");
 num_losses = length(losses);
 %% plot data
 figure();
@@ -146,4 +146,4 @@ FIT = best_dorrit_fits;
 COSSIM = best_dorrit_cossims;
 CORCON = best_dorrit_corcondias;
 
-T1 = table(ID,OBJ,FIT,COSSIM,CORCON);
+T1 = table(ID,OBJ,FIT,COSSIM,CORCON)

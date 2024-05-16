@@ -1,5 +1,5 @@
 %% load data
-load("amino_rand-init_100-runs_5-losses06-May-2024 14:08:22.mat");
+load("amino_rand-init_100-runs_5-losses_rank4.mat");
 %%
 num_losses = length(losses);
 %% plot data

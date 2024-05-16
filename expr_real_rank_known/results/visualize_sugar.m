@@ -1,5 +1,5 @@
 %% load data
-load("sugar_rand-init_100-runs_5-losses06-May-2024 16:24:59.mat");
+load("sugar_rand-init_100-runs_5-losses_rank4.mat");
 num_losses = length(losses);
 %% plot data
 figure();
