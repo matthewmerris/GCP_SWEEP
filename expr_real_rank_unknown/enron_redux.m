@@ -13,7 +13,7 @@ clear raw_data;
 sz = size(enron);
 nc = 11;     % NORMO paper estimate for enron tensor
 num_runs = 100;
-losses = {'count' 'poisson-log' 'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'}; % GCP loss types
+losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)' 'count' 'poisson-log' 'negative-binomial (4)'}; % GCP loss types
 num_losses = length(losses);
 factor_init = 'rand';
 

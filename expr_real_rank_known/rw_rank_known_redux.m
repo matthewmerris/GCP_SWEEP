@@ -18,7 +18,7 @@ adj_by = -1 * min_val + 10*eps;
 X_amino = X_amino + adj_by;
 
 %% Perform decompositions of amino data and collect metrics
-losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'}; % GCP loss types
+losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)' 'Poisson' 'Poisson-log'}; % GCP loss types
 num_losses = length(losses);
 num_runs = 100;
 sz = size(X_amino);
@@ -95,81 +95,82 @@ save(amino_results_path, 'losses', 'amino_fits', 'amino_cossims', ...
      'best_amino_fits', 'best_amino_cossims', 'best_amino_times', ...
      'best_amino_corcondias', 'best_amino_rmses', 'best_amino_objectives', ...
      'amino_inits');
-% %% Dorrit Experiment
-% load(dorrit_path);
-% X_dorrit = tensor(EEM.data);
-% min_val = min(X_dorrit(:));
-% adj_by = -1 * min_val + 10*eps;
-% X_dorrit(isnan(X_dorrit(:)))=0;
-% X_dorrit = X_dorrit + adj_by;
-% 
-% dorrit_inits = cell(num_runs);
-% dorrit_fest_traces = cell(num_runs, num_losses);
-% 
-% dorrit_fits = zeros(num_runs,num_losses);
-% dorrit_cossims = zeros(num_runs, num_losses);
-% dorrit_times = zeros(num_runs, num_losses);
-% dorrit_corcondias = zeros(num_runs, num_losses);
-% dorrit_rmses = zeros(num_runs, num_losses);
-% dorrit_objectives = zeros(num_runs, num_losses);
-% dorrit_angles = cell(num_runs, num_losses);
-% 
-% best_dorrit_fits = zeros(num_losses,1);
-% best_dorrit_cossims = zeros(num_losses,1);
-% best_dorrit_times = zeros(num_losses,1);
-% best_dorrit_corcondias = zeros(num_losses,1);
-% best_dorrit_rmses = zeros(num_losses,1);
-% best_dorrit_objectives = zeros(num_losses,1);
-% 
-% % Generate initializations
-% for i = 1:num_runs
-%     dorrit_inits{i} = create_guess('Data', X_dorrit,'Num_Factors', nc,'Factor_Generator', factor_init);
-% end
-% 
-% parpool(16);
-% c_losses = parallel.pool.Constant(losses);
-% t_start = tic;
-% parfor i = 1:num_runs
-%     % generate a random initialization
-% %     M_init = create_guess('Data', enron,'Num_Factors', 7);
-%     M_init = dorrit_inits{i};
-%     for j = 1:num_losses
-%         [M1, M0, out] = gcp_opt(X_dorrit, nc, 'type', c_losses.Value{j},'init', M_init, ...
-%             'opt', 'adam','printitn',0, 'maxiters', 5000);
-%         dorrit_fits(i,j) = fitScore(X_dorrit, M1);
-%         dorrit_cossims(i,j) = cosSim(X_dorrit, M1, 3);
-%         dorrit_times(i,j) = out.mainTime;
-%         [dorrit_corcondias(i,j),~] = efficient_corcondia(X_dorrit, M1);
-%         dorrit_rmses(i,j) = rms_err(X_dorrit,M1);
-%         dorrit_objectives(i,j) = out.fest_trace(end);
-%         dorrit_fest_traces{i,j} = out.fest_trace;
-%         dorrit_angles{i,j} = subspaceAngles(full(X_dorrit), M1);
-%     end
-%     fprintf("Run %d complete.\n", i);
-% end
-% toc(t_start);
-% 
-% delete(gcp("nocreate"));
-% 
-% % gather best results
-% for i = 1:num_losses
-%     best_dorrit_fits(i) = squeeze(max(dorrit_fits(:,i)));
-%     best_dorrit_cossims(i) = squeeze(max(dorrit_cossims(:,i)));
-%     best_dorrit_times(i) = squeeze(min(dorrit_times(:,i)));
-%     best_dorrit_corcondias(i) = squeeze(max(dorrit_corcondias(:,i)));
-%     best_dorrit_rmses(i) = squeeze(min(dorrit_rmses(:,i)));
-%     best_dorrit_objectives(i) = squeeze(min(dorrit_objectives(:,i)));
-% end
-% 
-% % Save dorrit results
-% dorrit_results_path = sprintf('results/dorrit_rand-init_%d-runs_%d-losses',num_runs, num_losses) ...
-%     + string(datetime("now"));
-% save(dorrit_results_path, 'losses', 'dorrit_fits', 'dorrit_cossims', ...
-%      'dorrit_times', 'dorrit_corcondias', 'dorrit_rmses', 'dorrit_objectives', ...
-%      'dorrit_fest_traces','dorrit_angles', ...
-%      'best_dorrit_fits', 'best_dorrit_cossims', 'best_dorrit_times', ...
-%      'best_dorrit_corcondias', 'best_dorrit_rmses', 'best_dorrit_objectives', ...
-%      'dorrit_inits');
+
+%% Dorrit Experiment
+load(dorrit_path);
+X_dorrit = tensor(EEM.data);
+min_val = min(X_dorrit(:));
+adj_by = -1 * min_val + 10*eps;
+X_dorrit(isnan(X_dorrit(:)))=0;
+X_dorrit = X_dorrit + adj_by;
+
+dorrit_inits = cell(num_runs);
+dorrit_fest_traces = cell(num_runs, num_losses);
+
+dorrit_fits = zeros(num_runs,num_losses);
+dorrit_cossims = zeros(num_runs, num_losses);
+dorrit_times = zeros(num_runs, num_losses);
+dorrit_corcondias = zeros(num_runs, num_losses);
+dorrit_rmses = zeros(num_runs, num_losses);
+dorrit_objectives = zeros(num_runs, num_losses);
+dorrit_angles = cell(num_runs, num_losses);
+
+best_dorrit_fits = zeros(num_losses,1);
+best_dorrit_cossims = zeros(num_losses,1);
+best_dorrit_times = zeros(num_losses,1);
+best_dorrit_corcondias = zeros(num_losses,1);
+best_dorrit_rmses = zeros(num_losses,1);
+best_dorrit_objectives = zeros(num_losses,1);
+
+% Generate initializations
+for i = 1:num_runs
+    dorrit_inits{i} = create_guess('Data', X_dorrit,'Num_Factors', nc,'Factor_Generator', factor_init);
+end
+
+parpool(16);
+c_losses = parallel.pool.Constant(losses);
+t_start = tic;
+parfor i = 1:num_runs
+    % generate a random initialization
+%     M_init = create_guess('Data', enron,'Num_Factors', 7);
+    M_init = dorrit_inits{i};
+    for j = 1:num_losses
+        [M1, M0, out] = gcp_opt(X_dorrit, nc, 'type', c_losses.Value{j},'init', M_init, ...
+            'opt', 'adam','printitn',0, 'maxiters', 5000);
+        dorrit_fits(i,j) = fitScore(X_dorrit, M1);
+        dorrit_cossims(i,j) = cosSim(X_dorrit, M1, 3);
+        dorrit_times(i,j) = out.mainTime;
+        [dorrit_corcondias(i,j),~] = efficient_corcondia(X_dorrit, M1);
+        dorrit_rmses(i,j) = rms_err(X_dorrit,M1);
+        dorrit_objectives(i,j) = out.fest_trace(end);
+        dorrit_fest_traces{i,j} = out.fest_trace;
+        dorrit_angles{i,j} = subspaceAngles(full(X_dorrit), M1);
+    end
+    fprintf("Run %d complete.\n", i);
+end
+toc(t_start);
+
+delete(gcp("nocreate"));
+
+% gather best results
+for i = 1:num_losses
+    best_dorrit_fits(i) = squeeze(max(dorrit_fits(:,i)));
+    best_dorrit_cossims(i) = squeeze(max(dorrit_cossims(:,i)));
+    best_dorrit_times(i) = squeeze(min(dorrit_times(:,i)));
+    best_dorrit_corcondias(i) = squeeze(max(dorrit_corcondias(:,i)));
+    best_dorrit_rmses(i) = squeeze(min(dorrit_rmses(:,i)));
+    best_dorrit_objectives(i) = squeeze(min(dorrit_objectives(:,i)));
+end
+
+% Save dorrit results
+dorrit_results_path = sprintf('results/dorrit_rand-init_%d-runs_%d-losses',num_runs, num_losses) ...
+    + string(datetime("now"));
+save(dorrit_results_path, 'losses', 'dorrit_fits', 'dorrit_cossims', ...
+     'dorrit_times', 'dorrit_corcondias', 'dorrit_rmses', 'dorrit_objectives', ...
+     'dorrit_fest_traces','dorrit_angles', ...
+     'best_dorrit_fits', 'best_dorrit_cossims', 'best_dorrit_times', ...
+     'best_dorrit_corcondias', 'best_dorrit_rmses', 'best_dorrit_objectives', ...
+     'dorrit_inits');
 
 %% Sugar experiments
 load(sugar_path);
@@ -178,7 +179,7 @@ min_val = min(X_sugar(:));
 adj_by = -1 * min_val + 10*eps;
 X_sugar = X_sugar + adj_by;
 
-losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)'}; % GCP loss types
+losses = {'normal' 'huber (0.25)' 'rayleigh' 'gamma' 'beta (0.3)' 'Poisson' 'Poisson-log'}; % GCP loss types
 num_losses = length(losses);
 num_runs = 100;
 sz = size(X_sugar);
@@ -231,6 +232,7 @@ parfor i = 1:num_runs
 end
 toc(t_start);
 delete(gcp("nocreate"));
+
 % gather best results
 for i = 1:num_losses
     best_sugar_fits(i) = squeeze(max(sugar_fits(:,i)));

@@ -142,6 +142,6 @@ OBJ = best_objectives;
 FIT = best_fits;
 COSSIM = best_cossims;
 CORCON = best_corcondias;
-TIMES = best_times;
+% TIMES = best_times;
 
-T1 = table(ID,OBJ,FIT,COSSIM,CORCON,TIMES)
+T1 = table(ID,OBJ,FIT,COSSIM,CORCON)
