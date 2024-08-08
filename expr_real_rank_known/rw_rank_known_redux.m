@@ -7,7 +7,7 @@ sugar_path = '~/datasets/real-world-rank-known/sugar/data.mat';
 
 % all datasets are known to be of rank 4, verified via domain experts
 % some indication that amino and dorrit may be rank 3
-nc = 3; 
+nc = 4; 
 
 %% load amino data
 load(amino_path);
