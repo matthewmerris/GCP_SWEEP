@@ -60,20 +60,37 @@ init_arnoldi = cp_init_arnoldi(full(enron), nc);
 %% Run a series of random experiments: rand init, nvecs init, arnoldi init
 sz = [100 100 100];
 nc = 10;
-num_runs = 5;
-
-tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .8, 'Noise', 0);
+num_runs = 10;
+modes = size(sz);
+tns = create_problem('Size', sz, 'Factor_Generator', 'rand', 'Sparse_Generation', .98, 'Noise', 0);
 
 fits_random_nvec_arno =cell(num_runs, 3);
+conds_init = cell(3,num_runs);
+conds_final = cell(3, num_runs);
 
 for idx = 1:num_runs
-    [M_random,~,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,1} = outp_random.fits;
-    [M_nvecs,~,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', 'nvecs');
+    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', 'nvecs');
     fits_random_nvec_arno{idx,2} = outp_nvecs.fits;
     init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
-    [M_arnoldi,~,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,3} = outp_arnoldi.fits;
+    % collect condition numbers of factor matrices
+    for jdx = 1:modes
+        conds_init_rand(jdx) = cond(M0_rand{jdx});
+        conds_init_nvecs(jdx) = cond(M0_nvecs{jdx});
+        conds_init_arno(jdx) = cond(M0_arno{jdx});
+        conds_rand(jdx) = cond(M_rand{jdx});
+        conds_nvecs(jdx) = cond(M_nvecs{jdx});
+        conds_arno(jdx) = cond(M_arnoldi{jdx});
+    end
+    conds_init{1,idx} = conds_init_rand;
+    conds_init{2,idx} = conds_init_nvecs;
+    conds_init{3,idx} = conds_init_arno;
+    conds_final{1,idx} = conds_rand;
+    conds_final{2,idx} = conds_nvecs;
+    conds_final{3,idx} = conds_arno;
 end
 
 %% plot results
@@ -85,6 +102,79 @@ for jdx = 1:num_runs
     plot(fits_random_nvec_arno{jdx,3}(fits_random_nvec_arno{jdx,3} > 0), 'b');
 end
 hold off
-    
+
+%% subplot of
+figure;
+rows = ceil(num_runs/2);
+for jdx = 1:num_runs
+    subplot(rows,2,jdx);
+    hold on;
+%     plot(fits_random_nvec_arno{jdx,1}(fits_random_nvec_arno{jdx,1} > 0), 'g');
+%     plot(fits_random_nvec_arno{jdx,2}(fits_random_nvec_arno{jdx,2} > 0), 'r');
+%     plot(fits_random_nvec_arno{jdx,3}(fits_random_nvec_arno{jdx,3} > 0), 'b');
+    plot(fits_random_nvec_arno{jdx,1}(1:30), 'g');
+    plot(fits_random_nvec_arno{jdx,2}(1:30), 'r');
+    plot(fits_random_nvec_arno{jdx,3}(1:30), 'b');
+    legend('rand', 'nvecs','arnoldi');
+    title('Run: ', jdx);
+    hold off;
+end
+
+%% collect best fit and num_iters needed
+max_fits = zeros(3,num_runs);
+max_iters = zeros(3,num_runs);
+for jdx = 1:num_runs
+    [max_fits(1,jdx), max_iters(1,jdx)] = max(fits_random_nvec_arno{jdx,1}(fits_random_nvec_arno{jdx,1} > 0));
+    [max_fits(2,jdx), max_iters(2,jdx)] = max(fits_random_nvec_arno{jdx,2}(fits_random_nvec_arno{jdx,2} > 0));
+    [max_fits(3,jdx), max_iters(3,jdx)] = max(fits_random_nvec_arno{jdx,3}(fits_random_nvec_arno{jdx,3} > 0));
+end
+max_fits
+max_iters
+
+%% condition numbers
+
+%% lets play with FROSTT tensors, specifically count data tensors
+chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
+chi_4d = load_frostt(chicago_4d_path);
+chicago_5d_path = '~/datasets/FROSTT/chicago/chicago-crime-geo.tns';
+chi_5d = load_frostt(chicago_5d_path);
+lbnl_path = '~/datasets/FROSTT/lbnl_network/lbnl-network.tns';
+lbnl = load_frostt(lbnl_path);
+uber_path = '~/datasets/FROSTT/uber/uber.tns';
+uber = load_frostt(uber_path);
+
+%% Chicago 4d - inits: rand, stochastic, nvecs, arnoldi
+nc = 10;
+X = uber;
+[M_rand,M0_rand, out_rand] = gcp_opt(X, nc, 'type', 'count', 'opt', 'adam', 'printitn', 10);
+M_init_sto = create_guess('Data',X, 'Num_Factors', nc, 'Factor_Generator', 'stochastic');
+[M_sto, M0_sto, out_sto] = gcp_opt(X, nc, 'type', 'count', 'opt', 'adam', 'printitn', 10, 'init', M_init_sto);
+M_init_nvecs = create_guess('Data',X, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+[M_nvecs, M0_nvecs, out_nvecs] = gcp_opt(X, nc, 'type', 'count', 'opt', 'adam', 'printitn', 10, 'init', M_init_nvecs);
+M_init_arnoldi = cp_init_arnoldi(full(X), nc);
+[M_arno, M0_arno, out_arno] = gcp_opt(X, nc, 'type', 'count', 'opt', 'adam', 'printitn', 10, 'init', M_init_arnoldi);
+
+%% check fitscores 
+display('Rand Fit Score: ')
+fitsc_rand = fitScore(X, M_rand)
+display('Sto Fit Score: ')
+fitsc_sto = fitScore(X, M_sto)
+display('NVECs Fit Score: ')
+fitsc_nvecs = fitScore(X, M_nvecs)
+display('Arnoldi Fit Score: ')
+fitsc_arno = fitScore(X, M_arno)
+
+%% retooling fit score for ktensor
+n = ndims(chi_4d);
+U_mttkrp = mttkrp(chi_4d, M_arno.U, n);
+iprod = sum(sum(M_arno.U{n} .* U_mttkrp) .* M_arno.lambda');
+normX = norm(chi_4d);
+if normX == 0
+    fit = norm(M_arno)^2 - 2 * iprod;
+else
+    normRes = sqrt(normX^2 + norm(M_arno)^2 - 2 * iprod);
+    fit = 1 - (normRes / normX);
+end
+
 
 

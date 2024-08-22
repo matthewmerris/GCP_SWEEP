@@ -7,3 +7,4 @@ function result = normDiff(X,M)
 result = sqrt(norm(X)^2 - 2*innerprod(X,M) + norm(M)^2);
 end
 
+
