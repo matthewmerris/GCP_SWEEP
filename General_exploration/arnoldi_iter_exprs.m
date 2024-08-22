@@ -64,9 +64,9 @@ num_runs = 10;
 modes = length(sz);
 tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .98, 'Noise', 0);
 
-fits_random_nvec_arno =cell(num_runs, 3);
-conds_init = cell(3,num_runs);
-conds_final = cell(3, num_runs);
+fits_random_nvec_arno =cell(num_runs, 4);
+conds_init = cell(4,num_runs);
+conds_final = cell(4, num_runs);
 
 for idx = 1:num_runs
     [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
@@ -76,21 +76,29 @@ for idx = 1:num_runs
     init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
     [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,3} = outp_arnoldi.fits;
+    tns_matlab = full(tns.Data);
+    [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
+    [M_gevd, M0_gevd, outp_gevd] = cp_als(tns.Data, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    fits_random_nvec_arno{idx,4} = outp_gevd.fits;
     % collect condition numbers of factor matrices
     for jdx = 1:modes
         conds_init_rand(jdx) = cond(M0_rand{jdx});
         conds_init_nvecs(jdx) = cond(M0_nvecs{jdx});
         conds_init_arno(jdx) = cond(M0_arno{jdx});
+        conds_init_gevd(jdx) = cond(M0_gevd{jdx});
         conds_rand(jdx) = cond(M_rand{jdx});
         conds_nvecs(jdx) = cond(M_nvecs{jdx});
         conds_arno(jdx) = cond(M_arnoldi{jdx});
+        conds_gevd(jdx) = cond(M_gevd{jdx});
     end
     conds_init{1,idx} = conds_init_rand;
     conds_init{2,idx} = conds_init_nvecs;
     conds_init{3,idx} = conds_init_arno;
+    conds_init{4,idx} = conds_init_gevd;
     conds_final{1,idx} = conds_rand;
     conds_final{2,idx} = conds_nvecs;
     conds_final{3,idx} = conds_arno;
+    conds_final{4,idx} = conds_gevd;
 end
 
 %% Run a series of random experiments on MULTIPLE tensors: rand init, nvecs init, arnoldi init
