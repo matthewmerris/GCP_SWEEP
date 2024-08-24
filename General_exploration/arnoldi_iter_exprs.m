@@ -62,24 +62,39 @@ sz = [100 100 100];
 nc = 5;
 num_runs = 10;
 modes = length(sz);
-tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .98, 'Noise', 0);
+tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .9, 'Noise', 0);
 
 fits_random_nvec_arno =cell(num_runs, 4);
 conds_init = cell(4,num_runs);
 conds_final = cell(4, num_runs);
+times = zeros(num_runs, 3);
 
 for idx = 1:num_runs
     [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,1} = outp_random.fits;
-    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', 'nvecs');
+    
+    t_nvecs = tic;
+    init_nvecs = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+    times(idx, 1) = toc(t_nvecs);
+    
+    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
     fits_random_nvec_arno{idx,2} = outp_nvecs.fits;
+    
+    t_arno = tic;
     init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
+    times(idx, 2) = toc(t_arno);
+    
     [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,3} = outp_arnoldi.fits;
+    
     tns_matlab = full(tns.Data);
+    t_gevd = tic;
     [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
+    times(idx, 3) = toc(t_gevd);
+    
     [M_gevd, M0_gevd, outp_gevd] = cp_als(tns.Data, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,4} = outp_gevd.fits;
+    
     % collect condition numbers of factor matrices
     for jdx = 1:modes
         conds_init_rand(jdx) = cond(M0_rand{jdx});
@@ -102,27 +117,41 @@ for idx = 1:num_runs
 end
 
 %% Run a series of random experiments on MULTIPLE tensors: rand init, nvecs init, arnoldi init
-sz = [50 50 50];
+sz = [100 100 100];
 nc = 5;
-num_runs = 10;
+num_runs = 50;
 modes = length(sz);
 
 
 fits_random_nvec_arno =cell(num_runs, 4);
 conds_init = cell(4,num_runs);
 conds_final = cell(4, num_runs);
+times = zeros(num_runs, 3);
 
 for idx = 1:num_runs
-    tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .98, 'Noise', 0);
+    tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .9, 'Noise', 0);
     [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,1} = outp_random.fits;
-    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', 'nvecs');
+    
+    t_nvecs = tic;
+    init_nvecs = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+    times(idx, 1) = toc(t_nvecs);
+    
+    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
     fits_random_nvec_arno{idx,2} = outp_nvecs.fits;
+    
+    t_arno = tic;
     init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
+    times(idx, 2) = toc(t_arno);
+    
     [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,3} = outp_arnoldi.fits;
+    
     tns_matlab = full(tns.Data);
+    t_gevd = tic;
     [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
+    times(idx, 3) = toc(t_gevd);
+    
     [M_gevd, M0_gevd, outp_gevd] = cp_als(tns.Data, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,4} = outp_gevd.fits;
     % collect condition numbers of factor matrices
@@ -153,7 +182,7 @@ for jdx = 1:num_runs
     plot(fits_random_nvec_arno{jdx,1}(fits_random_nvec_arno{jdx,1} > 0), 'g');
     plot(fits_random_nvec_arno{jdx,2}(fits_random_nvec_arno{jdx,2} > 0), 'r');
     plot(fits_random_nvec_arno{jdx,3}(fits_random_nvec_arno{jdx,3} > 0), 'b');
-    plot(fits_random_nvec_arno{jdx,4}(fits_random_nvec_arno{jdx,4} > 0), 'y');
+    plot(fits_random_nvec_arno{jdx,4}(fits_random_nvec_arno{jdx,4} > 0), 'm');
 end
 hold off
 
@@ -166,10 +195,10 @@ for jdx = 1:num_runs
 %     plot(fits_random_nvec_arno{jdx,1}(fits_random_nvec_arno{jdx,1} > 0), 'g');
 %     plot(fits_random_nvec_arno{jdx,2}(fits_random_nvec_arno{jdx,2} > 0), 'r');
 %     plot(fits_random_nvec_arno{jdx,3}(fits_random_nvec_arno{jdx,3} > 0), 'b');
-    plot(fits_random_nvec_arno{jdx,1}(1:30), 'g');
-    plot(fits_random_nvec_arno{jdx,2}(1:30), 'r');
-    plot(fits_random_nvec_arno{jdx,3}(1:30), 'b');
-    plot(fits_random_nvec_arno{jdx,4}(1:30), 'y');
+    plot(fits_random_nvec_arno{jdx,1}(1:30), 'g', 'LineWidth', 2);
+    plot(fits_random_nvec_arno{jdx,2}(1:30), 'r', 'LineWidth', 2);
+    plot(fits_random_nvec_arno{jdx,3}(1:30), 'b', 'LineWidth', 2);
+    plot(fits_random_nvec_arno{jdx,4}(1:30), 'm', 'LineWidth', 2);
     legend('rand', 'nvecs','arnoldi', 'gevd');
     title('Run: ', jdx);
     hold off;
@@ -191,20 +220,43 @@ scatter(max_iters',max_fits', 'filled')
 legend('rand', 'nvecs','arnoldi','gevd');
 %% condition numbers
 % current run of interest
-roi = 6;
-display('rand:')
-conds_init{1,roi}
-conds_final{1,roi}
-display('nvecs:')
-conds_init{2,roi}
-conds_final{2,roi}
-display('arnoldi: ')
-conds_init{3,roi}
-conds_final{3,roi}
-display('gevd')
-conds_init{4,roi}
-conds_final{4,roi}
+% roi = 5;
+% display('rand:')
+% conds_init{1,roi}
+% conds_final{1,roi}
+% display('nvecs:')
+% conds_init{2,roi}
+% conds_final{2,roi}
+% display('arnoldi: ')
+% conds_init{3,roi}
+% conds_final{3,roi}
+% display('gevd')
+% conds_init{4,roi}
+% conds_final{4,roi}
+% compute 'condition number score'
+cond_scores = zeros(num_runs,4);
 
+for idx = 1:num_runs
+    cond_scores(idx,1) = norm(conds_final{1,idx});
+    cond_scores(idx,2) = norm(conds_final{2,idx});
+    cond_scores(idx,3) = norm(conds_final{3,idx});
+    cond_scores(idx,4) = norm(conds_final{4,idx});
+end
+figure;
+semilogy(cond_scores, 'LineWidth',2);
+legend('rand', 'nvecs','arnoldi','gevd');
+grid on;
+
+
+
+%% Initialization times
+figure;
+hold on;
+plot(times(:,1)', 'r', 'LineWidth', 2);
+plot(times(:,2)', 'b', 'LineWidth', 2);
+plot(times(:,3)', 'm', 'LineWidth', 2);
+legend('nvecs','arnoldi','gevd');    
+hold off;
 %% lets play with FROSTT tensors, specifically count data tensors
 chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
 chi_4d = load_frostt(chicago_4d_path);
