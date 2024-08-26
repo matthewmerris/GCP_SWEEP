@@ -188,9 +188,10 @@ hold off
 
 %% subplot of
 figure;
-rows = ceil(num_runs/2);
+cols = 5;
+rows = ceil(num_runs/cols);
 for jdx = 1:num_runs
-    subplot(rows,2,jdx);
+    subplot(rows,cols,jdx);
     hold on;
 %     plot(fits_random_nvec_arno{jdx,1}(fits_random_nvec_arno{jdx,1} > 0), 'g');
 %     plot(fits_random_nvec_arno{jdx,2}(fits_random_nvec_arno{jdx,2} > 0), 'r');
@@ -247,8 +248,6 @@ semilogy(cond_scores, 'LineWidth',2);
 legend('rand', 'nvecs','arnoldi','gevd');
 grid on;
 
-
-
 %% Initialization times
 figure;
 hold on;
@@ -257,6 +256,10 @@ plot(times(:,2)', 'b', 'LineWidth', 2);
 plot(times(:,3)', 'm', 'LineWidth', 2);
 legend('nvecs','arnoldi','gevd');    
 hold off;
+
+%% Save results
+results_filename = sprintf('results/Arnoldi_expr2_%d-tensors', num_runs)+ string(datetime("now"));
+save(results_filename, 'fits_random_nvec_arno', 'conds_init', 'conds_final', 'times', 'max_fits', 'max_iters', 'cond_scores')
 %% lets play with FROSTT tensors, specifically count data tensors
 chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
 chi_4d = load_frostt(chicago_4d_path);
@@ -266,6 +269,72 @@ lbnl_path = '~/datasets/FROSTT/lbnl_network/lbnl-network.tns';
 lbnl = load_frostt(lbnl_path);
 uber_path = '~/datasets/FROSTT/uber/uber.tns';
 uber = load_frostt(uber_path);
+
+rw_tensors = cell(4,1);
+rw_tensors{1} = chi_4d;
+rw_tensors{2} = chi_5d;
+rw_tensors{3} = lbnl;
+rw_tensors{4} = uber;
+
+%% Experiment 3: Real-world sparse tensors, cp-als decomps with random, nvecs, arnoldi, and gevd initializations
+nc = 10;
+num_runs = max(size(rw_tensors));
+
+
+fits_random_nvec_arno =cell(num_runs, 4);
+conds_init = cell(4,num_runs);
+conds_final = cell(4, num_runs);
+times = zeros(num_runs, 3);
+
+for idx = 1:num_runs
+    tns = full(rw_tensors{idx});
+    modes = ndims(tns);
+
+    [M_rand,M0_rand,outp_random] = cp_als(tns, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    fits_random_nvec_arno{idx,1} = outp_random.fits;
+    
+    t_nvecs = tic;
+    init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+    times(idx, 1) = toc(t_nvecs);
+    
+    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
+    fits_random_nvec_arno{idx,2} = outp_nvecs.fits;
+    
+    t_arno = tic;
+    init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
+    times(idx, 2) = toc(t_arno);
+    
+    [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    fits_random_nvec_arno{idx,3} = outp_arnoldi.fits;
+    
+    tns_matlab = full(tns.Data);
+    t_gevd = tic;
+    [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
+    times(idx, 3) = toc(t_gevd);
+    
+    [M_gevd, M0_gevd, outp_gevd] = cp_als(tns, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    fits_random_nvec_arno{idx,4} = outp_gevd.fits;
+    % collect condition numbers of factor matrices
+    for jdx = 1:modes
+        conds_init_rand(jdx) = cond(M0_rand{jdx});
+        conds_init_nvecs(jdx) = cond(M0_nvecs{jdx});
+        conds_init_arno(jdx) = cond(M0_arno{jdx});
+        conds_init_gevd(jdx) = cond(M0_gevd{jdx});
+        conds_rand(jdx) = cond(M_rand{jdx});
+        conds_nvecs(jdx) = cond(M_nvecs{jdx});
+        conds_arno(jdx) = cond(M_arnoldi{jdx});
+        conds_gevd(jdx) = cond(M_gevd{jdx});
+    end
+    conds_init{1,idx} = conds_init_rand;
+    conds_init{2,idx} = conds_init_nvecs;
+    conds_init{3,idx} = conds_init_arno;
+    conds_init{4,idx} = conds_init_gevd;
+    conds_final{1,idx} = conds_rand;
+    conds_final{2,idx} = conds_nvecs;
+    conds_final{3,idx} = conds_arno;
+    conds_final{4,idx} = conds_gevd;
+end
+
 
 %% Chicago 4d - inits: rand, stochastic, nvecs, arnoldi
 nc = 10;
