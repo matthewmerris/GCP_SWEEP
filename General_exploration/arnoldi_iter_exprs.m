@@ -184,11 +184,12 @@ for jdx = 1:num_runs
     plot(fits_random_nvec_arno{jdx,3}(fits_random_nvec_arno{jdx,3} > 0), 'b');
     plot(fits_random_nvec_arno{jdx,4}(fits_random_nvec_arno{jdx,4} > 0), 'm');
 end
+legend('rand', 'nvecs','arnoldi', 'gevd');
 hold off
 
 %% subplot of
 figure;
-cols = 5;
+cols = 1;
 rows = ceil(num_runs/cols);
 for jdx = 1:num_runs
     subplot(rows,cols,jdx);
@@ -206,8 +207,8 @@ for jdx = 1:num_runs
 end
 
 %% collect best fit and num_iters needed
-max_fits = zeros(3,num_runs);
-max_iters = zeros(3,num_runs);
+max_fits = zeros(4,num_runs);
+max_iters = zeros(4,num_runs);
 for jdx = 1:num_runs
     [max_fits(1,jdx), max_iters(1,jdx)] = max(fits_random_nvec_arno{jdx,1}(fits_random_nvec_arno{jdx,1} > 0));
     [max_fits(2,jdx), max_iters(2,jdx)] = max(fits_random_nvec_arno{jdx,2}(fits_random_nvec_arno{jdx,2} > 0));
@@ -258,27 +259,25 @@ legend('nvecs','arnoldi','gevd');
 hold off;
 
 %% Save results
-results_filename = sprintf('results/Arnoldi_expr2_%d-tensors', num_runs)+ string(datetime("now"));
+% results_filename = sprintf('results/Arnoldi_expr2_%d-tensors', num_runs)+ string(datetime("now"));
+results_filename = sprintf('results/Arnoldi_expr3_ChiCrime4d', num_runs)+ string(datetime("now"));
 save(results_filename, 'fits_random_nvec_arno', 'conds_init', 'conds_final', 'times', 'max_fits', 'max_iters', 'cond_scores')
 %% lets play with FROSTT tensors, specifically count data tensors
 chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
 chi_4d = load_frostt(chicago_4d_path);
+%%
 chicago_5d_path = '~/datasets/FROSTT/chicago/chicago-crime-geo.tns';
 chi_5d = load_frostt(chicago_5d_path);
+%%
 lbnl_path = '~/datasets/FROSTT/lbnl_network/lbnl-network.tns';
 lbnl = load_frostt(lbnl_path);
+%%
 uber_path = '~/datasets/FROSTT/uber/uber.tns';
 uber = load_frostt(uber_path);
 
-rw_tensors = cell(4,1);
-rw_tensors{1} = chi_4d;
-rw_tensors{2} = chi_5d;
-rw_tensors{3} = lbnl;
-rw_tensors{4} = uber;
-
 %% Experiment 3: Real-world sparse tensors, cp-als decomps with random, nvecs, arnoldi, and gevd initializations
 nc = 10;
-num_runs = max(size(rw_tensors));
+num_runs = 1;
 
 
 fits_random_nvec_arno =cell(num_runs, 4);
@@ -287,30 +286,30 @@ conds_final = cell(4, num_runs);
 times = zeros(num_runs, 3);
 
 for idx = 1:num_runs
-    tns = full(rw_tensors{idx});
+    tns = full(uber(1:10,:,:,:));
     modes = ndims(tns);
+
+    % Construct initializations
+    t_nvecs = tic;
+    init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+    times(idx, 1) = toc(t_nvecs);
+
+    t_arno = tic;
+    init_arnoldi = cp_init_arnoldi(tns, nc);
+    times(idx, 2) = toc(t_arno);
+
+    t_gevd = tic;
+    [init_gevd,ot_gevd] = cpd_gevd(tns.data, nc);
+    times(idx, 3) = toc(t_gevd);
 
     [M_rand,M0_rand,outp_random] = cp_als(tns, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,1} = outp_random.fits;
     
-    t_nvecs = tic;
-    init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
-    times(idx, 1) = toc(t_nvecs);
-    
     [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
     fits_random_nvec_arno{idx,2} = outp_nvecs.fits;
     
-    t_arno = tic;
-    init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
-    times(idx, 2) = toc(t_arno);
-    
     [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,3} = outp_arnoldi.fits;
-    
-    tns_matlab = full(tns.Data);
-    t_gevd = tic;
-    [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
-    times(idx, 3) = toc(t_gevd);
     
     [M_gevd, M0_gevd, outp_gevd] = cp_als(tns, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,4} = outp_gevd.fits;
