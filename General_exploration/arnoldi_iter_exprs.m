@@ -58,11 +58,12 @@ init_arnoldi = cp_init_arnoldi(full(enron), nc);
 [M_arnoldi,~,outp_arnoldi] = cp_als(enron, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 100);
 
 %% Run a series of random experiments on a SINGLE tensor: rand init, nvecs init, arnoldi init
-sz = [100 100 100];
+sz = [50 50 50];
 nc = 5;
 num_runs = 10;
 modes = length(sz);
-tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .9, 'Noise', 0);
+tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
+    'Num_Factors', nc,'Sparse_Generation', .9, 'Noise', 0);
 
 fits_random_nvec_arno =cell(num_runs, 4);
 conds_init = cell(4,num_runs);
@@ -117,7 +118,7 @@ for idx = 1:num_runs
 end
 
 %% Run a series of random experiments on MULTIPLE tensors: rand init, nvecs init, arnoldi init
-sz = [100 100 100];
+sz = [50 50 50];
 nc = 5;
 num_runs = 50;
 modes = length(sz);
@@ -129,7 +130,8 @@ conds_final = cell(4, num_runs);
 times = zeros(num_runs, 3);
 
 for idx = 1:num_runs
-    tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', 'Sparse_Generation', .9, 'Noise', 0);
+    tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
+        'Sparse_Generation', .9, 'Noise', 0, 'Num_Factors', nc);
     [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits_random_nvec_arno{idx,1} = outp_random.fits;
     
@@ -189,7 +191,7 @@ hold off
 
 %% subplot of
 figure;
-cols = 1;
+cols = 2;
 rows = ceil(num_runs/cols);
 for jdx = 1:num_runs
     subplot(rows,cols,jdx);
