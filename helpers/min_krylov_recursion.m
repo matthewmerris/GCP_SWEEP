@@ -18,27 +18,49 @@ for idx = 1:n
         u = rand(sz(idx),1);
         % normalize and store
         u = u / norm(u);
-        U{idx}(:,1) = u;
+    else
+        us = cell(1,n - 1);
+        modes = zeros(1,n - 1);
+        for jdx = 1:(n-1)
+        %     vecs.append(U{idx}(:,1));
+            us{1,jdx} = U{jdx}(:,1);
+            modes(1,jdx) = jdx;
+        end
+        u = ttv(A,us, modes);
+        u = u / norm(u);
     end
+    U{idx}(:,1) = u;
 end
-
-% calculate first column of n-th mode factor matrix
-us = cell(1,n - 1);
-modes = zeros(1,num_modes - 1);
-for idx = 1:(n-1)
-%     vecs.append(U{idx}(:,1));
-    us{1,idx} = U{idx}(:,1);
-    modes(1,idx) = idx;
-end
-u = ttv(tns,us, modes);
-% normalize and store
-u = u / norm(u);
-U{n}(:,1) = u;
 
 % Ready to cycle
-
-
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+for kdx = 2:k           % kdx-th column
+    for jdx = 1:n       % jdx-th mode
+        us = cell(1, n - 1);
+        modes = zeros(1,n -1);
+        for i = 1:n
+            if i < jdx
+                us{1,i} = U{i}(:, kdx - 1);
+                modes(1,i) = i;
+            elseif i > jdx
+                us{1, i - 1} = U{i}(:, kdx - 1);
+                modes(1, i - 1) = i;
+            end
+        end
+        w = ttv(A, us, modes);
+        for idx = 1:kdx % orthogonalization loop
+%             foo = U{jdx}(:,idx);
+%             bar = double(w);
+            H{jdx}(idx,kdx) = U{jdx}(:,idx)' * double(w);
+            w = double(w) - H{jdx}(idx,kdx) * U{jdx}(:,idx);
+        end
+        H{jdx}(kdx + 1, kdx) = norm(w);
+        if H{jdx}(kdx + 1, kdx) == 0
+            break;
+        end
+        % store in jdx-th mode basis
+        U{jdx}(:,kdx) = w / H{jdx}(kdx + 1, kdx);
+    end
+end
+% 
 end
 

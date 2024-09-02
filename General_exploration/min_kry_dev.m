@@ -61,7 +61,7 @@ for kdx = 2:k           % kdx-th column
             break;
         end
         % store in jdx-th mode basis
-        U{jdx}(:,kdx + 1) = w / H(kdx + 1, kdx);
+        U{jdx}(:,kdx) = w / H{jdx}(kdx + 1, kdx);
     end
 end
 
