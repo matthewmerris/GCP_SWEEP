@@ -1,4 +1,4 @@
-function [U,H] = min_krylov_recursion(A, k)
+function [U,H,num_cols] = min_krylov_recursion(A, k)
 %MIN_KRYLOV_RECURSION Summary of this function goes here
 %   Detailed explanation goes here
 n = ndims(A);
@@ -6,6 +6,7 @@ sz = size(A);
 % initialize cell arrays for each mode's factor matrix and Hessian
 U = cell(n,1); 
 H = cell(n,1);
+num_cols = [k k k];
 
 % populate the first column of the first (n-1) factor matrices w/ 
 % uniform random vectors
@@ -55,6 +56,7 @@ for kdx = 2:k           % kdx-th column
         end
         H{jdx}(kdx + 1, kdx) = norm(w);
         if H{jdx}(kdx + 1, kdx) == 0
+            num_cols(jdx) = kdx;
             break;
         end
         % store in jdx-th mode basis
