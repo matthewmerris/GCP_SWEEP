@@ -1,16 +1,16 @@
 %% load Chicago Crime data
-chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
-tns = load_frostt(chicago_4d_path);
+% chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
+% tns = load_frostt(chicago_4d_path);
 
-% chicago_5d_path = '~/datasets/FROSTT/chicago/chicago-crime-geo.tns';
-% chi_5d = load_frostt(chicago_5d_path);
+chicago_5d_path = '~/datasets/FROSTT/chicago/chicago-crime-geo.tns';
+chi_5d = load_frostt(chicago_5d_path);
 
 sz = size(tns);
 modes = length(sz);
 nc = 10;
 
 num_inits = 5;
-num_runs = 10;
+num_runs = 1;
 
 fits = cell(num_runs, num_inits);
 times = zeros(num_runs, num_inits);
@@ -20,39 +20,39 @@ conds_final = cell(num_inits, num_runs);
 for idx = 1:num_runs
     sprintf("Expr 3 - run %d", idx)
     t_rand = tic;
-    init_rand = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'rand');
+    init_rand = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'rand');
     times(idx, 1) = toc(t_rand);
 
-    [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    [M_rand,M0_rand,outp_random] = cp_als(tns, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits{idx,1} = outp_random.fits;
     
     t_nvecs = tic;
-    init_nvecs = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+    init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
     times(idx, 2) = toc(t_nvecs);
     
-    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
+    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
     fits{idx,2} = outp_nvecs.fits;
     
-    tns_matlab = full(tns.Data);
+    tns_matlab = full(tns);
     t_gevd = tic;
     [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
     times(idx, 3) = toc(t_gevd);
     
-    [M_gevd, M0_gevd, outp_gevd] = cp_als(tns.Data, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    [M_gevd, M0_gevd, outp_gevd] = cp_als(tns, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits{idx,3} = outp_gevd.fits;
 
     t_arno = tic;
-    init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
+    init_arnoldi = cp_init_arnoldi(full(tns), nc);
     times(idx, 4) = toc(t_arno);
     
-    [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits{idx,4} = outp_arnoldi.fits;
 
     t_kryl = tic;
-    [init_krylov, ~, ~] = min_krylov_recursion(tns.Data, nc);
+    [init_krylov, ~, ~] = min_krylov_recursion(tns, nc);
     times(idx, 5) = toc(t_kryl);
 
-    [M_kryl, M0_kryl, outp_kryl] = cp_als(tns.Data, nc, 'init', init_krylov, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
+    [M_kryl, M0_kryl, outp_kryl] = cp_als(tns, nc, 'init', init_krylov, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
     fits{idx,5} = outp_kryl.fits;
     % collect condition numbers of factor matrices
     for jdx = 1:modes
@@ -174,3 +174,7 @@ plot(times(:,4)', 'm', 'LineWidth', 2);
 plot(times(:,5)', 'y', 'LineWidth', 2);
 legend('rand', 'nvecs', 'gevd', 'arnoldi', 'min_krylov' );
 hold off;
+
+%% Save results
+results_filename = sprintf('results/expr3_', num_runs)+ string(datetime("now"));
+save(results_filename, "num_runs", "modes", "num_inits", "fits", "times", "conds_final", "conds_init");

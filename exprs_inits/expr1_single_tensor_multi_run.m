@@ -105,7 +105,7 @@ hold off
 
 %% subplot of
 figure;
-cols = 2;
+cols = 8;
 rows = ceil(num_runs/cols);
 for jdx = 1:num_runs
     subplot(rows,cols,jdx);
@@ -161,9 +161,15 @@ for idx = 1:num_runs
 end
 
 figure;
+subplot(1,2,1);
 semilogy(cond_scores_init, 'LineWidth',2);
 legend('rand', 'nvecs', 'gevd','arnoldi', 'min_krylov');
 grid on;
+subplot(1,2,2);
+semilogy(cond_scores_final, 'LineWidth',2);
+legend('rand', 'nvecs', 'gevd','arnoldi', 'min_krylov');
+grid on;
+
 
 %% Initialization times
 figure;
@@ -175,3 +181,7 @@ plot(times(:,4)', 'm', 'LineWidth', 2);
 plot(times(:,5)', 'y', 'LineWidth', 2);
 legend('rand', 'nvecs', 'gevd', 'arnoldi', 'min_krylov' );
 hold off;
+
+%% Save results
+results_filename = sprintf('results/expr1_', num_runs)+ string(datetime("now"));
+save(results_filename, "num_runs", "modes", "num_inits", "fits", "times", "conds_final", "conds_init");
