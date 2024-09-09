@@ -2,12 +2,12 @@
 % chicago_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
 % tns = load_frostt(chicago_4d_path);
 
-chicago_5d_path = '~/datasets/FROSTT/chicago/chicago-crime-geo.tns';
-chi_5d = load_frostt(chicago_5d_path);
+% chicago_5d_path = '~/datasets/FROSTT/chicago/chicago-crime-geo.tns';
+% chi_5d = load_frostt(chicago_5d_path);
 
 sz = size(tns);
 modes = length(sz);
-nc = 10;
+nc = 32;
 
 num_inits = 5;
 num_runs = 1;
