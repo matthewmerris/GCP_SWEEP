@@ -1,25 +1,24 @@
-function factors = cp_init_arnoldi(tns,rank)
+function factors = cp_init_arnoldi(tns,k)
 %CP_INIT_ARNOLDI Summary of this function goes here
 %   Detailed explanation goes here
 modes = ndims(tns);
 factors = cell(modes,1);
 
-if(isa(tns,'tensor'))
-    for i=1:modes
-        tmp = unfold(tns,i);
-        [m,~] = size(tmp);
-        q1 = rand(m,1);
-        tmp1 = tmp * tmp';
-        [factor,~] = arnoldi_constructor(tmp1, q1, rank);
-        factors{i} = factor;
+for i = 1:modes
+    % form A depending on tns (tensor or sptensor)
+    if(isa(tns,'tensor'))
+        tmp = unfold(tns, i);
+        A = tmp * tmp';
+    elseif(isa(tns,'sptensor'))
+        tmp = double(sptenmat(tns, i, 'fc'));
+        A = full(tmp * tmp');
     end
-elseif(isa(tns,'sptensor'))
-    for i=1:modes
-        % reshape tns to order-2 for the i-th mode
-        % form AA^T
-        % call the arnoldi constructor
-        % store factor matrix
-    end
+    [m,~] = size(A);
+    q1 = rand(m,1);
+    % call the arnoldi constructor
+    [factor,~] = arnoldi_constructor(A, q1, k);
+    % store factor matrix
+    factors{i} = factor;
 end
 
 end
