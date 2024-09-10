@@ -1,26 +1,26 @@
 %% generate a problem and gather relevant details
 
-% sz = [100 100 100];
-% nc = 20;
-% modes = length(sz);
-% tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
-%      'Num_Factors', nc,'Sparse_Generation', .99, 'Noise', 0);
+sz = [100 100 100];
+nc = 20;
+modes = length(sz);
+tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
+     'Num_Factors', nc,'Sparse_Generation', .99, 'Noise', 0);
 
 % chi_4d_path = '~/datasets/FROSTT/chicago/chicago-crime-comm.tns';
 % tns = load_frostt(chi_4d_path);
-% 
-uber_path = '~/datasets/FROSTT/uber/uber.tns';
-tns = load_frostt(uber_path);
+% % 
+% uber_path = '~/datasets/FROSTT/uber/uber.tns';
+% tns = load_frostt(uber_path);
 % 
 %  
 % 
-sz = size(tns);
-modes = length(sz);
+% sz = size(tns);
+% modes = length(sz);
 %%
 
 k = max(sz);
 t_construct = tic;
-Us = cp_init_arnoldi(tns,k);
+Us = cp_init_arnoldi(tns.Data,k);
 t_construct = toc(t_construct);
 cond_nums = zeros(k, modes);
 
@@ -66,7 +66,7 @@ mode_ks = zeros(modes,1);
 for jdx = 1:modes
     tmp_k = 0;
     for idx = 1:(k-1)
-        if cond_ratios(idx,jdx) > 1.001
+        if cond_ratios(idx,jdx) > 1.5
             tmp_k = idx;
             break;
         end
@@ -82,7 +82,7 @@ for jdx = 1:modes
     plot(cond_ratios(1:top));
     xlabel('Num\_cols');
     ylabel('Ratio of cond #s');
-    xticks(0:25:top);
+    xticks(0:top);
     title('Mode: ',jdx);
 end
 

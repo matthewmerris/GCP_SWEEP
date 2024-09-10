@@ -5,10 +5,16 @@ sz = [100 100 100];
 num_tensors = length(ranks);
 modes = length(sz);
 k = max(sz);
+est_ranks = zeros(num_tensors,1);
+cond_nums_raw = cell(num_tensors,1);
+cond_ratios_raw = cell(num_tensors,1);
 
-for rank = ranks
+
+for kdx = 1:num_tensors
+%     tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
+%       'Num_Factors', ranks(kdx),'Sparse_Generation', .9, 'Noise', 0);
     tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
-      'Num_Factors', nc,'Sparse_Generation', .99, 'Noise', 0);
+      'Num_Factors', ranks(kdx), 'Noise', 0.1);
     Us = cp_init_arnoldi(tns.Data, k);
     % calculate condition numbers
     cond_nums = zeros(k, modes);
@@ -17,21 +23,21 @@ for rank = ranks
             cond_nums(idx, jdx) = cond(Us{jdx}(:,1:idx));
         end
     end
+    cond_nums_raw{kdx, 1} = cond_nums;
     % evaluate cond number ratios
     cond_ratios = zeros(k-1,modes);
-    % cond_scaled_diff = zeros(k-1,modes);
     for jdx = 1:modes
         for idx = 1:(k-1)
             cond_ratios(idx,jdx) = cond_nums(idx+1,3) / cond_nums(idx,3);
-    %         cond_scaled_diff(idx,jdx) = 100 * (cond_nums(idx+1, 3) - cond_nums(idx,3));
         end
     end
-    
+    cond_ratios_raw{kdx,1} = cond_ratios;
+
     mode_ks = zeros(modes,1);
     for jdx = 1:modes
         tmp_k = 0;
         for idx = 1:(k-1)
-            if cond_ratios(idx,jdx) > 1.001
+            if cond_ratios(idx,jdx) > 1.5
                 tmp_k = idx;
                 break;
             end
@@ -44,5 +50,15 @@ for rank = ranks
     for idx =1:modes
         Us1{idx} = Us{idx}(:,1:max_k);
     end
+    est_ranks(kdx) = max_k;
 end
 
+%%
+figure;
+for kdx = 1:num_tensors
+    for jdx = 1:modes
+%         for idx = 1:(k-1)
+        subplot(num_tensors, modes, (modes * (kdx -1) + jdx));
+        plot(cond_ratios_raw{kdx,1}(1:(ranks(kdx)+2),jdx));
+    end
+end
