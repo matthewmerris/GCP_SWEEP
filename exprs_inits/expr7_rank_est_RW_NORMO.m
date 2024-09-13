@@ -4,6 +4,7 @@ dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
 sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
 enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
 eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat'
+uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
 
 %% load amino data
 load(amino_path);
@@ -28,6 +29,9 @@ tns = Enron;
 %% load eem
 load(eem_path);
 tns = tensor(X);
+%% load uber
+load(uber_path);
+tns = sptensor(uber);
 %%
 k = max(size(tns));
 modes = ndims(tns);
@@ -70,9 +74,9 @@ for cols = 1:modes
     for rows = 1:2
         subplot(2,modes, (modes * (rows -1) + cols));
         if rows == 1
-            plot(cond_nums(1:5,cols));
+            plot(cond_nums(1:500,cols));
         else
-            plot(cond_ratios(1:5,cols));
+            plot(cond_ratios(1:500,cols));
         end
     end 
 end
