@@ -1,6 +1,6 @@
 %% Testing krylov-based rank estimation and intialization on synthetic
 % sparse data tensors
-ranks = [10 20 30 40 50];
+ranks = [10 20 30 40 50 60 70 80 90 100];
 % ranks = [80 85 90 95 100];
 sz = [500 500 500];
 num_tensors = length(ranks);

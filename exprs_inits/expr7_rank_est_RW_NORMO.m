@@ -74,9 +74,38 @@ for cols = 1:modes
     for rows = 1:2
         subplot(2,modes, (modes * (rows -1) + cols));
         if rows == 1
-            plot(cond_nums(1:500,cols));
+            plot(cond_nums(1:25,cols));
         else
-            plot(cond_ratios(1:500,cols));
+            plot(cond_ratios(1:25,cols));
         end
     end 
 end
+
+%% compare CORCONDIA (1), NORMO(2), and ARNOLDI (3) fits
+ranks_enron = [12 11 21];
+num_decomps = length(ranks_enron);
+num_runs = 10;
+M_inits = cell(num_decomps,1);
+M_fins = cell(num_runs,num_decomps);
+outs = cell(num_runs, num_decomps);
+
+% isolate arnoldi initializations for each rank
+for jdx = 1:num_decomps
+    tmp_U = cell(modes, 1);
+    for idx = 1:modes
+        tmp_U{idx,1} = Us{idx,1}(:,1:ranks_enron(jdx));
+    end
+    M_inits{jdx,1} = tmp_U;
+end
+
+% perform decompositions
+for kdx = 1:num_runs
+    for jdx = 1:num_decomps
+        [M_fins{kdx,jdx}, ~, outs{kdx,jdx}] = cp_als(tns, ranks_enron(jdx), 'init', M_inits{jdx,1}, 'printitn',0, 'maxiters', 1000);
+    end
+end
+
+
+
+
+
