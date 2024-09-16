@@ -5,6 +5,22 @@ enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
 load(enron_path);
 tns = Enron;
 
+%% Estimate ranks: AutoTen, Normo, TensorLab(elbow), and Arnoldi
+ranks = zeros(4,1);
+times = zeros(4,1);
+
+t_auto = tic;
+[M_auto, ranks(1,1), ~,~] = AutoTen(tns, max(size(tns)),1);
+times(1,1) = toc(t_auto);
+%%
+[ranks(2,1), times(2,1)] = b_NORMO(double(tns), floor(max(size(tns)/2)));
+%%
+% t_elbo = tic;
+% [ranks(3,10), ~, M_elbo] = rankest(full(tns).data);
+% times(3,1) = toc(t_elbo);
+
+[ranks_arno, U_arnoldi, times(4,1)] = arnoldi_rank_init(tns);
+
 %% over estimate dimension of initialization according to the largest mode
 % 
 k = max(size(tns));
