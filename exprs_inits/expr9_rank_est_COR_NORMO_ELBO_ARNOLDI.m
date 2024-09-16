@@ -1,38 +1,12 @@
 % Set data file paths
-amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
-dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
-sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
 enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat'
-uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
-
-%% load amino data
-load(amino_path);
-tns = tensor(X);
-% % adjust to be non-negative
-% min_val = min(X_amino(:));
-% adj_by = -1 * min_val + 10*eps;
-% X_amino = X_amino + adj_by;
-
-%% load dorrit
-load(dorrit_path);
-tns = tensor(X);
-
-%% load sugar - issue constructing krylov subspace, singular matrices for the factors
-load(sugar_path);
-tns = tensor(X);
 
 %% load enron
 load(enron_path);
 tns = Enron;
 
-%% load eem
-load(eem_path);
-tns = tensor(X);
-%% load uber
-load(uber_path);
-tns = sptensor(uber);
-%%
+%% over estimate dimension of initialization according to the largest mode
+% 
 k = max(size(tns));
 modes = ndims(tns);
 t_construct = tic;
@@ -60,7 +34,7 @@ mode_ks = zeros(modes,1);
 for jdx = 1:modes
     tmp_k = 0;
     for idx = 1:(k-1)
-        if cond_ratios(idx,jdx) > 1.5
+        if cond_ratios(idx,jdx) > 1.001
             tmp_k = idx;
             break;
         end
@@ -83,6 +57,7 @@ end
 
 %% compare CORCONDIA (1), NORMO(2), and ARNOLDI (3) fits
 ranks_enron = [12 11 21];
+
 num_decomps = length(ranks_enron);
 num_runs = 10;
 M_inits = cell(num_decomps,1);
@@ -105,7 +80,15 @@ for kdx = 1:num_runs
     end
 end
 
-
+%% plot fits for each rank estimation using the same arnoldi constructed initialization
+ests = ['Corcondia' 'NORMO' 'Arnoldi'];
+figure;
+hold on;
+for idx = 1:num_decomps
+    plot(outs{1, idx}.fits(outs{1,idx}.fits > 0));
+end
+legend('Corcondia (12)', 'NORMO (11)', 'Arnoldi (21)');
+hold off;
 
 
 

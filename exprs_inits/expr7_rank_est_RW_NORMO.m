@@ -16,11 +16,18 @@ tns = tensor(X);
 
 %% load dorrit
 load(dorrit_path);
-tns = tensor(X);
-
+tns = tensor(EEM.data);
+min_val = min(tns(:));
+adj_by = -1 * min_val + 10*eps;
+tns(isnan(tns(:)))=0;
+tns = tns + adj_by;
 %% load sugar - issue constructing krylov subspace, singular matrices for the factors
 load(sugar_path);
 tns = tensor(X);
+min_val = min(tns(:));
+adj_by = -1 * min_val + 10*eps;
+tns(isnan(tns(:)))=0;
+tns = tns + adj_by;
 
 %% load enron
 load(enron_path);
@@ -60,7 +67,7 @@ mode_ks = zeros(modes,1);
 for jdx = 1:modes
     tmp_k = 0;
     for idx = 1:(k-1)
-        if cond_ratios(idx,jdx) > 1.5
+        if cond_ratios(idx,jdx) > 1.000001
             tmp_k = idx;
             break;
         end
@@ -74,9 +81,9 @@ for cols = 1:modes
     for rows = 1:2
         subplot(2,modes, (modes * (rows -1) + cols));
         if rows == 1
-            plot(cond_nums(1:25,cols));
+            plot(cond_nums(1:6,cols));
         else
-            plot(cond_ratios(1:25,cols));
+            plot(cond_ratios(1:6,cols));
         end
     end 
 end
