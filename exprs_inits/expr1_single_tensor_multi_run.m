@@ -2,10 +2,11 @@
 % Intitialization schemes: rand init, nvecs init, gevd, arnoldi init, & min
 % krylov recursion.
 sz = [100 100 100];
-nc = 10;
-num_runs = 50;
+ranks = [5 10 15 20 25];
+num_runs = 10;              % number of runs of 'random' class of inits
 num_inits = 5;
 modes = length(sz);
+num_tensors = length(ranks);
 tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
     'Num_Factors', nc,'Sparse_Generation', .98, 'Noise', 0);
 
