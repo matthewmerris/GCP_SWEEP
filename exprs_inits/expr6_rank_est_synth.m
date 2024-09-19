@@ -1,8 +1,8 @@
 %% Testing krylov-based rank estimation and intialization on synthetic
 % sparse data tensors
-ranks = [10 20 30 40 50 60 70 80 90 100];
+ranks = [10 20 30 40 50];% 60 70 80 90 100];
 % ranks = [80 85 90 95 100];
-sz = [500 500 500];
+sz = [100 100 100];
 num_tensors = length(ranks);
 modes = length(sz);
 k = max(sz) + 10;
@@ -16,7 +16,7 @@ for kdx = 1:num_tensors
       'Num_Factors', ranks(kdx),'Sparse_Generation', .9, 'Noise', 0);
 %     tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
 %       'Num_Factors', ranks(kdx), 'Noise', 0);
-    Us = cp_init_arnoldi(tns.Data, k);
+    Us = arnoldi_cp_init(tns.Data, k);
     % calculate condition numbers
     cond_nums = zeros(k, modes);
     for jdx = 1:modes
