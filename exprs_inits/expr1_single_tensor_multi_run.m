@@ -1,81 +1,155 @@
 %% Run a series of random experiments on a SINGLE tensor: 
 % Intitialization schemes: rand init, nvecs init, gevd, arnoldi init, & min
 % krylov recursion.
+rng(1339);
 sz = [100 100 100];
-ranks = [5 10 15 20 25];
+ranks = [10 20 30 40 50];
 num_runs = 10;              % number of runs of 'random' class of inits
-num_inits = 5;
+num_inits = 5;              % rand, arno, min_krylov, nvecs, gevd
 modes = length(sz);
 num_tensors = length(ranks);
-tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
-    'Num_Factors', nc,'Sparse_Generation', .98, 'Noise', 0);
+tol = 1.0e-6;
+max_iters = 1000;
 
-fits = cell(num_runs, num_inits);
-times = zeros(num_runs, num_inits);
-conds_init = cell(num_inits,num_runs);
-conds_final = cell(num_inits, num_runs);
 
-for idx = 1:num_runs
-    sprintf("Expr 1 - run %d", idx)
-    t_rand = tic;
-    init_rand = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'rand');
-    times(idx, 1) = toc(t_rand);
 
-    [M_rand,M0_rand,outp_random] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
-    fits{idx,1} = outp_random.fits;
+decomps = cell(num_tensors,num_runs,num_inits,3);
+init_times = zeros(num_tensors, num_runs, num_inits);
+
+% fits = cell(num_runs, num_inits);
+% conds_init = cell(num_inits,num_runs);
+% conds_final = cell(num_inits, num_runs);
+
+for jdx = 1:num_tensors
+    nc = ranks(jdx);
+    tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
+        'Num_Factors', nc,'Sparse_Generation', 0.8, 'Noise', 0);
+    for idx = 1:num_runs
+        sprintf("Tensor %d - run %d", jdx, idx)
+        
+        % ********************* form initializations and init_times
+        t_rand = tic;
+        init_rand = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'rand');
+        init_times(jdx, idx, 1) = toc(t_rand);
+        
+        t_arno = tic;
+        init_arnoldi = arnoldi_cp_init(tns.Data, nc);
+        init_times(jdx, idx, 2) = toc(t_arno);
     
-    t_nvecs = tic;
-    init_nvecs = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
-    times(idx, 2) = toc(t_nvecs);
-    
-    [M_nvecs,M0_nvecs,outp_nvecs] = cp_als(tns.Data, nc, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0, 'init', init_nvecs);
-    fits{idx,2} = outp_nvecs.fits;
-    
-    tns_matlab = full(tns.Data);
-    t_gevd = tic;
-    [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
-    times(idx, 3) = toc(t_gevd);
-    
-    [M_gevd, M0_gevd, outp_gevd] = cp_als(tns.Data, nc, 'init', init_gevd, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
-    fits{idx,3} = outp_gevd.fits;
+        t_kryl = tic;
+        [init_krylov, ~, ~] = min_krylov_recursion(tns.Data, nc);
+        init_times(jdx, idx, 3) = toc(t_kryl);
+        if idx == 1
+            t_nvecs = tic;
+            init_nvecs = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+            init_times(jdx, idx, 4) = toc(t_nvecs);
+            
+            tns_matlab = full(tns.Data);
+            t_gevd = tic;
+            [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
+            init_times(jdx, idx, 5) = toc(t_gevd);
+        else
+            init_times(jdx, idx,4) = init_times(jdx, idx-1,4);
+            init_times(jdx, idx,5) = init_times(jdx, idx-1,5);
+        end
+        
+        % ********************* perform decompositions
+        if idx == 1
+            [decomps{jdx,idx,1,1},decomps{jdx,idx,1,2},decomps{jdx,idx,1,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_rand);
+            [decomps{jdx,idx,2,1},decomps{jdx,idx,2,2},decomps{jdx,idx,2,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_arnoldi);
+            [decomps{jdx,idx,3,1},decomps{jdx,idx,3,2},decomps{jdx,idx,3,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_krylov);
+            [decomps{jdx,idx,4,1},decomps{jdx,idx,4,2},decomps{jdx,idx,4,3}] ...  
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_nvecs);
+            [decomps{jdx,idx,5,1},decomps{jdx,idx,5,2},decomps{jdx,idx,5,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_gevd);
+        else
+            [decomps{jdx,idx,1,1},decomps{jdx,idx,1,2},decomps{jdx,idx,1,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_rand);
+            [decomps{jdx,idx,2,1},decomps{jdx,idx,2,2},decomps{jdx,idx,2,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_arnoldi);
+            [decomps{jdx,idx,3,1},decomps{jdx,idx,3,2},decomps{jdx,idx,3,3}] ... 
+                = cp_als(tns.Data, nc, 'tol', tol, 'maxiters', max_iters, 'printitn', 0, 'init', init_krylov);
+        end
+        
+        % collect condition numbers of factor matrices
+%         for jdx = 1:modes
+%             conds_init_rand(jdx) = cond(M0_rand{jdx});
+%             conds_init_nvecs(jdx) = cond(M0_nvecs{jdx});
+%             conds_init_gevd(jdx) = cond(M0_gevd{jdx});
+%             conds_init_arno(jdx) = cond(M0_arno{jdx});
+%             conds_init_kryl(jdx) = cond(M0_kryl{jdx});
+%             conds_rand(jdx) = cond(M_rand{jdx});
+%             conds_nvecs(jdx) = cond(M_nvecs{jdx});
+%             conds_gevd(jdx) = cond(M_gevd{jdx});
+%             conds_arno(jdx) = cond(M_arnoldi{jdx});
+%             conds_kryl(jdx) = cond(M_kryl{jdx});
+%         end
+%         conds_init{1,idx} = conds_init_rand;
+%         conds_init{2,idx} = conds_init_nvecs;
+%         conds_init{3,idx} = conds_init_gevd;
+%         conds_init{4,idx} = conds_init_arno;
+%         conds_init{5,idx} = conds_init_kryl;
+%         conds_final{1,idx} = conds_rand;
+%         conds_final{2,idx} = conds_nvecs;
+%         conds_final{3,idx} = conds_gevd;
+%         conds_final{4,idx} = conds_arno;
+%         conds_final{5,idx} = conds_kryl;
 
-    t_arno = tic;
-    init_arnoldi = cp_init_arnoldi(full(tns.Data), nc);
-    times(idx, 4) = toc(t_arno);
-    
-    [M_arnoldi,M0_arno,outp_arnoldi] = cp_als(tns.Data, nc, 'init', init_arnoldi, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
-    fits{idx,4} = outp_arnoldi.fits;
-
-    t_kryl = tic;
-    [init_krylov, ~, ~] = min_krylov_recursion(tns.Data, nc);
-    times(idx, 5) = toc(t_kryl);
-
-    [M_kryl, M0_kryl, outp_kryl] = cp_als(tns.Data, nc, 'init', init_krylov, 'tol', 1.0e-8, 'maxiters', 1000, 'printitn', 0);
-    fits{idx,5} = outp_kryl.fits;
-    % collect condition numbers of factor matrices
-    for jdx = 1:modes
-        conds_init_rand(jdx) = cond(M0_rand{jdx});
-        conds_init_nvecs(jdx) = cond(M0_nvecs{jdx});
-        conds_init_gevd(jdx) = cond(M0_gevd{jdx});
-        conds_init_arno(jdx) = cond(M0_arno{jdx});
-        conds_init_kryl(jdx) = cond(M0_kryl{jdx});
-        conds_rand(jdx) = cond(M_rand{jdx});
-        conds_nvecs(jdx) = cond(M_nvecs{jdx});
-        conds_gevd(jdx) = cond(M_gevd{jdx});
-        conds_arno(jdx) = cond(M_arnoldi{jdx});
-        conds_kryl(jdx) = cond(M_kryl{jdx});
     end
-    conds_init{1,idx} = conds_init_rand;
-    conds_init{2,idx} = conds_init_nvecs;
-    conds_init{3,idx} = conds_init_gevd;
-    conds_init{4,idx} = conds_init_arno;
-    conds_init{5,idx} = conds_init_kryl;
-    conds_final{1,idx} = conds_rand;
-    conds_final{2,idx} = conds_nvecs;
-    conds_final{3,idx} = conds_gevd;
-    conds_final{4,idx} = conds_arno;
-    conds_final{5,idx} = conds_kryl;
+end
 
+%% plot times vs rank
+avg_times = zeros(num_tensors, num_inits);
+for jdx = 1:num_tensors
+    for idx = 1:num_inits
+        avg_times(jdx,idx) = mean(init_times(jdx,:,idx));
+    end
+end
+figure;
+hold on;
+for jdx = 1:num_inits
+    plot(ranks, avg_times(:,jdx));
+end
+legend('rand', 'arnoldi', 'min_krylov', 'nvecs', 'gevd');
+hold off;
+
+%% isolate best fits
+best_fits = cell(num_tensors, num_inits);
+for jdx = 1:num_tensors
+    for kdx = 1:num_inits
+        if kdx < 4
+            best_fit = 0;
+            fit_index = 1;
+            for idx = 1:num_runs
+                tmp = max(decomps{jdx,idx,kdx,3}.fits);
+                if  tmp > best_fit
+                    best_fit = tmp;
+                    fit_index = idx;
+                end
+            end
+            best_fits{jdx,kdx} = decomps{jdx,1,kdx,3}.fits(decomps{jdx,1,kdx,3}.fits > 0);
+        else
+            best_fits{jdx,kdx} = decomps{jdx,1,kdx,3}.fits(decomps{jdx,1,kdx,3}.fits > 0);
+        end
+    end
+end
+
+%% Plot 1st 100 iterations
+for idx = 1:num_tensors
+    figure;
+    hold on;
+    for jdx = 1:num_inits
+        semilogy(best_fits{idx,jdx});
+    end
+    ttl = sprintf("Fit Score Convergence - Rank %d", ranks(idx));
+    title(ttl);
+    xlabel("Iterations");
+    ylabel("Fit Score");
+    legend('rand', 'arnoldi', 'min_krylov', 'nvecs', 'gevd');
+    hold off;
 end
 
 %% plot results
