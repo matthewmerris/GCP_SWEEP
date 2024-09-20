@@ -10,9 +10,10 @@ modes = length(sz);
 num_tensors = length(ranks);
 tol = 1.0e-6;
 max_iters = 1000;
+sparsity = 0.90;
 
 
-
+%%
 decomps = cell(num_tensors,num_runs,num_inits,3);
 init_times = zeros(num_tensors, num_runs, num_inits);
 
@@ -23,7 +24,7 @@ init_times = zeros(num_tensors, num_runs, num_inits);
 for jdx = 1:num_tensors
     nc = ranks(jdx);
     tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
-        'Num_Factors', nc,'Sparse_Generation', 0.8, 'Noise', 0);
+        'Num_Factors', nc,'Sparse_Generation', sparsity, 'Noise', 0);
     for idx = 1:num_runs
         sprintf("Tensor %d - run %d", jdx, idx)
         
@@ -116,23 +117,52 @@ end
 legend('rand', 'arnoldi', 'min_krylov', 'nvecs', 'gevd');
 hold off;
 
-%% isolate best fits
+%% isolate best fits and condition numbers of factor matrices (init and final)
 best_fits = cell(num_tensors, num_inits);
+best_conds_init = cell(num_tensors,num_inits);
+best_conds_final = cell(num_tensors,num_inits);
+best_max_fits = zeros(num_tensors, num_inits);
+best_max_iters = zeros(num_tensors, num_inits);
 for jdx = 1:num_tensors
     for kdx = 1:num_inits
         if kdx < 4
             best_fit = 0;
+            best_fit_itrs = 0;
             fit_index = 1;
             for idx = 1:num_runs
-                tmp = max(decomps{jdx,idx,kdx,3}.fits);
+                [tmp,max_itr] = max(decomps{jdx,idx,kdx,3}.fits);
                 if  tmp > best_fit
                     best_fit = tmp;
                     fit_index = idx;
+                    best_fit_itrs = max_itr;
                 end
             end
-            best_fits{jdx,kdx} = decomps{jdx,1,kdx,3}.fits(decomps{jdx,1,kdx,3}.fits > 0);
+            best_max_fits(jdx,kdx) = best_fit;
+            best_max_iters(jdx,kdx) = best_fit_itrs;
+            best_fits{jdx,kdx} = decomps{jdx,fit_index,kdx,3}.fits(decomps{jdx,fit_index,kdx,3}.fits > 0);
+            tmp_init = decomps{jdx,fit_index,kdx,2};
+            tmp_final =  decomps{jdx,fit_index,kdx,1};
+            cnds_init = zeros(modes,1);
+            cnds_final = zeros(modes,1);
+            for idx = 1:modes
+                cnds_init(idx,1) = cond(tmp_init{idx});
+                cnds_final(idx,1) = cond(tmp_final{idx});
+            end
+            best_conds_init{jdx,kdx} = cnds_init;
+            best_conds_final{jdx,kdx} = cnds_final;
         else
+            [best_max_fits(jdx,kdx),best_max_iters(jdx,kdx)] = max(decomps{jdx,1,kdx,3}.fits);
             best_fits{jdx,kdx} = decomps{jdx,1,kdx,3}.fits(decomps{jdx,1,kdx,3}.fits > 0);
+            tmp_init = decomps{jdx,1,kdx,2};
+            tmp_final =  decomps{jdx,1,kdx,1};
+            cnds_init = zeros(modes,1);
+            cnds_final = zeros(modes,1);
+            for idx = 1:modes
+                cnds_init(idx,1) = cond(tmp_init{idx});
+                cnds_final(idx,1) = cond(tmp_final{idx});
+            end
+            best_conds_init{jdx,kdx} = cnds_init;
+            best_conds_final{jdx,kdx} = cnds_final;
         end
     end
 end
@@ -142,7 +172,7 @@ for idx = 1:num_tensors
     figure;
     hold on;
     for jdx = 1:num_inits
-        semilogy(best_fits{idx,jdx});
+        plot(best_fits{idx,jdx});
     end
     ttl = sprintf("Fit Score Convergence - Rank %d", ranks(idx));
     title(ttl);
@@ -151,7 +181,23 @@ for idx = 1:num_tensors
     legend('rand', 'arnoldi', 'min_krylov', 'nvecs', 'gevd');
     hold off;
 end
+%% Calculate condition number scores and plot results
+cn_scores_init = zeros(num_tensors, num_inits);
+cn_scores_final = zeros(num_tensors, num_inits);
+for idx = 1:num_tensors
+    for jdx = 1:num_inits
+        cn_scores_init(idx,jdx) = norm(best_conds_init{idx,jdx});
+        cn_scores_final(idx,jdx) = norm(best_conds_final{idx,jdx});
+    end
+end
 
+%% save results
+results_filename = sprintf('results/expr1_%dtensor_%dinits_%.2fsparsity_%druns_', num_tensors, num_inits, ...
+    sparsity, num_runs)+ string(datetime("now"));
+save(results_filename, 'sz', 'ranks','num_runs', 'modes', 'tol', 'max_iters', 'sparsity', 'num_tensors', 'num_inits', ...
+    'decomps', 'init_times', 'avg_times', 'best_fits', 'best_conds_init', 'best_conds_final', ...
+    'best_max_fits', 'best_max_iters', 'cn_scores_init', 'cn_scores_final');
+%% OLD CODE BELOW
 %% plot results
 figure
 hold on
