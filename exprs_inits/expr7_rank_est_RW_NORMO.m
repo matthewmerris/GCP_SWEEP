@@ -3,7 +3,7 @@ amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
 dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
 sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
 enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat'
+eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
 uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
 
 %% load amino data
@@ -43,7 +43,7 @@ tns = sptensor(uber);
 k = max(size(tns));
 modes = ndims(tns);
 t_construct = tic;
-Us = cp_init_arnoldi(tns,k);
+Us = arnoldi_cp_init(tns,k);
 t_construct = toc(t_construct);
 cond_nums = zeros(k, modes);
 
@@ -58,7 +58,7 @@ cond_ratios = zeros(k-1,modes);
 % cond_scaled_diff = zeros(k-1,modes);
 for jdx = 1:modes
     for idx = 1:(k-1)
-        cond_ratios(idx,jdx) = cond_nums(idx+1,3) / cond_nums(idx,3);
+        cond_ratios(idx,jdx) = cond_nums(idx+1,jdx) / cond_nums(idx,jdx);
 %         cond_scaled_diff(idx,jdx) = 100 * (cond_nums(idx+1, 3) - cond_nums(idx,3));
     end
 end
@@ -81,9 +81,9 @@ for cols = 1:modes
     for rows = 1:2
         subplot(2,modes, (modes * (rows -1) + cols));
         if rows == 1
-            plot(cond_nums(1:6,cols));
+            plot(cond_nums(1:460,cols));
         else
-            plot(cond_ratios(1:6,cols));
+            plot(cond_ratios(1:460,cols));
         end
     end 
 end

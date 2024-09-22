@@ -1,6 +1,6 @@
 %% Testing krylov-based rank estimation and intialization on synthetic
 % sparse data tensors
-ranks = [10 20 30 40 50 60 70 80 90];
+ranks = [10 20 30 40 50];% 60 70 80 90];
 % ranks = [5 10 15 20 25];
 sz = [100 100 100];
 num_tensors = length(ranks);
@@ -11,7 +11,7 @@ cond_nums_raw = cell(num_tensors,1);
 
 for kdx = 1:num_tensors
     tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
-      'Num_Factors', ranks(kdx),'Sparse_Generation', .9, 'Noise', 0);
+      'Num_Factors', ranks(kdx),'Sparse_Generation', 0, 'Noise', 0);
 %     tns = create_problem('Size', sz, 'Factor_Generator', 'stochastic', ...
 %       'Num_Factors', ranks(kdx), 'Noise', 0);
     Us = arnoldi_cp_init(tns.Data, k);
@@ -27,6 +27,18 @@ for kdx = 1:num_tensors
 end
 
 %% analyze cond_nums
+for kdx = 1:num_tensors
+    figure;
+    for jdx = 1:modes
+        subplot(1,modes,jdx);
+%         plot(cond_nums_raw{kdx,1}(1:ranks(kdx)+2,jdx));
+        plot(cond_nums_raw{kdx,1}(:,jdx));
+    end
+    ttl = sprintf("Rank %d", ranks(kdx));
+    sgtitle(ttl);
+end
+
+%% calculate %-difference in condition number growth according to number of columns
 % cond_num_thershold = 500000;
 for kdx = 1:num_tensors
     tmp_ranks = zeros(modes,1);
