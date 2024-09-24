@@ -1,9 +1,9 @@
 % Set data file paths
-amino_path = '/Users/matthewmerris/datasets/real-world-rank-known/amino/claus.mat';
-dorrit_path = '/Users/matthewmerris/datasets/real-world-rank-known/dorrit/dorrit.mat';
-enron_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-eem_path = '/Users/matthewmerris/datasets/real-world-rank-known/eem/EEM18.mat';
-uber_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
+amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
+dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
+enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
+eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
+uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
 sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
 dataset_names = ["amino" "dorrit" "enron" "eem" "uber" "sugar"];
 dataset_paths = {amino_path, dorrit_path, enron_path, eem_path, uber_path, sugar_path};
@@ -45,7 +45,7 @@ for kdx = 1:num_datasets
         adj_by = -1 * min_val + 10*eps;
         tns(isnan(tns(:)))=0;
         tns = tns + adj_by;
-        tns = reshape(tns,[268, 571,7]);
+%         tns = reshape(tns,[268, 571,7]);
     else
         disp("Trouble now: dataset(s) requested DNE");
     end

@@ -2,7 +2,7 @@
 % Intitialization schemes: rand init, nvecs init, gevd, arnoldi init, & min
 % krylov recursion.
 rng(1339);
-sz = [100 100 100];
+sz = [50 50 50];
 ranks = [10 20 30 40 50];
 num_runs = 30;              % number of runs of 'random' class of inits
 num_inits = 5;              % rand, arno, min_krylov, nvecs, gevd
@@ -88,6 +88,73 @@ for jdx = 1:num_tensors
     end
 end
 
+%% plot average times by rank
+figure;
+bar(avg_times);
+xticklabels(ranks);
+ttl = sprintf("Initialization times by rank");
+title(ttl);
+ylabel("Time (seconds)");
+xlabel("Tesor Rank");
+legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+fondsize(gca, 20, "pixels");
+grid on;
+
+%% CP_OPT FIT = 1 - sqrt(f) where f is objective
+best_fs = cell(num_tensors, num_inits);
+best_conds_init = cell(num_tensors,num_inits);
+best_conds_final = cell(num_tensors,num_inits);
+best_max_fs = zeros(num_tensors, num_inits);
+best_max_iters = zeros(num_tensors, num_inits);
+best_max_times = zeros(num_tensors, num_inits);
+for jdx = 1:num_tensors
+    for kdx = 1:num_inits
+        if kdx < 4
+            best_fit = 0;
+            best_fit_itrs = 0;
+            fit_index = 1;
+            best_f = decomps{jdx, 1, kdx,3}.f;
+            best_run = 1;
+            for idx = 1:num_runs
+                tmp_f = decomps{jdx,idx,kdx,3}.f;
+                if  tmp_f < best_fit
+                    best_f = tmp_f;
+                    best_run = idx;
+                end
+            end
+            % modify collection to f and f_trace and opttime and iterations
+            % add gnorm_trace (?) - all values stored in decomps anyway
+            best_max_fits(jdx,kdx) = best_fit;
+            best_max_iters(jdx,kdx) = best_fit_itrs;
+            best_fits{jdx,kdx} = decomps{jdx,fit_index,kdx,3}.fits(decomps{jdx,fit_index,kdx,3}.fits > 0);
+            tmp_init = decomps{jdx,fit_index,kdx,2};
+            tmp_final =  decomps{jdx,fit_index,kdx,1};
+            cnds_init = zeros(modes,1);
+            cnds_final = zeros(modes,1);
+            for idx = 1:modes
+                cnds_init(idx,1) = cond(tmp_init{idx});
+                cnds_final(idx,1) = cond(tmp_final{idx});
+            end
+            best_conds_init{jdx,kdx} = cnds_init;
+            best_conds_final{jdx,kdx} = cnds_final;
+        else
+            [best_max_fits(jdx,kdx),best_max_iters(jdx,kdx)] = max(decomps{jdx,1,kdx,3}.fits);
+            best_fits{jdx,kdx} = decomps{jdx,1,kdx,3}.fits(decomps{jdx,1,kdx,3}.fits > 0);
+            tmp_init = decomps{jdx,1,kdx,2};
+            tmp_final =  decomps{jdx,1,kdx,1};
+            cnds_init = zeros(modes,1);
+            cnds_final = zeros(modes,1);
+            for idx = 1:modes
+                cnds_init(idx,1) = cond(tmp_init{idx});
+                cnds_final(idx,1) = cond(tmp_final{idx});
+            end
+            best_conds_init{jdx,kdx} = cnds_init;
+            best_conds_final{jdx,kdx} = cnds_final;
+        end
+    end
+end
+
+%% CP-ALS metrics collection below,
 %% isolate best fits and condition numbers of factor matrices (init and final)
 best_fits = cell(num_tensors, num_inits);
 best_conds_init = cell(num_tensors,num_inits);
