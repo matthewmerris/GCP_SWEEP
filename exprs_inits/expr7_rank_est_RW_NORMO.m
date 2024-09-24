@@ -28,6 +28,7 @@ min_val = min(tns(:));
 adj_by = -1 * min_val + 10*eps;
 tns(isnan(tns(:)))=0;
 tns = tns + adj_by;
+tns = reshape(tns,[268, 571,7]);
 
 %% load enron
 load(enron_path);
