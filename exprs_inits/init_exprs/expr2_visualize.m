@@ -16,7 +16,7 @@ title(ttl);
 ylabel("Time (seconds)");
 xlabel("Tesor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
-fondsize(gca, 20, "pixels");
+fontsize(gca, 20, "pixels");
 grid on;
 
 %% identify best model out runs for each tensor
@@ -28,7 +28,7 @@ for jdx = 1:num_tensors
             best_run = 1;
             for idx = 1:num_runs
                 tmp_f = decomps{jdx,idx,kdx,3}.f;
-                if  tmp_f < best_fit
+                if  tmp_f < best_f
                     best_run = idx;
                 end
             end
@@ -63,11 +63,11 @@ end
 
 %% bar graph best fit scores by tensor rank
 figure;
-bar(best_fit_scores(:,1:4));  % excluding gevd currently
+bar(best_fit_scores);  % excluding gevd currently
 xticklabels(ranks);
 ttl = sprintf("Final Fit Score by Rank");
 title(ttl);
-ylim([0.975 1.0]);   % adjust yaxis limit according to dataset
+ylim([0.97 1.0]);   % adjust yaxis limit according to dataset
 ylabel("Fit Score");
 xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
@@ -75,15 +75,23 @@ fontsize(gca, 15, "pixels");
 grid on;
 
 %% plot fit traces for convergence comparison
-figure;
-hold on;
-for idx = 1:4
-    plot(best_fit_score_traces{5,idx}, 'LineWidth', 2);
+for idx = 1:num_tensors
+    figure;
+    hold on;
+    [best_fit, itr_indx] = max(best_fit_scores(idx,:));
+    best_iter = best_fit_score_iters(idx,itr_indx);
+    for jdx = 1:num_inits
+        if length(best_fit_score_traces{idx,jdx}) < best_iter
+            plot(best_fit_score_traces{idx,jdx}, 'LineWidth', 2);
+        else
+            plot(best_fit_score_traces{idx,jdx}(1:best_iter), 'LineWidth', 2);
+        end
+    end 
+    ttl = sprintf("Fit Score by Iteration (Rank %d)",ranks(idx));
+    title(ttl);
+    ylim([0.8 1.0]);   % adjust yaxis limit according to dataset
+    ylabel("Fit Score");
+    xlabel("Tensor Rank");
+    legend("rand", "arnoldi", "min_krylov", "nvecs","gevd");
+    fontsize(gca, 15, "pixels");
 end
-ttl = sprintf("Fit Score by Rank");
-title(ttl);
-ylim([0.88 1.0]);   % adjust yaxis limit according to dataset
-ylabel("Fit Score");
-xlabel("Tensor Rank");
-legend("rand", "arnoldi", "min_krylov", "nvecs");
-fontsize(gca, 15, "pixels");
