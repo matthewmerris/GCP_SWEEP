@@ -44,6 +44,7 @@ for jdx = 1:num_tensors
             t_gevd = tic;
             [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
             init_times(jdx, idx, 5) = toc(t_gevd);
+            init_gevd = init_gevd';
         else
             init_times(jdx, idx,4) = init_times(jdx, idx-1,4);
             init_times(jdx, idx,5) = init_times(jdx, idx-1,5);
@@ -81,12 +82,7 @@ for jdx = 1:num_tensors
 end
 
 %% collect average initialization times
-avg_times = zeros(num_tensors, num_inits);
-for jdx = 1:num_tensors
-    for idx = 1:num_inits
-        avg_times(jdx,idx) = mean(init_times(jdx,:,idx));
-    end
-end
+
 
 %% plot average times by rank
 figure;
@@ -205,22 +201,13 @@ for jdx = 1:num_tensors
     end
 end
 
-%% Calculate condition number scores and plot results
-cn_scores_init = zeros(num_tensors, num_inits);
-cn_scores_final = zeros(num_tensors, num_inits);
-for idx = 1:num_tensors
-    for jdx = 1:num_inits
-        cn_scores_init(idx,jdx) = norm(best_conds_init{idx,jdx});
-        cn_scores_final(idx,jdx) = norm(best_conds_final{idx,jdx});
-    end
-end
+
 
 %% save results
 results_filename = sprintf('results/expr2_%dtensor_%dinits_%.2fsparsity_%druns_cp_opt', num_tensors, num_inits, ...
     sparsity, num_runs)+ string(datetime("now"));
 save(results_filename, 'sz', 'ranks','num_runs', 'modes', 'tol', 'max_iters', 'sparsity', 'num_tensors', 'num_inits', ...
-    'decomps', 'init_times', 'avg_times', 'best_fits', 'best_conds_init', 'best_conds_final', ...
-    'best_max_fits', 'best_max_iters', 'cn_scores_init', 'cn_scores_final');
+    'decomps', 'init_times', 'avg_times');
 
 % %% plot times vs rank
 % figure;
