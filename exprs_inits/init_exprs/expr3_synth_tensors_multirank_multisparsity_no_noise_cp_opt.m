@@ -10,7 +10,7 @@ modes = length(sz);
 num_tensors = length(ranks);
 tol = 1.0e-10;
 max_iters = 10000;
-sparsity = [50 60 70 80 90 95 99];
+sparsity = [.8 .9 .95 .99];
 
 
 %% Generate tensors, initialize, factorize, collect raw data
@@ -88,7 +88,7 @@ for sdx = 1:length(sparsity)
     end
     
     % save results
-    results_filename = sprintf('results/expr3_%dtensor_%dinits_%.2fsparsity_%druns_cp_opt', num_tensors, num_inits, ...
+    results_filename = sprintf('results/expr3_%dtensor_%dinits_%.2fsparsity_%druns_cp_opt_', num_tensors, num_inits, ...
         sparsity(sdx), num_runs)+ string(datetime("now"));
     save(results_filename, 'sz', 'ranks','num_runs', 'modes', 'tol', 'max_iters', 'sparsity', 'num_tensors', 'num_inits', ...
         'decomps', 'init_times');

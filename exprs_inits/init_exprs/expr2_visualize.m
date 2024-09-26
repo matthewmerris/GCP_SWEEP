@@ -67,7 +67,7 @@ bar(best_fit_scores);  % excluding gevd currently
 xticklabels(ranks);
 ttl = sprintf("Final Fit Score by Rank");
 title(ttl);
-ylim([0.97 1.0]);   % adjust yaxis limit according to dataset
+ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
 ylabel("Fit Score");
 xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
