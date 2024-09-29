@@ -92,6 +92,84 @@ for idx = 1:num_tensors
     ylim([0.8 1.0]);   % adjust yaxis limit according to dataset
     ylabel("Fit Score");
     xlabel("Tensor Rank");
-    legend("rand", "arnoldi", "min_krylov", "nvecs","gevd");
+    legend("rand", "arnoldi", "min\_krylov", "nvecs","gevd");
+    
     fontsize(gca, 15, "pixels");
 end
+
+%% collect condition numbers and calculate cond scores
+cond_nums_init = cell(num_tensors,num_inits);
+cond_nums_final = cell(num_tensors,num_inits);
+cond_scores_init = zeros(num_tensors,num_inits);
+cond_scores_final = zeros(num_tensors,num_inits);
+for jdx = 1:num_tensors
+    for idx = 1:num_inits
+        mdl_init = best_models{jdx,idx}{2};
+        mdl_fin = best_models{jdx,idx}{1};
+        cns_init = zeros(modes,1);
+        cns_final = zeros(modes,1);
+        for kdx = 1:modes
+            cns_init(kdx) = cond(mdl_init.U{kdx});
+            cns_final(kdx) = cond(mdl_fin.U{kdx});
+        end
+        cond_nums_init{jdx,idx} = cns_init;
+        cond_nums_final{jdx,idx} = cns_final;
+        cond_scores_init(jdx,idx) = norm(cns_init);
+        cond_scores_final(jdx,idx) = norm(cns_final);
+    end
+end
+
+%% visualize cond scores
+figure;
+subplot(1,2,1);
+bar(cond_scores_init);
+xticklabels(ranks);
+ttl = sprintf("Condition Score by Rank");
+title(ttl);
+% ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
+ylabel("Condition Score");
+xlabel("Tensor Rank");
+legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+fontsize(gca, 15, "pixels");
+grid on;
+subplot(1,2,2);
+bar(cond_scores_final);
+xticklabels(ranks);
+ttl = sprintf("Condition Score by Rank");
+title(ttl);
+% ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
+ylabel("Condition Score");
+xlabel("Tensor Rank");
+legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+fontsize(gca, 15, "pixels");
+grid on;
+
+
+%% visualize final model condition numbers by mode
+conds_by_mode = zeros(num_tensors, modes, num_inits);
+for kdx = 1:num_tensors
+    for jdx = 1:modes
+        for idx = 1:num_inits
+            conds_by_mode(kdx,jdx,idx) = cond_nums_final{kdx,idx}(jdx);
+        end
+    end
+end
+
+
+figure;
+for jdx = 1:modes
+    subplot(1,modes,jdx);
+    bar(squeeze(conds_by_mode(:,jdx,:)));
+    xticklabels(ranks);
+    ttl = sprintf("Condition Number - Mode %d", jdx);
+    title(ttl);
+    % ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
+    ylabel("Condition Number");
+    xlabel("Tensor Rank");
+    legend("rand", "arnoldi", "min\_krylov", "nvecs", "gevd");
+    fontsize(gca, 15, "pixels");
+    grid on;
+end
+
+
+
