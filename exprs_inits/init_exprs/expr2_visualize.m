@@ -63,6 +63,7 @@ end
 
 %% bar graph best fit scores by tensor rank
 figure;
+subplot(1,2,1);
 bar(best_fit_scores);  % excluding gevd currently
 xticklabels(ranks);
 ttl = sprintf("Final Fit Score by Rank");
@@ -71,7 +72,18 @@ ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
 ylabel("Fit Score");
 xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
-fontsize(gca, 15, "pixels");
+fontsize(gca, 20, "pixels");
+grid on;
+
+subplot(1,2,2);
+bar(best_fit_score_iters);
+ttl = sprintf("Total Iterations by Rank");
+title(ttl);
+% ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
+ylabel("Iterations");
+xlabel("Tensor Rank");
+legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+fontsize(gca, 20, "pixels");
 grid on;
 
 %% plot fit traces for convergence comparison
@@ -82,14 +94,18 @@ for idx = 1:num_tensors
     best_iter = best_fit_score_iters(idx,itr_indx);
     for jdx = 1:num_inits
         if length(best_fit_score_traces{idx,jdx}) < best_iter
-            plot(best_fit_score_traces{idx,jdx}, 'LineWidth', 2);
+            tmp_bf = best_fit_score_traces{idx,jdx};
+            tmp_bf(tmp_bf < 0) = 0;
+            plot(tmp_bf , 'LineWidth', 2);
         else
-            plot(best_fit_score_traces{idx,jdx}(1:best_iter), 'LineWidth', 2);
+            tmp_bf = best_fit_score_traces{idx,jdx}(1:best_iter);
+            tmp_bf(tmp_bf < 0) = 0;
+            plot(tmp_bf, 'LineWidth', 2);
         end
     end 
     ttl = sprintf("Fit Score by Iteration (Rank %d)",ranks(idx));
     title(ttl);
-    ylim([0.8 1.0]);   % adjust yaxis limit according to dataset
+    ylim([0.85 1.0]);   % adjust yaxis limit according to dataset
     ylabel("Fit Score");
     xlabel("Tensor Rank");
     legend("rand", "arnoldi", "min\_krylov", "nvecs","gevd");
@@ -170,6 +186,4 @@ for jdx = 1:modes
     fontsize(gca, 15, "pixels");
     grid on;
 end
-
-
 
