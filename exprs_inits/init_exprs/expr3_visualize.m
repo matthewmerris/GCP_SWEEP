@@ -16,7 +16,7 @@ xticklabels(ranks);
 ttl = sprintf("Initialization times by rank");
 title(ttl);
 ylabel("Time (seconds)");
-xlabel("Tesor Rank");
+xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
 fontsize(gca, 20, "pixels");
 grid on;
@@ -77,7 +77,7 @@ y_min = min(best_fit_scores(1,:),[],"all") - max(std(best_fit_scores(1,:)));
 y_max = max(best_fit_scores(1,:),[],"all") + max(std(best_fit_scores(1,:)))/2;
 bar(10,best_fit_scores(1,:)');  % excluding gevd currently
 % xticklabels(ranks);
-ttl = sprintf("Final Fit Score by Rank");
+ttl = sprintf("Final Fit Score");
 title(ttl);
 ylim([y_min y_max]);   % adjust yaxis limit according to dataset
 ylabel("Fit Score");
@@ -88,21 +88,21 @@ grid on;
 subplot(2,3,2);
 bar(10,best_fit_score_iters(1,:));
 % xticklabels(ranks);
-ttl = sprintf("Final Fit Score by Rank");
+ttl = sprintf("Total Iteration");
 title(ttl);
 % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
-ylabel("Fit Score");
+ylabel("Iterations");
 xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
 fontsize(gca, 15, "pixels");
 grid on;
 subplot(2,3,3);
-bar(10,best_fit_score_opttimes(1,:));
+bar(10,best_fit_score_opttimes(1,:)./60);
 % xticklabels(ranks);
-ttl = sprintf("Final Fit Score by Rank");
+ttl = sprintf("Total Optimization Time");
 title(ttl);
 % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
-ylabel("Fit Score");
+ylabel("Time (min)");
 xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
 fontsize(gca, 15, "pixels");
@@ -112,7 +112,7 @@ y_min = min(best_fit_scores(2,:),[],"all") - max(std(best_fit_scores(2,:)));
 y_max = max(best_fit_scores(2,:),[],"all") + max(std(best_fit_scores(2,:)))/2;
 bar(20,best_fit_scores(2,:));  % excluding gevd currently
 % xticklabels(ranks);
-ttl = sprintf("Final Fit Score by Rank");
+ttl = sprintf("Final Fit Score");
 title(ttl);
 ylim([y_min y_max]);   % adjust yaxis limit according to dataset
 ylabel("Fit Score");
@@ -123,23 +123,23 @@ grid on;
 subplot(2,3,5);
 bar(20,best_fit_score_iters(2,:));
 % xticklabels(ranks);
-ttl = sprintf("Final Fit Score by Rank");
+ttl = sprintf("Total Iterations");
 title(ttl);
 % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
-ylabel("Fit Score");
+ylabel("Iterations");
 xlabel("Tensor Rank");
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
 fontsize(gca, 15, "pixels");
 grid on;
 subplot(2,3,6);
-bar(20,best_fit_score_opttimes(2,:));
+bar(20,best_fit_score_opttimes(2,:)./60);
 % xticklabels(ranks);
-ttl = sprintf("Final Fit Score by Rank");
+ttl = sprintf("Total Optimization Time");
 title(ttl);
 % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
-ylabel("Fit Score");
+ylabel("Time (min)");
 xlabel("Tensor Rank");
-legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+legend("rand", "arnoldi", "min\_krylov", "nvecs", "gevd");
 fontsize(gca, 15, "pixels");
 grid on;
 
@@ -200,7 +200,7 @@ title(ttl);
 % ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
 ylabel("Condition Score");
 xlabel("Tensor Rank");
-legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+legend("rand", "arnoldi", "min\_krylov", "nvecs", "gevd");
 fontsize(gca, 15, "pixels");
 grid on;
 subplot(1,2,2);
@@ -211,7 +211,7 @@ title(ttl);
 % ylim([0.98 1.0]);   % adjust yaxis limit according to dataset
 ylabel("Condition Score");
 xlabel("Tensor Rank");
-legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+legend("rand", "arnoldi", "min\_krylov", "nvecs", "gevd");
 fontsize(gca, 15, "pixels");
 grid on;
 
@@ -242,3 +242,51 @@ for jdx = 1:modes
     grid on;
 end
 
+%% collect scores from best models
+best_scores = zeros(num_tensors, num_inits);
+for idx = 1:num_tensors
+    best_scores(idx,1) = score(sols{idx,1},best_models{idx,1}{1});
+    best_scores(idx,2) = score(sols{idx,1},best_models{idx,2}{1});
+    best_scores(idx,3) = score(sols{idx,1},best_models{idx,3}{1});
+    best_scores(idx,4) = score(sols{idx,1},best_models{idx,4}{1});
+    best_scores(idx,5) = score(sols{idx,1},best_models{idx,5}{1});
+end
+
+%% craft bar plots for: final fit score, score, optimization time
+figure;
+for idx = 1:num_tensors
+    plt_adj = 3 *(idx-1);
+    % fit score
+    subplot(num_tensors,3, plt_adj + 1);
+    y_min = min(best_fit_scores(idx,:),[],"all") - max(std(best_fit_scores(idx,:)));
+    y_max = max(best_fit_scores(idx,:),[],"all") + max(std(best_fit_scores(idx,:)))/2;
+    bar(ranks(idx),best_fit_scores(idx,:)');  % excluding gevd currently
+    % xticklabels(ranks);
+    ttl = sprintf("Final Fit Score");
+    title(ttl);
+    ylim([y_min y_max]);   % adjust yaxis limit according to dataset
+    ylabel("Fit Score");
+    xlabel("Tensor Rank");
+    legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+    fontsize(gca, 15, "pixels");
+    grid on;
+    % Score
+    subplot(num_tensors,3, plt_adj + 2);
+    bar(ranks(idx), best_scores(idx,:));
+    ttl = sprintf("Model Scores");
+    title(ttl);
+    ylabel("Model Score");
+    xlabel("Tensor Rank");
+    legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+    fontsize(gca, 15, "pixels");
+    grid on;
+    % Optimization Time
+    subplot(num_tensors,3, plt_adj + 3);
+    bar(ranks(idx), best_fit_score_opttimes(idx,:)./60);
+    ttl = sprintf("Optimization Time");
+    title(ttl);
+    ylabel("Time (min)");
+    xlabel("Tensor Rank");
+    legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+    fontsize(gca, 15, "pixels");
+end
