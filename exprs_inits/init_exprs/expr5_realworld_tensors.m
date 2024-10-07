@@ -1,10 +1,18 @@
 %% set-up data tensors
-amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
-dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
-enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
-uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
-sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
+% amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
+% dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
+% enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
+% eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
+% uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
+% sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
+
+amino_path = '/Users/matthewmerris/datasets/real-world-rank-known/amino/claus.mat';
+dorrit_path = '/Users/matthewmerris/datasets/real-world-rank-known/dorrit/dorrit.mat';
+enron_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/enron/enron_emails.mat';
+eem_path = '/Users/matthewmerris/datasets/real-world-rank-known/eem/EEM18.mat';
+uber_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
+sugar_path = '/Users/matthewmerris/datasets/real-world-rank-known/sugar/sugar.mat';
+
 dataset_names = ["amino" "dorrit" "enron" "eem" "uber" "sugar"];
 ranks = [4 4 10 3 21 4];
 dataset_paths = {amino_path, dorrit_path, enron_path, eem_path, uber_path, sugar_path};
@@ -83,16 +91,17 @@ for jdx = 1:num_tensors
             t_nvecs = tic;
             init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
             init_times(jdx, idx, 4) = toc(t_nvecs);
-            
-            tns_matlab = full(tns);
-            t_gevd = tic;
-            [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
-            init_times(jdx, idx, 5) = toc(t_gevd);
-            init_gevd = init_gevd';                     % trying to resolve gevd malfunction, likely source is negatives in the factors
-            % attempting to resolve by adjusting the factors to be
-            % non-negative
-            for i = 1:modes
-                init_gevd{i} = init_gevd{i} - min(init_gevd{i},[],"all") + eps;
+            if ~strcmp(dataset_names(jdx),"uber") 
+                tns_matlab = full(tns);
+                t_gevd = tic;
+                [init_gevd,ot_gevd] = cpd_gevd(tns_matlab.data, nc);
+                init_times(jdx, idx, 5) = toc(t_gevd);
+                init_gevd = init_gevd';                     % trying to resolve gevd malfunction, likely source is negatives in the factors
+                % attempting to resolve by adjusting the factors to be
+                % non-negative
+                for i = 1:modes
+                    init_gevd{i} = init_gevd{i} - min(init_gevd{i},[],"all") + eps;
+                end
             end
         else
             init_times(jdx, idx,4) = init_times(jdx, idx-1,4);
@@ -113,9 +122,11 @@ for jdx = 1:num_tensors
             [decomps_opt{jdx,idx,4,1},decomps_opt{jdx,idx,4,2},decomps_opt{jdx,idx,4,3}] ...  
                 = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
                 'printitn', 0, 'lower', 0, 'init', init_nvecs);
-            [decomps_opt{jdx,idx,5,1},decomps_opt{jdx,idx,5,2},decomps_opt{jdx,idx,5,3}] ... 
-                = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
-                'printitn', 0, 'lower', 0, 'init', init_gevd);
+            if ~strcmp(dataset_names(jdx),"uber")
+                [decomps_opt{jdx,idx,5,1},decomps_opt{jdx,idx,5,2},decomps_opt{jdx,idx,5,3}] ... 
+                    = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
+                    'printitn', 0, 'lower', 0, 'init', init_gevd);
+            end
         else
             [decomps_opt{jdx,idx,1,1},decomps_opt{jdx,idx,1,2},decomps_opt{jdx,idx,1,3}] ... 
                 = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
