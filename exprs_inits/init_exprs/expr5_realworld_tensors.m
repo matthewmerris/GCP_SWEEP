@@ -1,17 +1,17 @@
 %% set-up data tensors
-% amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
-% dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
-% enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-% eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
-% uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
-% sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
+amino_path = '~/datasets/real-world-rank-known/amino/claus.mat';
+dorrit_path = '~/datasets/real-world-rank-known/dorrit/dorrit.mat';
+enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
+eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
+uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
+sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
 
-amino_path = '/Users/matthewmerris/datasets/real-world-rank-known/amino/claus.mat';
-dorrit_path = '/Users/matthewmerris/datasets/real-world-rank-known/dorrit/dorrit.mat';
-enron_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-eem_path = '/Users/matthewmerris/datasets/real-world-rank-known/eem/EEM18.mat';
-uber_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
-sugar_path = '/Users/matthewmerris/datasets/real-world-rank-known/sugar/sugar.mat';
+% amino_path = '/Users/matthewmerris/datasets/real-world-rank-known/amino/claus.mat';
+% dorrit_path = '/Users/matthewmerris/datasets/real-world-rank-known/dorrit/dorrit.mat';
+% enron_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/enron/enron_emails.mat';
+% eem_path = '/Users/matthewmerris/datasets/real-world-rank-known/eem/EEM18.mat';
+% uber_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
+% sugar_path = '/Users/matthewmerris/datasets/real-world-rank-known/sugar/sugar.mat';
 
 dataset_names = ["amino" "dorrit" "enron" "eem" "uber" "sugar"];
 ranks = [4 4 10 3 21 4];
@@ -26,6 +26,7 @@ num_inits = length(inits);
 
 %% load and prep datasets
 data_tns = cell(num_tensors,1);
+szs = cell(num_tensors,1);
 for kdx = 1:num_tensors
     load(dataset_paths{kdx});
     if strcmp(dataset_names(kdx),"amino")
@@ -63,7 +64,7 @@ for kdx = 1:num_tensors
         disp("Trouble now: dataset(s) requested DNE");
     end
     data_tns{kdx} = tns;
-
+    szs{kdx} = ndims(tns);
 end
 
 %% set-up initialization experiments
@@ -141,3 +142,8 @@ for jdx = 1:num_tensors
     end
 end
 
+% save results
+results_filename = sprintf('results/expr5_RW_%dtensor_%dinits_%druns_cp_opt_', num_tensors, num_inits, ...
+    num_runs)+ string(datetime("now"));
+save(results_filename, 'szs', 'ranks','num_runs', 'tol', 'max_iters', 'num_tensors', 'num_inits', ...
+    'decomps_opt', 'init_times', 'inits');
