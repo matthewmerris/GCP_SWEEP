@@ -5,6 +5,8 @@ enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
 eem_path = '~/datasets/real-world-rank-known/eem/EEM18.mat';
 uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
 sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
+chi_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime.mat';
+chi_2019_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime_2019.mat';
 
 % amino_path = '/Users/matthewmerris/datasets/real-world-rank-known/amino/claus.mat';
 % dorrit_path = '/Users/matthewmerris/datasets/real-world-rank-known/dorrit/dorrit.mat';
@@ -12,6 +14,8 @@ sugar_path = '~/datasets/real-world-rank-known/sugar/sugar.mat';
 % eem_path = '/Users/matthewmerris/datasets/real-world-rank-known/eem/EEM18.mat';
 % uber_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
 % sugar_path = '/Users/matthewmerris/datasets/real-world-rank-known/sugar/sugar.mat';
+% chi_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime.mat';
+% chi_2019_path = '/Users/matthewmerris/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime_2019.mat';
 
 dataset_names = ["amino" "dorrit" "enron" "eem" "uber" "sugar"];
 ranks = [4 4 10 3 21 4];
@@ -21,7 +25,7 @@ num_tensors = length(dataset_paths);
 num_runs = 10;
 tol = 1.0e-8;
 max_iters = 5000;
-inits = ['rand' 'arnoldi' 'min\_krylov' 'nvecs' 'gevd'];
+inits = ["rand" "arnoldi" "min\_krylov" "nvecs" "gevd"];
 num_inits = length(inits);
 
 %% load and prep datasets
