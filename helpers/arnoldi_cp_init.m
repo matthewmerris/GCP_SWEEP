@@ -1,4 +1,4 @@
-function factors = cp_init_arnoldi(tns,k)
+function factors = arnoldi_cp_init(tns,k)
 %CP_INIT_ARNOLDI Summary of this function goes here
 %   Detailed explanation goes here
 modes = ndims(tns);
@@ -9,14 +9,20 @@ for i = 1:modes
     if(isa(tns,'tensor'))
         tmp = unfold(tns, i);
         A = tmp * tmp';
+        [m,~] = size(A);
     elseif(isa(tns,'sptensor'))
-        tmp = double(sptenmat(tns, i, 'fc'));
-        A = full(tmp * tmp');
+        A = sptenmat(tns, i, 'fc');
+        m = size(A,1);
     end
-    [m,~] = size(A);
-    q1 = rand(m,1);
+
     % call the arnoldi constructor
-    [factor,~] = arnoldi_constructor(A, q1, k);
+    q1 = rand(m,1);
+    if(isa(tns,'sptensor'))
+        [factor,~] = arnoldi_constructor_sparse(A, q1, k);
+    else
+        [factor,~] = arnoldi_constructor(A, q1, k);
+    end
+    
     % store factor matrix
     factors{i} = factor;
 end
