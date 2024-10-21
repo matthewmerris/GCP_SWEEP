@@ -5,14 +5,16 @@ nell2_path = '~/datasets/FROSTT/nell2/nell-2.tns';
 uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
 chi_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime.mat';
 chi_2019_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime_2019.mat';
-nips_path = '~/datasets/FROSTT/
+nips_path = '~/datasets/FROSTT/nips/nips.tns';
+% del4d_path = '~/datasets/FROSTT/delicious/delicious-4d.tns'; % too big
+% del3d_path = '~/datasets/FROSTT/delicious/delicious-3d.tns';  % too big
 
 dataset_names = [ "vast3d","nell2","uber", "chicago", "chicago_2019", "nips"];
 ranks = [10,10,10,10,10];
 dataset_paths = {vast3d_path, nell2_path, uber_path, chi_path, chi_2019_path, nips_path};
 num_tensors = length(dataset_paths);
 
-num_runs = 10;
+num_runs = 2;
 tol = 1.0e-6;
 max_iters = 5000;
 % inits = ["rand" "arnoldi" "min\_krylov" "nvecs"];
@@ -38,9 +40,10 @@ for kdx = 1:num_tensors
         tns = tns(:,:,:,:,1:86400);
     elseif strcmp(dataset_names{kdx}, "nips")
         tns = load_frostt(dataset_paths{kdx});
-        tns = squeeze(tns(:,:,:,:,1));
+        tns = squeeze(tns(:,:,:,1));
     elseif strcmp(dataset_names(kdx),"vast5d") || strcmp(dataset_names(kdx),"vast3d") ...
-            || strcmp(dataset_names(kdx),"nell2")
+            || strcmp(dataset_names(kdx),"nell2") || strcmp(dataset_names(kdx),"del4d") ...
+            || strcmp(dataset_names(kdx),"del3d")
         tns = load_frostt(dataset_paths{kdx});
     else
         disp("Trouble now: dataset(s) requested DNE");
