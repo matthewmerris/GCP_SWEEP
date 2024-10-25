@@ -1,25 +1,21 @@
 % lbnl_path = '~/datasets/FROSTT/lbnl_network/lbnl-network.tns';  % too big
 % vast5d_path = '~/datasets/FROSTT/vast_2015_mini/vast-2015-mc1-5d.tns'; % too big
 enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
-vast3d_path = '~/datasets/FROSTT/vast_2015_mini/vast-2015-mc1-3d.tns';
-nell2_path = '~/datasets/FROSTT/nell2/nell-2.tns';
-uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
-chi_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime.mat';
 chi_2019_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime_2019.mat';
 nips_path = '~/datasets/FROSTT/nips/nips.tns';
 % del4d_path = '~/datasets/FROSTT/delicious/delicious-4d.tns'; % too big
 % del3d_path = '~/datasets/FROSTT/delicious/delicious-3d.tns';  % too big
 
-dataset_names = [ "enron","vast3d","nell2","uber", "chicago", "chicago\_2019", "nips"];
-dataset_paths = {enron_path, vast3d_path, nell2_path, uber_path, chi_path, chi_2019_path, nips_path};
-ranks = [8,6,5,10,10,9,9,6];
+dataset_names = [ "enron", "chicago\_2019", "nips"];
+dataset_paths = {enron_path, chi_2019_path, nips_path};
+ranks = [9,13,10];   % based on CN analysis @ 1e-13 tolerance
 num_tensors = length(dataset_paths);
 
-num_runs = 10;
-tol = 1.0e-8;
+num_runs = 1;
+tol = 1.0e-12;
 max_iters = 5000;
 % inits = ["rand" "arnoldi" "min\_krylov" "nvecs"];
-inits = ["rand" "arnoldi"];
+inits = ["rand" "arnoldi" "nvecs"];
 num_inits = length(inits);
 
 %% load and prep datasets
@@ -33,7 +29,7 @@ for kdx = 1:num_tensors
     elseif strcmp(dataset_names(kdx),"uber")
         load(dataset_paths{kdx});
         tns = sptensor(uber);
-    elseif strcmp(dataset_names(kdx),"chicago") || strcmp(dataset_names(kdx),"chicago_2019")
+    elseif strcmp(dataset_names(kdx),"chicago") || strcmp(dataset_names(kdx),"chicago\_2019")
         load(dataset_paths{kdx});
         tns = sptensor(X);
     elseif strcmp(dataset_names{kdx}, "lbnl")
@@ -75,13 +71,13 @@ for jdx = 1:num_tensors
 %         t_kryl = tic;
 %         [init_krylov, ~, ~] = min_krylov_recursion(tns, nc);
 %         init_times(jdx, idx, 3) = toc(t_kryl);
-%         if idx == 1
-%             t_nvecs = tic;
-%             init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
-%             init_times(jdx, idx, 4) = toc(t_nvecs);
-%         else
-%             init_times(jdx, idx,4) = init_times(jdx, idx-1,4);
-%         end
+        if idx == 1
+            t_nvecs = tic;
+            init_nvecs = create_guess('Data',tns, 'Num_Factors', nc, 'Factor_Generator', 'nvecs');
+            init_times(jdx, idx, 3) = toc(t_nvecs);
+        else
+            init_times(jdx, idx,3) = init_times(jdx, idx-1,3);
+        end
         
         % ********************* perform decompositions
         if idx == 1
@@ -94,9 +90,9 @@ for jdx = 1:num_tensors
 %             [decomps_opt{jdx,idx,3,1},decomps_opt{jdx,idx,3,2},decomps_opt{jdx,idx,3,3}] ... 
 %                 = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
 %                 'printitn', 0, 'lower', 0, 'init', init_krylov);
-%             [decomps_opt{jdx,idx,4,1},decomps_opt{jdx,idx,4,2},decomps_opt{jdx,idx,4,3}] ...  
-%                 = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
-%                 'printitn', 0, 'lower', 0, 'init', init_nvecs);
+            [decomps_opt{jdx,idx,3,1},decomps_opt{jdx,idx,3,2},decomps_opt{jdx,idx,3,3}] ...  
+                = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
+                'printitn', 0, 'lower', 0, 'init', init_nvecs);
         else
             [decomps_opt{jdx,idx,1,1},decomps_opt{jdx,idx,1,2},decomps_opt{jdx,idx,1,3}] ... 
                 = cp_opt(tns, nc, 'ftol', tol, 'gtol', tol, 'maxiters', max_iters, ...
@@ -112,7 +108,7 @@ for jdx = 1:num_tensors
 end
 
 %% save results
-results_filename = sprintf('results/expr7_RW_big_and_sparse_%dtensor_%dinits_%druns_cp_opt_', num_tensors, num_inits, ...
+results_filename = sprintf('results/expr7b_RW_big_and_sparse_%dtensor_%dinits_%druns_cp_opt_', num_tensors, num_inits, ...
     num_runs)+ string(datetime("now"));
 save(results_filename, 'szs', 'ranks','num_runs', 'tol', 'max_iters', 'num_tensors', 'num_inits', ...
     'decomps_opt', 'init_times', 'inits', "dataset_names");

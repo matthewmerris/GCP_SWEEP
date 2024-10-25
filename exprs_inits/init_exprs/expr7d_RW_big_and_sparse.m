@@ -1,18 +1,14 @@
 % lbnl_path = '~/datasets/FROSTT/lbnl_network/lbnl-network.tns';  % too big
 % vast5d_path = '~/datasets/FROSTT/vast_2015_mini/vast-2015-mc1-5d.tns'; % too big
-enron_path = '~/datasets/real-world-rank-unknown/enron/enron_emails.mat';
 vast3d_path = '~/datasets/FROSTT/vast_2015_mini/vast-2015-mc1-3d.tns';
 nell2_path = '~/datasets/FROSTT/nell2/nell-2.tns';
-uber_path = '~/datasets/real-world-rank-unknown/tensor_data_uber/uber.mat';
-chi_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime.mat';
-chi_2019_path = '~/datasets/real-world-rank-unknown/tensor_data_chicago_crime/chicago_crime_2019.mat';
-nips_path = '~/datasets/FROSTT/nips/nips.tns';
+
 % del4d_path = '~/datasets/FROSTT/delicious/delicious-4d.tns'; % too big
 % del3d_path = '~/datasets/FROSTT/delicious/delicious-3d.tns';  % too big
 
-dataset_names = [ "enron","vast3d","nell2","uber", "chicago", "chicago\_2019", "nips"];
-dataset_paths = {enron_path, vast3d_path, nell2_path, uber_path, chi_path, chi_2019_path, nips_path};
-ranks = [8,6,5,10,10,9,9,6];
+dataset_names = ["vast3d","nell2"];
+dataset_paths = {vast3d_path, nell2_path};
+ranks = [10,9];
 num_tensors = length(dataset_paths);
 
 num_runs = 10;
@@ -112,7 +108,7 @@ for jdx = 1:num_tensors
 end
 
 %% save results
-results_filename = sprintf('results/expr7_RW_big_and_sparse_%dtensor_%dinits_%druns_cp_opt_', num_tensors, num_inits, ...
+results_filename = sprintf('results/expr7d_RW_big_and_sparse_%dtensor_%dinits_%druns_cp_opt_', num_tensors, num_inits, ...
     num_runs)+ string(datetime("now"));
 save(results_filename, 'szs', 'ranks','num_runs', 'tol', 'max_iters', 'num_tensors', 'num_inits', ...
     'decomps_opt', 'init_times', 'inits', "dataset_names");

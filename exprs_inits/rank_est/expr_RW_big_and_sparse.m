@@ -80,13 +80,113 @@ end
 results_path = sprintf("results/expr_RW_big_and_sparse_" + string(datetime("now")));
 save(results_path, "raw_times", "raw_Us", "raw_CNs", "raw_CN_ratios", "dataset_names");
 
-%% start with Enron
+%% Enron rank estimate - rank(8,6,6)
+% rank(15,12,11) @ 1.0e-13 tolerance
 num_modes = length(raw_Us{1,1});
 [~,num_cols] = size(raw_Us{1,1}{1});
 figure;
-subplot(1,num_modes,1);
-plot(raw_CNs{1}(1:10,1));
-subplot(1,num_modes,2);
-plot(raw_CNs{1}(1:10,2));
-subplot(1,num_modes,3);
-plot(raw_CNs{1}(1:10,3));
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{1}(1:15,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(1));
+sgtitle(tmp_ttl);
+
+%% vast3d rank estimate - rank(5,4,2)  ** 3rd mode CNs are unique in behavior (mode-3 is size 2, likely the culprit) **
+% rank(8,10,3) @ 1.0e-13 tolerance
+num_modes = length(raw_Us{2,1});
+[~,num_cols] = size(raw_Us{2,1}{1});
+figure;
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{2}(1:100,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(2));
+sgtitle(tmp_ttl);
+
+%% nell2 rank estimate - rank(5,4,3) ** really takes off at 5 on all **
+% rank(9,8,9) @ 1.0e-13 tolerance
+num_modes = length(raw_Us{3,1});
+[~,num_cols] = size(raw_Us{3,1}{1});
+figure;
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{3}(1:10,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(3));
+sgtitle(tmp_ttl);
+
+%% uber rank estimate - rank(6,8,12,6) @ 1.0e-13 tolerance
+num_modes = length(raw_Us{4,1});
+[~,num_cols] = size(raw_Us{4,1}{1});
+figure;
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{4}(1:24,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(4));
+sgtitle(tmp_ttl);
+
+%% chi rank estimate - rank(3,7,6,9)
+% rank(4,8,11,13) @ 1.0e-13 tolerance
+num_modes = length(raw_Us{5,1});
+[~,num_cols] = size(raw_Us{5,1}{1});
+figure;
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{5}(1:12,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(5));
+sgtitle(tmp_ttl);
+
+%% chi_2019 rank estimate - rank(5,6,7,9)
+% rank(5,8,13,8) @ 1.0e-13 tolerance
+num_modes = length(raw_Us{6,1});
+[~,num_cols] = size(raw_Us{6,1}{1});
+figure;
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{6}(1:12,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(6));
+sgtitle(tmp_ttl);
+
+%% nips rank estimate - rank(3,6,3)
+% rank(7,10,5) @ 1.0e-13 tolerance
+num_modes = length(raw_Us{7,1});
+[~,num_cols] = size(raw_Us{7,1}{1});
+figure;
+for mdx = 1:num_modes
+    subplot(1,num_modes,mdx);
+    plot(raw_CNs{7}(1:10,mdx));
+    if mdx == 1
+        ylabel("Condition Number");
+    end
+    xlabel("Columns");
+end
+tmp_ttl = sprintf(dataset_names(7));
+sgtitle(tmp_ttl);

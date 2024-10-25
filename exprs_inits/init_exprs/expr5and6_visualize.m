@@ -71,7 +71,7 @@ for idx = 1:num_tensors
     title(ttl);
     ylim([y_min y_max]);   % adjust yaxis limit according to dataset
     ylabel("Fit Score");
-    xlabel("Tensor Rank");
+    xlabel("Initialization");
     legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
     fontsize(gca, 15, "pixels");
     grid on;
@@ -83,7 +83,7 @@ for idx = 1:num_tensors
     title(ttl);
     % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
     ylabel("Iterations");
-    xlabel("Tensor Rank");
+    xlabel("Initialization");
     legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
     fontsize(gca, 15, "pixels");
     grid on;
@@ -95,10 +95,12 @@ for idx = 1:num_tensors
     title(ttl);
     % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
     ylabel("Time (min)");
-    xlabel("Tensor Rank");
+    xlabel("Initialization");
     legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
     fontsize(gca, 15, "pixels");
     grid on;
+    ttl = sprintf("CP Metrics (%s - rank %d)",dataset_names{idx},ranks(idx));
+    sgtitle(ttl);
 end
 
 
