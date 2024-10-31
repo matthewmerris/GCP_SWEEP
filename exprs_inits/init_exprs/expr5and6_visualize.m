@@ -103,7 +103,34 @@ for idx = 1:num_tensors
     sgtitle(ttl);
 end
 
-
+%% whisker plots for fit scores, iterations, and opttimes
+all_fit_scores = zeros(num_tensors,num_runs,num_inits);
+all_iters = zeros(num_tensors,num_runs,num_inits);
+all_opttimes = zeros(num_tensors,num_runs,num_inits);
+for kdx =1:num_tensors
+    for jdx =1:num_inits
+        for idx = 1:num_runs
+            all_fit_scores(kdx,idx,jdx) = 1 - sqrt(decomps_opt{kdx,idx,jdx,3}.f);
+            all_iters(kdx,idx,jdx) = decomps_opt{kdx,idx,jdx,3}.optout.iters;
+            all_opttimes(kdx,idx,jdx) = decomps_opt{kdx,idx,jdx,3}.opttime;
+        end
+    end
+end
+%%
+init_cons = {'Random', 'Arnoldi'};
+for kdx = 1:num_tensors
+    figure;
+    subplot(1,3,1);
+    boxplot(squeeze(all_fit_scores(kdx,:,:)), init_cons);
+%     xlabel('Initialization');
+    ylabel('Fit Score');
+    subplot(1,3,2);
+    boxplot(squeeze(all_iters(kdx,:,:)), init_cons);
+    ylabel('Iterations');
+    subplot(1,3,3);
+    boxplot(squeeze(all_opttimes(kdx,:,:)), init_cons);
+    ylabel('Optimization Time (secs)');
+end
 
 %% plot fit traces for convergence comparison
 for idx = 1:num_tensors
