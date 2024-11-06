@@ -1,6 +1,10 @@
-function [U,H,num_cols] = min_krylov_recursion(A, k)
+function [U,H,num_cols] = min_krylov_recursion(A, k, vec_gen)
 %MIN_KRYLOV_RECURSION Summary of this function goes here
 %   Detailed explanation goes here
+if nargin < 3
+    vec_gen = "rand";
+end
+
 n = ndims(A);
 sz = size(A);
 % initialize cell arrays for each mode's factor matrix and Hessian
@@ -16,14 +20,20 @@ for idx = 1:n
     % populate 1st column of the first (num_modes - 1) modes
     % with rand
     if idx ~= n
-        u = rand(sz(idx),1);
+        if strcmp(vec_gen, "rand")
+            u = rand(sz(idx),1);
+        elseif strcmp(vec_gen, "randn")
+            u = rand(sz(idx),1);
+        else
+            sprintf("Type: %s not supported, uniform random initialization empoloyed.", vec_gen)
+            u = rand(sz(idx),1);
+        end
         % normalize and store
         u = u / norm(u);
     else
         us = cell(1,n - 1);
         modes = zeros(1,n - 1);
         for jdx = 1:(n-1)
-        %     vecs.append(U{idx}(:,1));
             us{1,jdx} = U{jdx}(:,1);
             modes(1,jdx) = jdx;
         end
@@ -49,8 +59,6 @@ for kdx = 2:k           % kdx-th column
         end
         w = ttv(A, us, modes);
         for idx = 1:kdx % orthogonalization loop
-%             foo = U{jdx}(:,idx);
-%             bar = double(w);
             H{jdx}(idx,kdx) = U{jdx}(:,idx)' * double(w);
             w = double(w) - H{jdx}(idx,kdx) * U{jdx}(:,idx);
         end

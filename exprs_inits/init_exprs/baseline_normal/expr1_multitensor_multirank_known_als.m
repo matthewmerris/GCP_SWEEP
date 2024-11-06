@@ -5,10 +5,11 @@ num_tensors = length(ranks);
 num_runs = 10;
 inits = ["randn" "arnoldi" "min\_krylov" "nvecs" "gevd"];
 num_inits = length(inits);
-tol = 1.0e-6;
+tol = 1.0e-8;
 max_iters = 2000;
 noise = 0.0;
 sparsity = 0.0;
+vec_gen = "randn";
 
 %%
 data_tns = cell(num_tensors,1);
@@ -18,22 +19,22 @@ init_times = zeros(num_tensors, num_runs, num_inits);
 for jdx = 1:num_tensors
     nc = ranks(jdx);
     tns = create_problem('Size', sz, 'Factor_Generator', 'randn', ...
-        'Num_Factors', nc,'Sparse_Generation', sparsity, 'Noise', 0);
+        'Num_Factors', nc,'Sparse_Generation', sparsity, 'Noise', noise);
     data_tns{jdx,1} = tns;
     for idx = 1:num_runs
         sprintf("Tensor %d - run %d", jdx, idx)
         
         % ********************* form initializations and init_times
         t_rand = tic;
-        init_rand = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', 'rand');
+        init_rand = create_guess('Data',tns.Data, 'Num_Factors', nc, 'Factor_Generator', vec_gen);
         init_times(jdx, idx, 1) = toc(t_rand);
         
         t_arno = tic;
-        init_arnoldi = arnoldi_cp_init(tns.Data, nc);
+        init_arnoldi = arnoldi_cp_init(tns.Data, nc, vec_gen);
         init_times(jdx, idx, 2) = toc(t_arno);
     
         t_kryl = tic;
-        [init_krylov, ~, ~] = min_krylov_recursion(tns.Data, nc);
+        [init_krylov, ~, ~] = min_krylov_recursion(tns.Data, nc, vec_gen);
         init_times(jdx, idx, 3) = toc(t_kryl);
         if idx == 1
             t_nvecs = tic;
