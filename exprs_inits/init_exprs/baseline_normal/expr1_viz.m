@@ -70,4 +70,13 @@ bar(1:num_tensors, best_fits');
 legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
 ylim([0.9 1.01]);
 
-%%
+%% collect iteration counts
+best_iters = zeros(num_tensors, num_inits);
+for jdx = 1:num_tensors
+    for idx = 1:num_inits
+        best_iters(jdx,idx) = best_models{jdx,idx}{3}.iters;
+    end
+end
+figure;
+bar(1:num_tensors, best_iters');
+legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
