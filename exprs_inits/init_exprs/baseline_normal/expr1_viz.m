@@ -62,3 +62,12 @@ for jdx = 1:num_tensors
         boxplot(squeeze(all_fits(jdx,:,:)));
     end
 end
+
+%% bar plot best fits
+best_fits = squeeze(max(real(all_fits),[],2));
+figure;
+bar(1:num_tensors, best_fits');
+legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+ylim([0.9 1.01]);
+
+%%
