@@ -1,6 +1,6 @@
 %% Experiment 1: Multi-tensor, multi-rank (known) with cp_als
 sz = [100 100 100];
-ranks = [5,10,15,20,25];
+ranks = [5,10,15,20];
 num_tensors = length(ranks);
 num_runs = 10;
 inits = ["randn" "arnoldi" "min\_krylov" "nvecs" "gevd"];
@@ -10,7 +10,7 @@ max_iters = 2000;
 noise = 0.0;
 sparsity = 0.0;
 vec_gen = "randn";
-
+rng(69420);
 %%
 data_tns = cell(num_tensors,1);
 decomps = cell(num_tensors,num_runs,num_inits,3);
@@ -72,3 +72,8 @@ for jdx = 1:num_tensors
         end
     end
 end
+%% save results
+results_filename = sprintf('results/expr1_multirank_known_%s_%dtensor_%dinits_%druns_cp_opt_', vec_gen,num_tensors, num_inits, ...
+    num_runs)+ string(datetime("now"));
+save(results_filename, 'sz', 'ranks','num_runs', 'tol', 'max_iters', 'num_tensors', 'num_inits', ...
+    'decomps', 'init_times', 'inits', 'vec_gen');

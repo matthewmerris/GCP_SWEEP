@@ -103,6 +103,41 @@ for idx = 1:num_tensors
     sgtitle(ttl);
 end
 
+%% Fit Score and Opt Time
+x_lbls = ["rand" "Arnoldi"];
+x_cats = categorical(x_lbls);
+for idx = 1:num_tensors
+    figure;
+    subplot(1,2,1);
+    y_min = min(best_fit_scores(idx,:),[],"all") - max(std(best_fit_scores(idx,:)));
+    y_max = max(best_fit_scores(idx,:),[],"all") + max(std(best_fit_scores(idx,:)))/2;
+    bar(1,best_fit_scores(idx,:)');  % excluding gevd currently
+    ttl = sprintf("Final Fit Score");
+    title(ttl);
+    ylim([y_min y_max]);   % adjust yaxis limit according to dataset
+    ylabel("Fit Score");
+    xlabel("Initialization");
+    legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+    fontsize(gca, 20, "pixels");
+    set(gca, 'XTickLabel', []);
+    grid on;
+    
+    subplot(1,2,2);
+    bar(1,best_fit_score_opttimes(idx,:)./3600);
+    % xticklabels(ranks);
+    ttl = sprintf("Total Optimization Time");
+    title(ttl);
+    % ylim([y_min y_max]);   % adjust yaxis limit according to dataset
+    ylabel("Time (hours)");
+    xlabel("Initialization");
+    legend("rand", "arnoldi", "min_krylov", "nvecs", "gevd");
+    fontsize(gca, 20, "pixels");
+    set(gca, 'XTickLabel', []);
+    grid on;
+    ttl = sprintf("CP Metrics (%s - rank %d)",dataset_names{idx},ranks(idx));
+    sgtitle(ttl);
+end
+
 %% whisker plots for fit scores, iterations, and opttimes
 all_fit_scores = zeros(num_tensors,num_runs,num_inits);
 all_iters = zeros(num_tensors,num_runs,num_inits);

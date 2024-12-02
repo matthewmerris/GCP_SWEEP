@@ -57,9 +57,9 @@ end
 for jdx = 1:num_tensors
     figure;
     if jdx == num_tensors
-        boxplot(squeeze(all_fits(jdx,:,1:4)));
+        boxplot(squeeze(all_fits(jdx,1:3)));
     else
-        boxplot(squeeze(all_fits(jdx,:,:)));
+        boxplot(squeeze(all_fits(jdx,1:3)));
     end
 end
 
