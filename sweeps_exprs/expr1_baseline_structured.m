@@ -28,5 +28,10 @@ mdl_Ms = cell(tens_per_gen, num_losses);
 mdl_infos = cell(tens_per_gen, num_losses);
 
 for idx = 1:tens_per_gen
+    sprintf("Tensor %d",idx)
+    init = create_guess('Data', data_tensors{1,idx},'Num_Factors', rank);
     for jdx = 1:num_losses
-        [mdl_Ms{idx,jdx}, ~, mdl_infos{idx,jdx}] = gcp_opt(data_tensors{1,idx}, )
+        [mdl_Ms{idx,jdx}, ~, mdl_infos{idx,jdx}] = gcp_opt(data_tensors{1,idx}, rank, 'type', losses{1,jdx},...
+            'printitn',0, 'init', init);
+    end
+end
