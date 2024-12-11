@@ -44,3 +44,8 @@ for idx = 1:tens_per_gen
     end
 end
     
+%% Save results
+initialization = "rand";
+results_filename = sprintf('results/expr1_1_binary_%dtensors_%s_init',tens_per_gen,initialization);
+save(results_filename, 'sz', 'rank','tens_per_gen','data_tensors','data_Ms', 'losses','Ms_binary','infos_binary',...
+    'scores','fits_Ms','fits_full','cossims','cors','times');

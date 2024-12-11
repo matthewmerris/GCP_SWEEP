@@ -11,7 +11,7 @@ for idx = 1:num_gens
     for jdx = 1:tens_per_gen
         [info, ~] = create_problem('Size',sz,'Num_Factors',rank,'Factor_Generator', gens{idx});
         data_tensors{idx,jdx} =  info.Data;
-        data_Ms{idx,jdx} = info.Sol;
+        data_Ms{idx,jdx} = info.Soln;
     end
 end
 
@@ -27,7 +27,7 @@ for idx = 1:num_gens
         sprintf("Gen: %s, Tensor %d",gens{idx},jdx)
         init = arnoldi_cp_init(data_tensors{idx,jdx},rank);
         for kdx = 1:num_losses
-            [Ms_normal{idx,jdx,kdx},~,infos_normal{idx,jdx,kdx}] = gcp_opt(data_tensors{idx,jdx}, rank, ...
+            [Ms_nonneg{idx,jdx,kdx},~,infos_nonneg{idx,jdx,kdx}] = gcp_opt(data_tensors{idx,jdx}, rank, ...
                 'type', losses{1,kdx}, 'printitn',0, 'init',init);
         end
     end

@@ -1,3 +1,4 @@
+%% Experiment 1 structured - normal
 sz = [100 100 100];
 rank = 10;
 tens_per_gen = 100;
@@ -5,7 +6,9 @@ data_tensors = cell(tens_per_gen,1);
 data_Ms = cell(tens_per_gen, 1);
 
 for jdx = 1:tens_per_gen
-    [data_tensors{jdx,1},data_Ms{jdx,1}, ~] = create_problem('Size',sz,'Num_Factors', rank, 'Factor_Generator', 'randn');
+    [info, ~] = create_problem('Size',sz,'Num_Factors', rank, 'Factor_Generator', 'randn');
+    data_tensors{jdx} = info.Data;
+    data_Ms{jdx} = info.Soln;
 end
 
 %% decompositions
