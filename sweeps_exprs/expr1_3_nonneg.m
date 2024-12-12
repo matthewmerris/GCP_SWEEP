@@ -2,10 +2,10 @@ sz = [100 100 100];
 rank = 10;
 gens = ["rand","orthogonal", "stochastic"];
 num_gens = length(gens);
-tens_per_gen = 100;
+tens_per_gen = 10;
 data_tensors = cell(num_gens,tens_per_gen);
 data_Ms = cell(num_gens,tens_per_gen);
-
+rng(1339);
 
 for idx = 1:num_gens
     for jdx = 1:tens_per_gen
