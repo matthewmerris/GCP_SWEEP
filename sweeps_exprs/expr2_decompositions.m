@@ -22,7 +22,7 @@ t_start = tic;
 for idx = 1:num_gens
     for jdx = 1:num_tensors
         sprintf("Gen: %s, Tensor %d",gens{idx},jdx)
-        tns = tensors{jdx,idx}.Data;
+        tns = tensors{jdx,idx}; % was tensors{jdx,idx}.Data
         init = inits{jdx,idx};
         rnk = ranks(jdx,idx);
         parfor kdx = 1:num_losses
@@ -35,9 +35,9 @@ end
 for idx = 1:num_gens
     for jdx = 1:num_tensors
         for kdx = 1:num_losses
-            fits(idx,jdx,kdx) = fitScore(tensors{jdx,idx}.Data, Ms{idx,jdx,kdx});
-            cossims(idx,jdx,kdx) = cosSim(tensors{jdx,idx}.Data, Ms{idx,jdx,kdx},3);
-            corcondias(idx,jdx,kdx) = efficient_corcondia(tensors{jdx,idx}.Data, Ms{idx,jdx,kdx});
+            fits(idx,jdx,kdx) = fitScore(tensors{jdx,idx}, Ms{idx,jdx,kdx});
+            cossims(idx,jdx,kdx) = cosSim(tensors{jdx,idx}, Ms{idx,jdx,kdx},3);
+            corcondias(idx,jdx,kdx) = efficient_corcondia(tensors{jdx,idx}, Ms{idx,jdx,kdx});
             times(idx,jdx,kdx) = infos{idx,jdx,kdx}.mainTime;
         end
     end
@@ -47,6 +47,5 @@ poolobj = gcp('nocreate');
 delete(poolobj);
 
 %%
-results_filename = sprintf("results/expr2_unstructured_normo_nvecs");
-save(resulas_filename,'Ms', 'infos', 'fits','cossims','corcondias','times');
-a
+results_filename = sprintf("results/expr2_022725_unstructured_normo_nvecs");
+save(results_filename,'Ms', 'infos', 'fits','cossims','corcondias','times');

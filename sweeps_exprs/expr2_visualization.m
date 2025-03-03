@@ -136,4 +136,34 @@ for idx = 1:num_gens
 end
 mat2latextable(mean_fits, '%0.4f');
 
+%% contruct mean metric and std tables
+mean_metrics = zeros(num_gens * num_losses, num_metrics);
+std_metrics = zeros(num_gens * num_losses, num_metrics);
+for idx = 1:num_gens
+    lo = (idx -1) * num_losses + 1;
+    hi = idx * num_losses;
+    for jdx = 1:num_metrics
+        if jdx == 1
+            mean_metrics(lo:hi,jdx) = squeeze(mean(fits(idx,:,:)))';
+            std_metrics(lo:hi,jdx) = squeeze(std(fits(idx,:,:)))';
+        elseif jdx == 2
+            mean_metrics(lo:hi,jdx) = squeeze(mean(cossims(idx,:,:)))';
+            std_metrics(lo:hi,jdx) = squeeze(std(cossims(idx,:,:)))';
+        elseif jdx == 3
+            mean_metrics(lo:hi,jdx) = squeeze(mean(corcondias(idx,:,:)))';
+            std_metrics(lo:hi,jdx) = squeeze(std(corcondias(idx,:,:)))';
+        elseif jdx == 4
+            mean_metrics(lo:hi,jdx) = squeeze(mean(times(idx,:,:)))';
+            std_metrics(lo:hi,jdx) = squeeze(std(times(idx,:,:)))';
+        end
+    end
+end
+
+%% generate mean metrics table
+mat2latextable(mean_metrics, '%0.4g');
+
+%% generate std metrics table
+mat2latextable(std_metrics, '%0.4g');
+
+
 

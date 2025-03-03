@@ -1,6 +1,6 @@
 sz = [100, 100, 100];
 num_modes = length(sz);
-num_tensors = 50;
+num_tensors = 100;
 gens = {'rand' 'randn' 'rayleigh' 'beta' 'gamma'};
 num_gens = length(gens);
 F = floor(max(sz)/2);
@@ -12,11 +12,16 @@ inits = cell(num_tensors, num_gens);    % initialization via NVECs, no retries n
 %% start parallel pool
 parpool(16);
 
-%% - Generate tensors
+%% - Generate tensors & adjust all values by (-min + 10*eps)
+rng(1339);
 t_start = tic;
 for j=1:num_gens
     for i=1:num_tensors
-        tensors{i,j} = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{j});
+        tmp_tns = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{j});
+        tmp_tns = tmp_tns.Data;
+        min_val = min(tmp_tns.data,[],"all");
+        tmp_tns = plus(tmp_tns, (-min_val + 10*eps));
+        tensors{i,j} = tmp_tns;
     end
 end
 %%
@@ -25,10 +30,11 @@ globalStream = RandStream.getGlobalStream;
 % - Estimate ranks
 for j=1:num_gens
     parfor i=1:num_tensors
-        X = tensors{i,j}.Data;
+        X = tensors{i,j}; % was 
         [nc, ~] = b_NORMO(double(X), F, 0.8,'shuffle');
         ranks(i,j) = nc;
     end
+    fprintf("Gen: %s tensor ranks estimated.\n", gens{j})
 end
 % *** NEED TO RESTORE GLOBAL RANDOM STREAM STATE ***
 RandStream.setGlobalStream(globalStream);
@@ -36,8 +42,8 @@ RandStream.setGlobalStream(globalStream);
 % - Generate initializations
 for j=1:num_gens
     for i=1:num_tensors
-        ten = tensors{i,j};
-        X = ten.Data;
+        X = tensors{i,j}; % X was ten
+        % X = ten.Data;
         nc = ranks(i,j);
 %         fprintf("Gen: %d \t Tensor: %d\n",j,i);
         % generate requisite initializations
@@ -54,6 +60,6 @@ delete(gcp('nocreate'));
 fprintf("Data Generation Complete\n");
 
 %% save data
-results_filename = sprintf("datasets_unstructured/expr2_021025_normo_nvecs");
+results_filename = sprintf("datasets_unstructured/expr2_022725_normo_nvecs_adjusted");
 save(results_filename, 'sz', 'gens', 'num_tensors', 'num_gens', 'num_modes',...
     'tensors', 'ranks', 'inits');
