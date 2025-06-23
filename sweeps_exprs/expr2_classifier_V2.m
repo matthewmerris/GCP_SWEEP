@@ -45,18 +45,53 @@ tbl = splitvars(tbl);
 %% view class names & split out
 classNames = categories(tbl{:,labelName});
 numObservations = size(tbl,1);
-numObservationsTrain = floor(0.7*numObservations);
-numObservationsValidation = floor(0.15*numObservations);
-numObservationsTest = numObservations - numObservationsTrain - numObservationsValidation;
+%% naive split - cross contaminates train, validation, and test sets
+% numObservationsTrain = floor(0.7*numObservations);
+% numObservationsValidation = floor(0.15*numObservations);
+% numObservationsTest = numObservations - numObservationsTrain - numObservationsValidation;
+% 
+% idx = randperm(numObservations);
+% idxTrain = idx(1:numObservationsTrain);
+% idxValidation = idx(numObservationsTrain+1:numObservationsTrain + numObservationsValidation);
+% idxTest = idx(numObservationsTrain + numObservationsValidation + 1:end);
+% 
+% tblTrain = tbl(idxTrain, :);
+% tblValidation = tbl(idxValidation, :);
+% tblTest = tbl(idxTest, :);
+%% Split by 5 row clumps
+numClumps = numObservations / num_losses;
+numClumpsTrain = floor(0.7*numClumps);
+numClumpsValidation = floor(0.15*numClumps);
+numClumpsTest = numClumps - numClumpsTrain - numClumpsValidation;
 
-idx = randperm(numObservations);
-idxTrain = idx(1:numObservationsTrain);
-idxValidation = idx(numObservationsTrain+1:numObservationsTrain + numObservationsValidation);
-idxTest = idx(numObservationsTrain + numObservationsValidation + 1:end);
+clump_idx = randperm(numClumps);
+clump_idxTrain = clump_idx(1:numClumpsTrain);
+clump_idxValidation = clump_idx(numClumpsTrain+1:numClumpsTrain + numClumpsValidation);
+clump_idxTest = clump_idx(numClumpsTrain + numClumpsValidation + 1:end);
 
-tblTrain = tbl(idxTrain, :);
-tblValidation = tbl(idxValidation, :);
-tblTest = tbl(idxTest, :);
+train_idx = [];
+for k = 1:numel(clump_idxTrain)
+    start_idx = (clump_idxTrain(k) - 1) * num_losses + 1;
+    end_idx = (clump_idxTrain(k) - 1) * num_losses + num_losses;
+    train_idx = [train_idx start_idx:end_idx];
+end
+tblTrain = tbl(train_idx,:);
+
+validation_idx = [];
+for k = 1:numel(clump_idxValidation)
+    start_idx = (clump_idxValidation(k) - 1) * num_losses + 1;
+    end_idx = (clump_idxValidation(k) - 1) * num_losses + num_losses;
+    validation_idx = [validation_idx start_idx:end_idx];
+end
+tblValidation = tbl(validation_idx,:);
+
+test_idx = [];
+for k = 1:numel(clump_idxTest)
+    start_idx = (clump_idxTest(k) - 1)*num_losses + 1;
+    end_idx = (clump_idxTest(k) - 1)*num_losses + num_losses;
+    test_idx = [test_idx start_idx:end_idx];
+end
+tblTest = tbl(test_idx,:);
 
 %% Define network architecture
 numFeatures = size(tbl,2)-1;
@@ -71,7 +106,7 @@ layers = [
     softmaxLayer];
 
 %% Specify Training options
-miniBatchSize = 25;
+miniBatchSize = 50;
 
 options = trainingOptions("adam", ...
     MiniBatchSize=miniBatchSize, ...

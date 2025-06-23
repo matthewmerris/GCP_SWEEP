@@ -3,23 +3,37 @@ losses = ["normal", "huber (0.25)","rayleigh", "gamma","beta (0.3)"];
 num_losses = length(losses);
 
 %% prep the data
-raw_data = cell(num_gens * num_tensors * num_losses, 6);  % hard coding feature vector length
+raw_data = cell(num_gens * num_tensors * num_losses, 12);  % hard coding feature vector length
 for idx = 1:num_gens
     for jdx = 1:num_tensors
+        tmp_tns = tensors{jdx,idx};
+        tns_data = tmp_tns.data(:);
+        m1 = mean(tns_data);
+        m2 = var(tns_data);
+        m3 = skewness(tns_data);
+        m4 = kurtosis(tns_data);
         for kdx = 1:num_losses
             row_idx = kdx + (idx -1)*(num_tensors*num_losses) + (jdx -1)*num_losses;
-            raw_data{row_idx, 1} = fits(idx, jdx, kdx);
-            raw_data{row_idx, 2} = cossims(idx, jdx, kdx);
-            raw_data{row_idx, 3} = corcondias(idx, jdx, kdx);
-            raw_data{row_idx, 4} = times(idx, jdx, kdx);
-            raw_data{row_idx, 5} = losses{kdx};
-            raw_data{row_idx, 6} = gens{idx};
+            raw_data{row_idx, 1} = m1;
+            raw_data{row_idx, 2} = m2;
+            raw_data{row_idx, 3} = m3;
+            raw_data{row_idx, 4} = m4;
+            raw_data{row_idx, 5} = fits(idx, jdx, kdx);
+            raw_data{row_idx, 6} = cossims(idx, jdx, kdx);
+            raw_data{row_idx, 7} = corcondias(idx, jdx, kdx);
+            raw_data{row_idx, 8} = times(idx, jdx, kdx);
+            raw_data{row_idx, 9} = ranks(jdx,idx);
+            raw_data{row_idx, 10} = "unknown";
+            raw_data{row_idx, 11} = losses{kdx};
+            raw_data{row_idx, 12} = gens{idx};
         end
     end
 end
 
 %% construct a table
-col_names = {'Fit Score', 'COSSIM', 'CORCONDIA', 'Time', 'Loss', 'Generator'};
+col_names = {'Mean', 'Variance', 'Skewness', 'Kurtosis', ...
+    'Fit Score', 'COSSIM', 'CORCONDIA', 'Time', ...
+    'Rank', 'Rank Status', 'Loss', 'Generator'};
 tbl = cell2table(raw_data, 'VariableNames',col_names);
 
 %% convert labels for prediction to categorical (Generator)
@@ -27,7 +41,7 @@ labelName = 'Generator';
 tbl = convertvars(tbl, labelName, "categorical");
 
 %% convert categorical features (Loss)
-categoricalInputs = ["Loss"];
+categoricalInputs = ["Loss", "Rank Status"];
 tbl = convertvars(tbl, categoricalInputs,"categorical");
 
 %% convert categorical variables to one-hot and split variables
@@ -43,21 +57,8 @@ tbl = splitvars(tbl);
 %% view class names & split out
 classNames = categories(tbl{:,labelName});
 numObservations = size(tbl,1);
-%% old naive split approach, cross contaminates train, validation and test sets
-% numObservationsTrain = floor(0.7*numObservations);
-% numObservationsValidation = floor(0.15*numObservations);
-% numObservationsTest = numObservations - numObservationsTrain - numObservationsValidation;
-% 
-% idx = randperm(numObservations);
-% idxTrain = idx(1:numObservationsTrain);
-% idxValidation = idx(numObservationsTrain+1:numObservationsTrain + numObservationsValidation);
-% idxTest = idx(numObservationsTrain + numObservationsValidation + 1:end);
-% 
-% tblTrain = tbl(idxTrain, :);
-% tblValidation = tbl(idxValidation, :);
-% tblTest = tbl(idxTest, :);
 
-%% clumping approach
+%% Split by 5 row clumps
 numClumps = numObservations / num_losses;
 numClumpsTrain = floor(0.7*numClumps);
 numClumpsValidation = floor(0.15*numClumps);
@@ -105,7 +106,7 @@ layers = [
     softmaxLayer];
 
 %% Specify Training options
-miniBatchSize = 25;
+miniBatchSize = 50;
 
 options = trainingOptions("adam", ...
     MiniBatchSize=miniBatchSize, ...

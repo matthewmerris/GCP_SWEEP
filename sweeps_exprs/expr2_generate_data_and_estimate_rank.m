@@ -17,10 +17,12 @@ rng(1339);
 t_start = tic;
 for j=1:num_gens
     for i=1:num_tensors
-        tmp_tns = NN_tensor_generator_whole('Size', sz, 'Gen_type', gens{j});
+        tmp_tns = NN_tensor_generator_wild('Size', sz, 'Gen_type', gens{j});
         tmp_tns = tmp_tns.Data;
         min_val = min(tmp_tns.data,[],"all");
-        tmp_tns = plus(tmp_tns, (-min_val + 10*eps));
+        if min_val <= 0
+            tmp_tns = plus(tmp_tns, (-min_val + 10*eps));
+        end
         tensors{i,j} = tmp_tns;
     end
 end
@@ -60,6 +62,6 @@ delete(gcp('nocreate'));
 fprintf("Data Generation Complete\n");
 
 %% save data
-results_filename = sprintf("datasets_unstructured/expr2_022725_normo_nvecs_adjusted");
+results_filename = sprintf("datasets_unstructured/expr2_042025_normo_nvecs_adjusted");
 save(results_filename, 'sz', 'gens', 'num_tensors', 'num_gens', 'num_modes',...
     'tensors', 'ranks', 'inits');
