@@ -1,3 +1,14 @@
+%% Run section on Borah only
+addpath(genpath("/bsuhome/mmerris/wares/matlab_tools"));
+addpath(genpath("/bsuhome/mmerris/GCP_SWEEP"));
+
+% check for results directory, make it if not there
+datafolder = "/bsuhome/mmerris/scratch/GCPSWEEPS_nn_results";
+if ~isfolder(datafolder)
+    mkdir(datafolder)
+end
+
+%% Experimental parameters
 sz = [100, 100, 100];
 num_modes = length(sz);
 num_tensors = 100;
